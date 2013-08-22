@@ -4,7 +4,7 @@
 %
 % favorov@sensi.org
 
-% $Id: GenometriCorrelation.Rd 1936 2013-08-22 01:37:46Z favorov $
+% $Id: GenometriCorrelation.Rd 1939 2013-08-22 02:41:08Z favorov $
 \name{GenometriCorrelation}
 \alias{GenometriCorrelation}
 \alias{GenometricCorrelation}
@@ -122,7 +122,7 @@ The same thing as the \code{representing.point.function}, but the representation
 %%  \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
-The result is a list (created originally with a \code{list()} rather than with \code{c()}. Each element of the list is also a list that describes results for a space (chromosome); one of them is 'awhole' (or other \code{awhole.space.name} if given) that describes the genome awhole, all others are named the same as the chromosomes and describe the chromosomwise statistics. The elements of the 'awhole' and chromosomewide lists are statistical measures and some datasets. The statistical measures are desribed in the \code{\link{GenometriCorr}} package help. For more explanations, see the MarkupsIndependence vignette. 
+The result is an istance of the \code{\link{GenometriCorrResult-class}} that describes the run parameters in its \code{\link{GenometriCorrResult-class}} \code{@config} slot and that extends a \code{\link{namedList}} list (created originally with a \code{list()} with the resilts of the run. Each element of the list is also a list that describes results for a space (chromosome); one of them is 'awhole' (or other \code{awhole.space.name} if given) that describes the genome awhole, all others are named the same as the chromosomes and describe the chromosomwise statistics. The elements of the 'awhole' and chromosomewide lists are statistical measures and some datasets. The statistical measures are desribed in the \code{\link{GenometriCorr}} package help. For more explanations, see the MarkupsIndependence vignette. 
 
 Below is the description of the values of the list returned for each chromosome. 
 \item{query.population}{Query points used in the comparisons.}

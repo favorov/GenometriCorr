@@ -3,7 +3,7 @@
 %              Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan
 %
 % favorov@sensi.org
-%$Id: GenometriCorr.Rd 1938 2013-08-22 02:23:38Z favorov $
+%$Id: GenometriCorr.Rd 1939 2013-08-22 02:41:08Z favorov $
 \name{GenometriCorr}
 \alias{GenometriCorr}
 \alias{GenometriCorr-package}
@@ -16,7 +16,7 @@ GenometriCorr (Genometric Correlation) package
 
 Most standard genomic feature annotation file formats are accepted as input. Each feature type is given in a separate file, one used as a query and the other used as a reference. The statistical comparisons that are made are not symmetric; that is, they are sensitive to which file is the query and which is the reference, so we recommend running the comparisons twice, switching the status of the input files for the second run. This is intentional, as biological relationships can be asymmetric. Once the files are read, the annotations are stored as \code{\link{GRanges}}, \code{\link{RangedData}} or \code{\link{IRanges-class}} objects (\code{IRanges}, \code{GenomicRanges} packages).
 
-There are two classes that are provided by the package. One of them, \code{\link{GenometriCorrConfig-class}} provide serialization into configuration file that describe a full run of the package that is intended to explore spatial correlations between two markups. The class also provide run.config method that open the input data files, read them, make all the calculations by applying the central \code{\link{GenomertiCorrelation}} function to mapped or unmapped data (see below). The \code{\link{GenomerticCorrelation}} function returns an instance of \code{\link{GenometriCorrResult-class}} that is based on a list with the results of the run and also contains the \code{\link{GenometriCorrConfig-class}} instance that describes the run as a slot. The \code{\link{GenometriCorrResult-class}} provides \code{\link{show}} method and two graphical representations: \code{\link{graphical.report}} and \code{\link{visualize}}. 
+There are two classes that are provided by the package. One of them, \code{\link{GenometriCorrConfig-class}} provide serialization into configuration file that describe a full run of the package that is intended to explore spatial correlations between two markups. The class also provide run.config method that open the input data files, read them, make all the calculations by applying the central \code{\link{GenometriCorrelation}} function to mapped or unmapped data (see below). The \code{\link{GenometriCorrelation}} function returns an instance of \code{\link{GenometriCorrResult-class}} that is based on a list with the results of the run and also contains the \code{\link{GenometriCorrConfig-class}} instance that describes the run as a slot. The \code{\link{GenometriCorrResult-class}} provides \code{\link{show}} method and two graphical representations: \code{\link{graphical.report}} and \code{\link{visualize}}. 
 
 Below we describe the statistical comparisons implemented in this package. One set of features is termed the \dQuote{query} and the other, the \dQuote{reference}, throughout. 
 
