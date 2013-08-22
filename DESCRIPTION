@@ -2,7 +2,7 @@ Package: GenometriCorr
 Type: Package
 Title: Genometric Correlation package
 Version: 1.1.9
-Date: 2013-07-30
+Date: 2013-08-22
 Author@R: c( person("Alexander", "Favorov",email =
         "favorov@sensi.org"), 
 				person("Loris", "Mularoni"),
@@ -23,4 +23,4 @@ Suggests: rtracklayer, tcltk
 biocViews: Annotation, Genetics, Infrastructure, DataRepresentation,
         Bioinformatics
 URL: http://genometricorr.sourceforge.net/
-Packaged: 2012-03-19 19:46:38 UTC; favorov
+Packaged: 2013-08-22 07:07:07 MSD; favorov
