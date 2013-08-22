@@ -1,0 +1,26 @@
+Package: GenometriCorr
+Type: Package
+Title: Genometric Correlation package
+Version: 1.1.9
+Date: 2013-07-30
+Author@R: c( person("Alexander", "Favorov",email =
+        "favorov@sensi.org"), 
+				person("Loris", "Mularoni"),
+        person("Leslie","M.","Cope"), 
+				person("Yulia","Medvedeva"),
+        person("Andrey","A.","Mironov"),
+        person("Vsevolod","J.","Makeev"), 
+				person("Sarah","J.","Wheelan")
+        )
+Author: Alexander Favorov, Loris Mularoni, Leslie M. Cope, Yulia Medvedeva, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan
+Maintainer: Alexander Favorov <favorov@sensi.org>
+Description: The package computes correlations between two genome annotations (known features, experimental data etc) that are represented as intervals on chromosomes. The package provides several different tests, each chosen for its particular sensitivity to a type of spatial correlation. The overarching question is whether the two interval sets are spatially related in any way. Tests can also be restricted to genomic intervals (chromosomes, chromosome arms, genes only, etc) when appropriate. Various visualization methods are provided. We emphasize that the package is intended to be a hypothesis generator; users should plan to follow up on any correlations suggested by the software.
+License: Artistic-2.0
+LazyLoad: yes
+Depends: R (>= 2.11.0), IRanges, GenomicRanges, methods
+Imports: grDevices, gplots
+Suggests: rtracklayer, tcltk
+biocViews: Annotation, Genetics, Infrastructure, DataRepresentation,
+        Bioinformatics
+URL: http://genometricorr.sourceforge.net/
+Packaged: 2012-03-19 19:46:38 UTC; favorov

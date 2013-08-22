@@ -1,0 +1,6 @@
+export('GenometriCorrelation','VisualiseTwoIRanges','MapRangesToGenomicIntervals')
+import('IRanges','GenomicRanges','methods')
+importFrom('grDevices','as.raster','rainbow')
+importFrom('gplots','colorpanel')
+exportClasses('GenometriCorrConfig','GenometriCorrResult')
+exportMethods('show','graphical.report','run.config','visualize')

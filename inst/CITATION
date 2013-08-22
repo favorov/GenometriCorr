@@ -1,0 +1,25 @@
+citHeader("To cite the GenometriCorr package in publications use:")
+
+citEntry(
+	entry="Article",title = "Exploring Massive, Genome Scale Datasets with the GenometriCorr Package", 
+	author = personList(
+		as.person("Alexander Favorov"),
+		as.person("Loris Mularoni"),	
+		as.person("Leslie M. Cope"),	
+		as.person("Yulia Medvedeva"),	
+		as.person("Andrey A. Mironov"),	
+		as.person("Vsevolod J. Makeev"),	
+		as.person("Sarah J. Wheelan")),
+		journal = "PLOS Computational Biology",
+		number = "5",
+		volume = "8",
+		year = "2012",
+		month = "may",
+		pages = "e1002529",
+		url= "http://dx.doi.org/10.1371/journal.pcbi.1002529/",
+		textVersion = paste(
+			"Alexander Favorov, Loris Mularoni, Leslie M. Cope, Yulia Medvedeva, Andrey A. Mironov, Vsevolod J. Makeev & Sarah J. Wheelan (2012)", 
+			"Exploring Massive, Genome Scale Datasets with the GenometriCorr Package",
+			"PLOS Computational Biology","5(8)","http://dx.doi.org/10.1371/journal.pcbi.1002529")
+)
+

@@ -1,0 +1,1 @@
+Just an R package structure.

@@ -1,0 +1,93 @@
+GenomertiCorr package version history.
+
+1.00
+Initial release.
+1.01
+Documentation improved.
+1.02
+Now, in the beginning if the core GenometricCorrelation function all the space names in parameters are converted to strings. It fixes strange behavior if the chromosomes.to.proceed is an integer vector.
+1.03
+Documentation Makefile changed to account for R_HOME. With R 2.13.0, R CMD check runs without warnings.
+1.0.4
+Version numbers mow compatible with R x.x.x standard. Some changes to documentation. This version is submitted to Bioconductor.
+1.0.5
+Documentation now can be compiled correctly both in 2.13.0 and in 2.14.0dev: \SweaveOpts{keep.source=FALSE} is added.
+1.0.6
+Option awhole.only added to GenometricCorrelation. 
+Member absolute.inter.reference.distance.data added to the list it returns.
+Rd file for GenometricCorrelation refurbished.
+1.0.7
+All the UCSC URLs to the example data are removed from package.
+Documentation spell-checked and improved a bit.
+1.0.8
+Parameters that allow the user to define his own procedure of the representing point calculation for an interval are added.
+1.0.9
+Typos in documentation are fixed. 
+readTableToIRanges is not exported any more.
+It is available as GenometriCorr:::readTableToIRanges
+1.0.10
+Three options are added to GenometricCorrelation: 
+add.chr.as.prefix to treat say '34' and 'chr34' as synonyms; supress.evaluated.length.warning to supress the warning; 
+cut.all.over.length to remove overlegnth data rather that to generate error. 
+Some bugs fixed.
+1.0.11
+MapRangesToGenomicIntervals added to the package
+GenometricCorrelation now works with GRanges as well as with RangedData
+Bugs fixed
+showTkProgressBar option added to GenometricCorrelation
+Documentation improved
+1.0.12
+Old parameter names (rangesA and rangesB) in GenometricCorrelation are changed to query and reference.
+Configuration class GenometriCorrConfig 
+1.0.13
+GenometriCorrResult class apeared
+GenometriCorrConfig now can do run.config with partial-written configs
+1.0.14
+Prepare major release
+plotgcr(GenometriCorrResult) changed to plot
+run.config works with mapping
+run.config accepts now: filename, object (GRanges, etc) or object name as parameter
+visualise added; it gives other GenometriCorrResult visual representation
+Documentation improved
+1.0.15
+config lines are parsed to their type
+bed.like.with.header format added
+a lot of bugfixes
+visualize improved
+1.0.16
+visualise and plot use the same paper size
+documenation improved
+1.1.0
+Documentation now is more reaasonable.
+The diagnostics is now less depressive: 
+  all the 'So what?' is now 'It's all lost!'
+1.1.1
+Sweave (class part) improvement
+1.1.2
+Galaxy example fixed. Thanks to Xuebing Wu <wuxbl@mit.edu>
+1.1.3
+strsplit() usage in GenometriCorrResult fixed.
+1.1.4
+mapping of plot() refined
+1.1.5
+visualize() fixed
+1.1.6
+USCS typo removes from all files
+GenometricCorrelation is now GenometriCorrelation (GenometricCorrelation deprecated)
+/inst/tests moved to /inst/extdata
+Documentation enriched
+plot(GenometriCorrResult) is renamed to graphical.report(GenometriCorrResult)
+1.1.7
+CITATION now shows PLOS Comp Bio, 2012, 5(8)
+1.1.8
+import from rtracklayer now requires asRangedData=TRUE
+thanks to Mike Parfenov from Harvard and to Svetlana Vinigradova from MSU
+1.1.9
+visualize now use red-white-blue color scheme, the old one can be called by style=rainbow
+graphical.report format improved
+graphical.report default file name creation improved
+GenometricCorrelation help error (awhole.only options were swapped) fixed.
+graphical.report error tried to refere to obsoleted reference.middles in GenometriCorrResult - fixed
+thanks to Mike Parfenov from Harvard and to Youri Kravatsky from IMB RAS
+relative.ecdf.deviation.area returned to list of obligatory values
+help for package now reflects classes
