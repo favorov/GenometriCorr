@@ -2,7 +2,7 @@ Package: GenometriCorr
 Type: Package
 Title: Genometric Correlation package
 Version: 1.1.9
-Date: 2013-08-22
+Date: 2013-08-26
 Author@R: c( person("Alexander", "Favorov",email =
         "favorov@sensi.org"), 
 				person("Loris", "Mularoni"),

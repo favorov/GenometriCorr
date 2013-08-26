@@ -344,6 +344,13 @@ Here, we passed {\tt query} and {\tt reference} to the {\tt run.config} call as 
 
 The {\tt run.config} returns a {\tt GenometriCorrResult} object that was obtained from {\tt GenometriCorrResult}. The {\tt @config} slot of the returned object is a {\tt GenometriCorrConfig} describing the run. 
 
+A config example with the permutation numbers already set to 10 is {\tt quick-config.ini}:
+
+<<simple_config_file>>=
+quickconfig<-new("GenometriCorrConfig",system.file("extdata", "quick-config.ini", package = "GenometriCorr"))
+print(quickconfig)
+@
+
 \section{More utilities}
 \subsection{Mapping}
 If we test the correlation of a reference and query that are consistently found in the same chromosomal regions (e.g. in genes), we will always achieve what looks like extremely high correlation on a genomic scale and we are unable to ask questions about finer-scale associations. To use the Genometric Correlation statistical tests on data such as these, we can convert the regions (that the query and reference occupy) to pseudochromosomes, and then run the {\tt GenometriCorrelation} test. The mapping is available in the package as {\tt MapRangesToGenomicIntervals.}
@@ -391,6 +398,12 @@ print(mapped_result)
 
 @
 
+Mapping config example is {\tt mapping-config.ini}:
+
+<<simple_config_file>>=
+mapconfig<-new("GenometriCorrConfig",system.file("extdata", "mapping-config.ini", package = "GenometriCorr"))
+print(mapconfig)
+@
 \end{document}
 
 
