@@ -92,3 +92,5 @@ thanks to Mike Parfenov from Harvard and to Youri Kravatsky from IMB RAS
 relative.ecdf.deviation.area returned to list of obligatory values
 help for package now reflects classes
 the same in Wizard and in Galaxy integration fixed: we called plot() instead of graphical.report()
+graphical.report test whether keep.distributions is defined rather than to start an error
+Wizard is consistent with current dir structure

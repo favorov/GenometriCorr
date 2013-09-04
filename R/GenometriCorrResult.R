@@ -4,7 +4,7 @@
 #              Loris Mularoni, Vsevolod Makeev, Sarah Wheelan.
 #
 # result - result of GenometriCorrelation function - works with ini file format  
-# $Id: GenometriCorrResult.R 1937 2013-08-22 02:04:42Z favorov $
+# $Id: GenometriCorrResult.R 1946 2013-08-31 13:41:54Z favorov $
 
 #if (!require('methods')) stop('GenometriCorrResult requires methods package!\n')
 #if (!require('graphics')) stop('GenometriCorrResult requires graphics package!\n')
@@ -70,7 +70,7 @@ setMethod('graphical.report',
 		chromosomes<-setdiff(names(x),awhole.space.name.list)
 
 		show.awhole<-(length(awhole.space.name.list)>0)
-
+		#we believe that both reference and exist, so we do not check it. 
 		if (pdffile=='') 
 		{
 			if (!is.null(x@config$data$query) && length(grep("[a-zA-Z0-9]",x@config$data$query))>0)
@@ -98,14 +98,16 @@ setMethod('graphical.report',
 				pdffile<-paste(pdffile,'.pdf',sep='')
 		}
 		
-		width<-if(x@config$options$keep.distributions) 12 else 4
+
+
+		width<-if(! is.null(x@config$options$keep.distributions) && x@config$options$keep.distributions) 12 else 4
 		if (make.new == TRUE)
 		{
 			pdf(file=pdffile, width=width, height=4, paper="special")
 		}
 		for (name in to.show)
 		{
-			if (x@config$options$keep.distributions)
+			if (! is.null(x@config$options$keep.distributions) && x@config$options$keep.distributions)
 				layout(matrix(c(1,2,3), 1, 3, byrow = TRUE), heights=c(1,1,1))
 			plot.new()
 			data <- x[[name]]#[[1]]
@@ -134,7 +136,7 @@ setMethod('graphical.report',
 			if('projection.test.lower.tail'%in% names(data))
 				mtext(paste("Projection test lower tail :", data$projection.test.lower.tail, sep=" "), line=-14, cex=0.7)
 
-			if (x@config$options$keep.distributions)
+			if (! is.null(x@config$options$keep.distributions) && x@config$options$keep.distributions)
 			{
 				twotimes<-function(x){2*x}
 				plot(ecdf(data$absolute.inter.reference.distance.data), col="blue", main="Absolute distances", xlab="Distance (bp)", ylab="Cumulative fraction")
