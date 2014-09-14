@@ -94,3 +94,6 @@ help for package now reflects classes
 the same in Wizard and in Galaxy integration fixed: we called plot() instead of graphical.report()
 graphical.report test whether keep.distributions is defined rather than to start an error
 Wizard is consistent with current dir structure
+1.1.10
+The rtraclayer's import now returns GRanges only, so a lot of things were changed
+vignettes are move to vignettes

@@ -1,11 +1,11 @@
 Package: GenometriCorr
 Type: Package
 Title: Genometric Correlation package
-Version: 1.1.9
-Date: 2013-09-04
+Version: 1.1.10
+Date: 2014-09-15
 Author@R: c( person("Alexander", "Favorov",email =
         "favorov@sensi.org"), 
-				person("Loris", "Mularoni"),
+		person("Loris", "Mularoni"),
         person("Leslie","M.","Cope"), 
 				person("Yulia","Medvedeva"),
         person("Andrey","A.","Mironov"),
@@ -23,4 +23,5 @@ Suggests: rtracklayer, tcltk
 biocViews: Annotation, Genetics, Infrastructure, DataRepresentation,
         Bioinformatics
 URL: http://genometricorr.sourceforge.net/
-Packaged: 2013-09-04 07:07:07 MSD; favorov
+Packaged: 2014-09-15 07:07:07 MSD; favorov
+Packaged: 2014-09-15 07:07:07 MSD; favorov

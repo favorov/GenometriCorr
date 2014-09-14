@@ -212,10 +212,10 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 			if (! file.exists(conf$data$query)) stop(paste('Cannot read from query filename: ',conf$data$query))
 
 			if (is.null(conf$data$query.format)) 
-				query<-rtracklayer:::import(conf$data$query,asRangedData=TRUE)
+				query<-rtracklayer::import(conf$data$query)
 			else if (conf$data$query.format=='bed.like.with.header')
-				query<-GenometriCorr:::readTableToIRanges(conf$data$query,header=TRUE)
-			else query<-rtracklayer:::import(conf$data$query,format=conf$data$query.format,asRangedData=TRUE)
+				query<-readTableToIRanges(conf$data$query,header=TRUE)
+			else query<-rtracklayer::import(conf$data$query,format=conf$data$query.format)
 		}
 
 		#object cannot be NA
@@ -277,10 +277,10 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 			if (! file.exists(conf$data$reference)) stop(paste('Cannot read from reference filename: ',conf$data$reference))
 
 
-			if (is.null(conf$data$reference.format)) reference<-rtracklayer:::import(conf$data$reference,asRangedData=TRUE)
+			if (is.null(conf$data$reference.format)) reference<-rtracklayer::import(conf$data$reference)
 			else if (conf$data$reference.format=='bed.like.with.header')
-				reference<-GenometriCorr:::readTableToIRanges(conf$data$reference,header=TRUE)
-			else reference<-rtracklayer:::import(conf$data$reference,format=conf$data$reference.format,asRangedData=TRUE)
+				reference<-readTableToIRanges(conf$data$reference,header=TRUE)
+			else reference<-rtracklayer::import(conf$data$reference,format=conf$data$reference.format)
 		}
 
 		#default is false; paramter overrides file; if default value is used, we do not 
@@ -361,10 +361,10 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 				if (! file.exists(conf$data$mapping)) stop(paste('Cannot read from mapping filename: ',conf$data$mapping))
 
 
-				if (is.null(conf$data$mapping.format)) mapping<-rtracklayer:::import(conf$data$mapping,asRangedData=TRUE)
+				if (is.null(conf$data$mapping.format)) mapping<-rtracklayer::import(conf$data$mapping)
 				else if (conf$data$mapping.format=='bed.like.with.header')
-					mapping<-GenometriCorr:::readTableToIRanges(conf$data$mapping,header=TRUE)
-				else mapping<-rtracklayer:::import(conf$data$mapping,format=conf$data$mapping.format,asRangedData=TRUE)
+					mapping<-readTableToIRanges(conf$data$mapping,header=TRUE)
+				else mapping<-rtracklayer::import(conf$data$mapping,format=conf$data$mapping.format)
 			}
 
 			chrom<-NA #default value means nothing

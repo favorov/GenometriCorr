@@ -473,7 +473,7 @@ setMethod('visualize',#'GenometriCorrResult',
 					return(rainbow(n=n,start=start,end=end))
 				}
 				ramp <- colorRamp(c("red","white"))
-				frCol = rgb( ramp(seq((start-0.05)/(0.18-0.05), 1, length = n)), max = 255)
+				frCol = rgb( ramp(seq((start-0.05)/(0.18-0.05), 1, length = n)), maxColorValue = 255)
 			}
 			else if (start==0.18)
 			{
@@ -483,7 +483,7 @@ setMethod('visualize',#'GenometriCorrResult',
 					return(rainbow(n=n,start=start,end=end))
 				}
 				ramp <- colorRamp(c("white","blue"))
-				frCol = rgb( ramp(seq(0, 1-((0.6-end)/(0.6-0.08)), length = n)), max = 255)
+				frCol = rgb( ramp(seq(0, 1-((0.6-end)/(0.6-0.08)), length = n)), maxColorValue = 255)
 			}
 			else
 			{

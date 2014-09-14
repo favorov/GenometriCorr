@@ -89,7 +89,7 @@ library("rtracklayer")
 
 cpgi_data<-system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr")
 
-cpgis_imported<-import(cpgi_data,asRangedData=TRUE);
+cpgis_imported<-as(import(cpgi_data),'RangedData');
 
 cpgis_read<-GenometriCorr:::readTableToIRanges(cpgi_data,comment.char='$',header=TRUE);
 
