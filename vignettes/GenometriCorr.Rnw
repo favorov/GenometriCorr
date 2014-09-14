@@ -1,0 +1,409 @@
+%\VignetteIndexEntry{Genometric Correlation}
+%\VignetteIndexEntry{GenometriCorrelation}
+%\VignetteIndexEntry{GenometriCorrelation}
+%\VignettePackage{GenometriCorr}
+
+\SweaveOpts{keep.source=FALSE}
+
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\usepackage[pdftex]{graphicx}
+  % \graphicspath{{../pdf/}{../jpeg/}}
+  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\usepackage{float}
+\usepackage{inputenc}
+\usepackage{natbib}
+\usepackage{indentfirst}
+\usepackage[font=small]{caption}
+\usepackage{color}
+\usepackage{Sweave}
+
+%\usepackage{graphicx}
+
+\begin{document}
+
+\title{GenometriCorr (Genometric Correlation): an R package for spatial correlation of genome-wide interval datasets}
+\author{Alexander Favorov\footnote{favorov@sensi.org}, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov\\ Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan}
+
+\maketitle
+
+\section{Introduction}
+
+\newcommand{\picscale}{0.5}
+
+\subsection{Genometric layouts; independence or correlation}
+\subsubsection{Using distance as a proxy for functional correlation}
+High-throughput sequencing has become a popular and ever more affordable method in molecular biology and clinical experiments, and will soon become a routine laboratory technique. Sequencing reads are mapped to a reference genome and the results are often drawn as points along lines representing chromosomes, with the layout of the points reflecting the physical distance between mapped reads. While this depiction is a convention, it is based on a longstanding belief that proximity on a chromosome implies potential functional interaction.
+
+If sequencing results are analyzed as points on a line, we can measure the physical distance between sequencing results and annotated genomic features. Deviations in these measurements from the expected distributions indicate associations (or anti-associations) that may be biologically interesting. While it is not difficult to judge these associations by eye, a genome-wide assessment of spatial correlations is impractical to do manually.
+
+Many, though certainly not all, functional relationships in genetics are based on proximity. For example, a promoter will be near the 5' end of the gene that it controls, a splicing control signal will be near splice sites, transcription factor binding sites will cluster where the transcription factors bind to regulate gene activity, and more. Measuring the proximity of a set of points on the genome to various genomic features will direct future experiments.
+
+Note that this type of correlation is not intended to give final results, but to generate testable hypotheses.
+
+
+Genomic intervals are anything that can be stored as a chromosome number, start, and end. Strands are not considered but could be managed by subsetting the data. Genomic intervals can be represented as blocks on a line:
+\begin{figure*}[h]
+	\centering\includegraphics[scale=\picscale]{png/fig1}
+	\caption{Genomic intervals}
+\end{figure*}
+
+
+\subsubsection{Intervals can be correlated or independent}
+
+If we have two types of features, they can be correlated, or they can be independent. If the features are independent, the locations of one type of feature are randomly positioned with respect to the other, while if they are correlated, the locations of the feature types will, on average, follow a recognizable pattern; the features can be a relatively constant distance apart, they can be consistently near or far away from each other in genomic coordinates, or they can preferentially overlap (or only rarely overlap). Thus, if features are correlated, the locations of one type of feature give information about the positions of the other type of feature.
+\begin{figure*}[h]
+ \centering\includegraphics[scale=\picscale]{png/fig2}
+ \caption{Three sets of genomic intervals. A and B are correlated, A and C are independent.}
+\end{figure*}
+
+\subsubsection{Correlation comes in many different flavors}
+We will introduce some terminology for simplicity. The set of intervals whose positions are considered fixed in the genome is the reference set. The intervals whose positions are being tested to see whether they are related to the reference set in any way is the query set. Note that the comparison is thus asymmetric.
+
+Figure 3 shows the basic question we are asking.
+
+\begin{figure*}[h]
+	\centering\includegraphics[scale=\picscale]{png/fig3}
+	\caption{Our goal is to determine whether the query points are correlated to the reference points. We do this, in essence, by assuming that if they are independent, they will be uniformly distributed with respect to the reference points, and if not, the density of distance between query and reference points will be nonuniform.}
+\end{figure*}
+
+
+Figure 4 illustrates some important complications that we address.
+
+
+\begin{figure*}[h]
+	\centering\includegraphics[scale=\picscale]{png/fig4}
+	\caption{Four scenarios.}
+\end{figure*}
+Comparing the intervals in query 1 to the reference intervals, we see that the two sets of intervals consistently do not overlap. They are not independent, and the statistics will show that they are anticorrelated. The query 2 intervals do overlap substantially with the reference intervals and are thus correlated; again the statistics will reflect this and will show a positive association. Query 3 has only one interval. That interval overlaps with a reference interval, so query 3 is correlated with the reference. However, if the query and reference identities are reversed, most of the new query intervals do not overlap with and are not near the single new reference interval, so these two datasets have an asymmetric relationship. Only by testing every query-reference set in both directions can we uncover such an asymmetry. The last set of intervals, query 4, brings up different issues. We can measure the relationship between the query and reference in two ways. First, we can look at the distribution of the midpoints of the query intervals with respect to the distribution of the reference interval midpoints and record the distances as ratios (for example, if the query is 10 units from one reference point and 90 units from the nearest on the other side, its ratio will be 0.1). In a large genome this works well, because average distances are big, so distinguishing a position 10\% into an inverval from a position 30\%
+ into an interval is easy. Second, we can look at the raw distance between the midpoints of the query and the midpoints of the reference. This works well for small genomes because here the midpoints of the reference can be close enough that if a query midpoint is, for example, always 100 bp from a reference midpoint, the ratio test will show a much wider distribution, as when the query is between two reference midpoints that are only 300 bp away the ratio test will read 0.33, but when the reference midpoints are 1000 bp away the ratio test will read 0.1, and the query will appear to be uncorrelated. For this reason we find it useful to do both tests, in both directions. These concepts will be elaborated in the next section.
+
+\subsection{Statistical approach}
+
+\subsubsection{Working with intervals}
+{\bf Tests on relative distances}
+
+Many of the tests we use work only with pointwise data, not with intervals. Very large intervals may relate to genomic features in different ways, depending on whether we examine their start points, end points, both boundaries, or just a point in the middle. Rather than trying to address this ambiguity or to randomly guess at what the user hopes to do, we expect the user to specify the points when the exact point is important, and we use the midpoint when the user inputs an interval. Also, the user can provide a custom calculation to define the representative point to use for each interval.
+
+Now, we can characterize each query point by its relative distance, as illustrated in figure 5. 
+
+\begin{figure*}[h]
+	\centering\includegraphics[scale=\picscale]{png/fig5}
+	\caption{Relative distance}
+\end{figure*}
+
+Formally, the relative distance $d_i$ for a query point $i$ is: 
+\[d_i=\displaystyle\frac{\min\left(\left|q_i-r_k\right|,\left|r_{k+1}-q_i\right|\right)}{\left|r_{k+1}-r_k\right|}, k=\arg\min_{q_i \geq r_k}(q_i-r_k).\]
+
+If the reference and query intervals are independent, the query points are positioned randomly with respect to the reference, and the $d_i$'s will be distributed uniformly in $\left[0..0.5\right]$. The corresponding $p-value$ is obtained by using the Kolmogorov-Smirnov test.
+
+\begin{figure*}[h!]
+	\centering\includegraphics[scale=\picscale]{png/fig6}
+	\caption{Area between \textcolor{blue}{uniform ECDF for unrelated feature sets (blue)} and \textcolor{black}{experimental ECDF for related feature sets (black)} is a measure of correlation of the query and reference feature sets.}
+\end{figure*}
+
+The Kolmogorov-Smirnov test \(K-S test\) is accompanied by permutation tests to determine the level and direction of deviation from the null expectation. The ECDF (Empirical Distribution Cumulative Function) of the relative distances $d_i$ is a straight line between $(0,0)$ and $(0.5,1)$ if the query and reference points are perfectly independent, so we compare our data to this line.
+
+The area between the ECDF for the reference and query points and the ideal straight line \[S=\displaystyle\int_0^{0.5} \! \left| ECDF(d)-ECDF_{ideal}(d) \right| \, dd \] is a measure of the correlation between the query and reference. So, by drawing $N$ sets of values that model uniform distribution of $d_i$ we get $N$ outcomes of a null distribution for $S$ and thus we can evaluate the $p-value$ for S.   
+
+Both the area permutation test and the Kolmogorov-Smirnov test show only how much the data deviate from independence, not whether they are positively or negatively correlated.
+
+The sign of difference between the areas under the real ECDF curve and the ideal ECDF curve indicates the direction of the correlation. We define a correlation-like measure
+\[Corr_{ECDF}=\displaystyle\frac{\displaystyle\int_0^{0.5} \! \left( ECDF(d)-ECDF_{ideal}(d) \right) \, dd}{\displaystyle\int_0^{0.5} \! ECDF_{ideal}(d) \, dd} .\] Positive $Corr_{ECDF}$ indicates positive correlation (query points tend to be close to reference points) and vice versa. 
+\definecolor{darkgreen}{RGB}{0,100,0}
+\begin{figure*}[h!]
+	\centering\includegraphics[scale=\picscale]{png/fig7}
+	\caption{$Corr_{ECDF}$ is positive for the data represented by the upper black line (left pane); the area under it is more than the area under \textcolor{blue}{the blue line that marks the distribution of independent data}, so the correlation is positive. For the data represented by the lower black line (right pane), the correlation is negative.}
+\end{figure*}
+
+\subsubsection{Absolute distance test}
+We can also determine whether the query intervals are spaced more often than expected at a specific distance from the reference intervals; for example a polymerase binding site and a transcription factor binding site. Figure 8 illustrates the design.
+\begin{figure*}[h!]
+        \centering\includegraphics[scale=\picscale]{png/fig8}
+        \caption{Query intervals are found at a fixed distance from reference intervals. Relative distances (0.4, 0.1, 0.2) are not consistent.}
+\end{figure*}
+
+For each query point (contracted interval) we define the minimal distance to a reference point, $l_i=\min_k(q_i-r_k)$. Its mean value,
+\[L=\displaystyle\frac{\displaystyle\sum_i\,l_i}{\#q}\] characterizes the correlation between query and reference points. We perform a permutation test for significance: keeping the reference points fixed, we draw $N$ simulated query positions that are uniformly distributed along the chromosome and calculate $L$ for each, to obtain the null distribution of $L$. The test is two-sided and gives both the $p-value$ for the real $L$, and the sign of any correlation.
+
+\subsubsection{Projection test}
+
+Another test we find useful is the projection test, which is robust when the intervals being tested cover a fairly large percentage of the length of the reference sequence. Here, we determine the number of midpoints of query intervals overlapping the reference intervals and test whether it is outside of the null expectation. The probability of a query midpoint falling into a reference interval is: 
+\[p=\displaystyle\frac{\mbox{coverage of the reference}}{\mbox{chromosome length}}\] Therefore, the distribution of the number of query points that overlap reference interval can be approximated by the binomial distribution for $\#q$ trial with success probability $p$. The null hypothesis is that query points hit the reference intervals randomly. The test is also two-sided; it provides both p-value and the direction of correlation.    
+
+\begin{figure*}[h!]
+	\centering\includegraphics[scale=\picscale]{png/fig9}
+	\caption{Projection test.}
+\end{figure*}
+
+\subsubsection{Na\"{i}ve Jaccard approach}
+\begin{figure*}[h!]
+	\centering\includegraphics[scale=\picscale]{png/fig10}
+	\caption{The Jaccard measure of the correlation of two interval sets is the ratio of the lengths (in bases) of their intersection and their union.}
+\end{figure*}
+For this we do not test the relationships between points, but between intervals, so this test is quite complementary to the pointwise tests.
+\begin{align*}
+\mbox{Jaccard measure (index):\ \ } J(A,B)=\displaystyle \frac {A \cap B}{A \cup B}
+\end{align*}
+To create a null distribution for comparison, we permute the order of the query intervals across the genome, not retaining the lengths of the gaps between the query intervals.
+
+
+\subsection{Tests of correlation over an entire genome}
+
+All the tests described above are applicable to a single chromosomes or a set of chromosomes (for example, a whole genome). The data for each test are simply summarized over all chromosomes before checking for significance. Another option that is available is restricting the analysis to a set of genomic intervals; for example, asking questions about whether features are correlated when the features always lie within genes is impossible when using the entire genome as the potential space for feature positions, as the features will always look tightly correlated since they co-occur within genes. Using the mapping functions provided, each sub-interval (here, a gene) can be considered as a separate "chromosome," to enable detection of correlations within smaller intervals.
+
+
+\subsection{GenometriCorr (Genometric Correlation) package}
+The package {\tt GenometriCorr} provides functions to load interval data from a plain text file (any accepted format), as well as the main procedure that tests whether the interval sets are spatially independent, and plotting functions to generate graphical representations of the relationships between the features.
+
+\section{Utilities}
+
+\subsection{R objects used by {\tt GenometriCorr}}
+
+The interval sets are represented by the {\tt IRanges} or {\tt RangedData} or {\tt GRanges} objects, which are interval data representation classes defined by {\tt IRanges } package.  {\tt IRanges} is a set of intervals in one space (chromosome). {\tt RangedData} is a set of intervals defined over different spaces (here, chromosomes), so it is suitable for encoding a full-genome annotation.  {\tt GRanges} is very simlar to {\tt RangedData} but it contains the chromosome length information and ensures that operations do not return intervals beyond the length of the chromosomes.
+
+\subsection{Code loading}
+Load the package:
+
+<<set_options,echo=false>>=
+options(width=50)
+@
+
+<<load_genometricorr>>=
+library('GenometriCorr')
+@
+
+
+\subsection{Let's load files}
+
+We will use the {\tt import} function from {\tt rtracklayer} package to read data for the query and reference intervals (the result will be used in later narration). The two files describe the coordinates of GpG islands and of RefSeq genes in human genome (v19). 
+
+<<load_rtracklayer_package,echo=false>>=
+if(!require("rtracklayer",quietly=TRUE))
+{
+	source("http://bioconductor.org/biocLite.R")
+	biocLite("rtracklayer")
+	require("rtracklayer")
+}
+@
+
+
+<<read_files>>=
+library('rtracklayer')
+#cpgis<-import("../extdata/UCSCcpgis_hg19.bed")
+refseq<-as(import(system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "GenometriCorr")),'RangedData');
+cpgis<-as(import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr")),'RangedData');
+#refseq <- import("../extdata/UCSCrefseqgenes_hg19.bed")
+@
+
+%Let's look at the objects that were read by {\tt import} calls.
+
+%<<show_cpgis>>=
+%cpgis
+%@
+
+%<<show_refseqs>>=
+%refseq
+%@
+
+We can specify the lengths of the chromosomes in our data (hg19):
+
+<<chrom_length>>=
+human.chrom.length<-c(249250621,243199373,198022430,191154276,180915260,171115067,159138663,146364022,141213431,135534747,135006516,133851895,115169878,107349540,102531392,90354753,81195210,78077248,59128983,63025520,48129895,51304566,59373566,155270560)
+@
+
+and the chromosome names that we are using:
+
+<<chrom_names>>=
+names(human.chrom.length)<-c('chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrY','chrX')
+@
+
+If the chromosome lengths are not given, they are taken to be the maximum of the reference and query coordinates provided, per chromosome, and a warning is generated. You can suppress the warning with {\tt supress.evaluated.length.warning=TRUE}.
+
+\subsection{Visualize the query and reference intervals}
+
+%closing rplots.pdf if it is open
+<<dev_off_init,echo=false,results=hide>>=
+(if (length(dev.list())) dev.off())
+@
+
+Sometimes, it is useful to examine a pair of interval sets by eye, to add information to the statistical results. Three visualization procedures are provided.
+
+\subsubsection{Examples}
+\newcommand{\picwidth}{4 in}
+
+Let's look at the CpG islands and RefSeq genes on chromosomes 1 (hg19).  
+
+%The result is:
+
+\begin{centering}
+<<chr1_picture,fig=true,results=hide>>=
+VisualiseTwoIRanges(cpgis['chr1']$ranges,refseq['chr1']$ranges,nameA='CpG Islands',nameB='RefSeq Genes',chrom_length=human.chrom.length[['chr1']],title="CpGIslands and RefGenes on chr1 of Hg19")
+@
+\end{centering}
+
+
+\section{The main procedure}
+{\tt GenometriCorrelation} tests the null hypothesis that the query and reference intervals are spatially independent; that is, that they have no significant relationship in terms of genomic coordinates.
+
+\subsection{Using the function:}
+
+
+<<test_chromosome_123,cache=TRUE>>=
+
+pn.area<-100
+pn.dist<-100
+pn.jacc<-100
+
+cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.length=human.chrom.length,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=TRUE,showProgressBar=FALSE)
+@
+
+The result is an object of the (S4) {\tt GenometriCorrResult} class. The class is actually (inferred from) a list of results with some useful functionality. The simplest is the {\tt show()} method.
+
+<<report_chromosome_123,cache=TRUE>>=
+print(cpgi_to_genes)
+@
+
+The {\tt GenometriCorrelation} function calculates the correlation statistics previously described, on each chromosome separately, and then on the genome as a whole ("awhole"). The visualization above suggested that the query and reference intervals are correlated. The resulting list is structured by the names of the chromosomes used and an additional {\tt 'awhole'} pseudochromosome. For each of them, it contains the folowing data:
+\begin{itemize}
+\item The very low p-value calculated in {\tt relative.distances.ks.p.value} is in accordance with the observation. {\tt relative.distances.ecdf.area.correlation} is positive, so the query and reference are in general closer to each other than we would expect if they are independent. 
+\item The {\tt projection.test.p.value} is zero, indicating either significant overlap or significant lack of overlap. {\tt projection.test.lower.tail} is {\tt FALSE}, meaning that we are in the upper tail of the distribution and there is significantly more overlap of the query and reference intervals than we would expect if they were independent. 
+\item All three permutation tests give {\tt <0.01} meaning that the observed spatial relationships (absolute or relative distance apart) are significantly different than what is seen in the permutation distribution. 
+\item From the p-values of the permutation distributions we cannot tell whether the query and reference intervals are significantly close together or significantly far apart. As the value of the {\tt scaled.absolute.min.distance.sum.lower.tail} is {\tt TRUE}, we know that the absolute distances between query and reference are consistent and small, and, finally, the {\tt jaccard.measure.lower.tail} is {\tt FALSE}, indicating an unexpectively high overlap, as defined by the Jaccard measure. 
+\end{itemize}
+In this case, all tests indicate that the query and reference intervals are close together and/or overlapping. In other datasets, the values may be very different; for example, the query and reference intervals can be separated by a consistent and large distance, giving a significant absolute distance correlation with {\tt scaled.absolute.min.distance.sum.lower.tail} {\tt FALSE}, and the overlap measures may or may not indicate consistent nonoverlapping intervals, depending on the size of the genome and the distances involved. Thus the various tests are extremely useful as a whole, to determine the relationship between the query and reference data in a much more precise way.
+
+It is helpful to use visualization tools like those shown in Figures 6 and 7. Two types of graphical output are available for the {\tt GenometriCorrResult} class. In both cases, use the {\tt keep.distributions=TRUE } parameter in the {\tt GenometriCorrelation} call so that the object returned by the call contains the distribution data needed to report anything more than the correlation statistics. Below is an example, generated by {\tt graphical.report} function, for chromosome 1.
+
+<<chromosome_1_graphical_report,results=hide>>=
+graphical.report(cpgi_to_genes,pdffile="CpGi_to_RefSeq_chr1_picture.pdf",show.chromosomes=c('chr1'),show.all=FALSE)
+@
+
+\begin{figure*}
+	\centering\includegraphics[scale=1.5]{CpGi_to_RefSeq_chr1_picture.pdf}
+	\caption{Simple graphical output for chromosome 1}
+\end{figure*}
+
+Another graphical display is available. The {\tt visualize} function has the same parameters as {\tt graphical.report} and also requires that the initial function be run with {\tt keep.distributions=TRUE}. An example for chromosome 1 follows.
+
+<<chromosome_1_visualize,results=hide>>=
+visualize(cpgi_to_genes,pdffile="CpGi_to_RefSeq_chr1_picture_vis.pdf",show.chromosomes=c('chr1'),show.all=FALSE)
+@
+
+\begin{figure*}
+        \centering\includegraphics[scale=1.25]{CpGi_to_RefSeq_chr1_picture_vis.pdf}
+        \caption{More colorful graphics with observed/expected trends for chromosome 1}
+\end{figure*}
+
+\section{Configuration file}
+	The main function can be called in two ways. First, the arguments can be supplied directly to {\tt GenometriCorrelation} function as before.
+	
+	The second, S4-compliant way to run the main function is to create an S4 GenometriCorrConfig object from a configuration file, and then to pass the object to the {\tt run.config} function with or without changes. This enables reproducibility and a simple interface. A file template is provided:
+
+<<read_config_file>>=
+config<-new("GenometriCorrConfig",system.file("extdata", "template-config.ini", package = "GenometriCorr"))
+@
+
+Now, let's print the configuration object.
+
+<<print_config_file>>=
+print(config)
+@
+
+We can change some fields:
+<<change_config_file>>=
+config$tests$ecdf.area.permut.number<-10
+config$tests$mean.distance.permut.number<-10
+config$tests$jaccard.measure.permut.number<-10
+config$chromosomes <- "chr18"
+@
+
+The {\tt GenometriCorrConfig} object contains all parameters for the {\tt GenometriCorrelation}. They are arranged in four groups: {\tt [chromosomes]}, {\tt [chromosomes.length]}, {\tt [options]} and {\tt [tests]} in the file and in correspondng lists in the {\tt GenometriCorrConfig} .
+
+Also, there is a group {\tt [data]} that describes the input for query, reference and mapping (see below) if any. It can be empty, or it can specify the filenames and formats of the input files, or the names of R objects in the current workpace, to be used as query, reference and mapping data sources. If an R variable name is used, the corresponding format is ''
+
+As a simple illustration of using the config file we will use sequencing data, instead of known annotations. The analyses performed by the GenometriCorr package are applicable to any type of whole-genome data as long as it can be specified as points or intervals in genomic coordinates. This means that the functions can analyze sequencing data or microarray data as well as perform comparison between annotations (as above); the sequencing or microarray data must be presented either as points or as intervals as the package contains no functions to do alignment. In this short example we compare ChIPseq data with expression data on a single human chromosome.
+
+The ChIPseq data are in .bed format; the expression data are also in .bed format (we have assigned an expression cutoff to compare highly expressed genes with the ChIPseq data).
+
+<<read_files>>=
+library('rtracklayer')
+histones<-import(system.file("extdata", "chr18.H3K4me3.bed", package = "GenometriCorr"));
+expr_genes<-import(system.file("extdata", "chr18.mRNAseq.bed", package = "GenometriCorr"));
+@
+
+And, finally, let's start the {\tt GenometriCorrelation} with this parameters:
+
+<<run_config_file>>=
+conf_res<-run.config(config,query=histones,reference=expr_genes)
+@
+
+Here, we passed {\tt query} and {\tt reference} to the {\tt run.config} call as {\tt RangedData} R objects, wo they will be pased to the {\tt GenometriCorrelation} as is. {\tt run.config} also accepts filenames, fileformats or the names or R variables to be used as query, reference and mapping. To show that a variable name is passed, the corresponding format idetifier is 'R.variable.name'. All the methods of passing data to {\tt run.config} except the direct pass of R object (as in the example) can be described in the configuration file.
+
+The {\tt run.config} returns a {\tt GenometriCorrResult} object that was obtained from {\tt GenometriCorrResult}. The {\tt @config} slot of the returned object is a {\tt GenometriCorrConfig} describing the run. 
+
+A config example with the permutation numbers already set to 10 is {\tt quick-config.ini}:
+
+<<simple_config_file>>=
+quickconfig<-new("GenometriCorrConfig",system.file("extdata", "quick-config.ini", package = "GenometriCorr"))
+print(quickconfig)
+@
+
+\section{More utilities}
+\subsection{Mapping}
+If we test the correlation of a reference and query that are consistently found in the same chromosomal regions (e.g. in genes), we will always achieve what looks like extremely high correlation on a genomic scale and we are unable to ask questions about finer-scale associations. To use the Genometric Correlation statistical tests on data such as these, we can convert the regions (that the query and reference occupy) to pseudochromosomes, and then run the {\tt GenometriCorrelation} test. The mapping is available in the package as {\tt MapRangesToGenomicIntervals.}
+
+The MapRangesToGenomicIntervals accepts two RangedData or GRanges, and maps the intervals from the second interval set that are contained in the first interval set, recalculating the coordinates so that within each new interval the coordinates range from 1 to the length of the interval. 
+
+Let's see how it works. In this artifical example, we create two random feature sets that reside only in bases $[1000000..2000000]$ in a chromosome of length 3000000. First, we correlate these two features as is, not accounting for their restricted range. Next we will run the correlation again, this time using the mapping functions to test their relationship only within the $[1000000..2000000]$ chromosomal range.
+
+In the first test, the query and reference appear to be correlated, and all of the correlations disappear when the test is confined to the correct genomic interval, except the {\tt relative.distances} family of tests that identify the features as independent in both cases.
+
+<<mapping_example_random,cache=TRUE>>=
+population<-1000
+
+chromo.length<-c(3000000)
+
+names(chromo.length)<-c('the_chromosome')
+
+rquery<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width=c(10)),space='the_chromosome')
+
+rref<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width=c(10)), space='the_chromosome')
+
+#create two features, they are randomly scattered in 1 000 000...2 000 000
+
+unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.length,ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+
+#correlate them on the whole cromosome: 1...3 000 000
+
+map_space<-RangedData(ranges=IRanges(start=c(1000000),end=c(2000000)),space='the_chromosome')
+
+mapped_rquery<-MapRangesToGenomicIntervals(what.to.map=rquery,where.to.map=map_space)
+
+mapped_rref<-MapRangesToGenomicIntervals(what.to.map=rref,where.to.map=map_space)
+
+#map them into 1 000 000...2 000 000
+
+mapped_result<-GenometriCorrelation(mapped_rquery,mapped_rref,ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+
+#then, correlate again
+
+cat('Unmapped result:\n')
+print(unmapped_result)
+
+cat('Mapped result:\n')
+print(mapped_result)
+
+@
+
+Mapping config example is {\tt mapping-config.ini}:
+
+<<simple_config_file>>=
+mapconfig<-new("GenometriCorrConfig",system.file("extdata", "mapping-config.ini", package = "GenometriCorr"))
+print(mapconfig)
+@
+\end{document}
+
+
