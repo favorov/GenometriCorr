@@ -1,3 +1,8 @@
+% GenometriCorrelation project evaluating two interval markups genomewide independence. 
+% (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+%               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+%               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+%
 \name{GenometriCorrResult-class}
 \Rdversion{1.1}
 \docType{class}
@@ -62,7 +67,6 @@ Class \code{"\linkS4class{vector}"}, by class "namedList", distance 3.
 
 \examples{
 
-library('rtracklayer')
 library("GenometriCorr")
 
 cpgis_bed<-system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr");

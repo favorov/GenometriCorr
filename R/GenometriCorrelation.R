@@ -1,10 +1,9 @@
-# GenometriCorrelation project evaluating two genometric annotations 
-#	correlation. Also provides some service IRanges-related procedures. 
-# (c) 2010-2011 Alexander Favorov, Leslie Cope, Yulia Medvedeva, 
-#              Loris Mularoni, Vsevolod Makeev, Sarah Wheelan.
+# GenometriCorrelation project evaluating two interval markups genomewide independence. 
+# (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+#               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+#               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 #
 # MarkupsIndependence is the main function of the package
-# $Id: GenometriCorrelation.R 1937 2013-08-22 02:04:42Z favorov $
 
 epsilon=1e-6
 integr_rel_tol=0.01
@@ -119,7 +118,7 @@ GenometriCorrelation <- function(
 	#reference.representing.point.function=representing.point.function for reference
 	
 	nameQ<-"query"
-	nameR<-"referece"
+	nameR<-"reference"	# HJ fixed typo
 	if (!is.object(query))  
 		stop("The thing given as first (",nameQ,") range argument to\n  MarkupsIndependence is not an object!")
 	if (!is.object(reference))  
@@ -417,8 +416,9 @@ GenometriCorrelation <- function(
 	else 
 		do.awhole<-FALSE
 	
-	if ((showTkProgressBar) && !require("tcltk",quietly=TRUE))
-		showTkProgressBar=FALSE
+	# HJ -- tcltk now part of R; we can Depends it
+	#if ((showTkProgressBar) && !require("tcltk",quietly=TRUE))
+		#showTkProgressBar=FALSE
 
 	#if there is no loadable tcltk, switch showTkProgressBar off 
 
@@ -958,8 +958,8 @@ GenometriCorrelation <- function(
 				mean_min_sum<-query_to_ref_min_absolute_distance_sum(
 					sample,ref,
 					map.to.half,
-					is_query_sorted=F,
-					is_ref_sorted=T,
+					is_query_sorted=FALSE,
+					is_ref_sorted=TRUE,
 				chrom_length=chr_length)
 				scaled_mean_min_sum<-mean_min_sum*(length(ref)/chr_length)
 				result[[space]][['scaled.absolute.min.distance.sum.null.list']]<-

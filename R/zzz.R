@@ -3,7 +3,7 @@
 .gnmCorr <- new.env(parent=emptyenv())
 
 .onAttach <- function(libname, pkgname) {
-       version <- packageDescription("GenometriCorr", field="Version")
+       version <- packageDescription("GenometriCorr", fields="Version")
        packageStartupMessage(paste("Welcome to GenometriCorr version ", version))
 }
 

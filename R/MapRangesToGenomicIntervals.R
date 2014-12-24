@@ -1,8 +1,8 @@
-# GenometriCorrelation project evaluating two markups genomwide independence. 
-# (c) 2010-2011 Alexander Favorov, Leslie Cope, Yulia Medvedeva, 
-#              Loris Mularoni, Vsevolod Makeev, Sarah Wheelan.
+# GenometriCorrelation project evaluating two interval markups genomewide independence. 
+# (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+#               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+#               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 # VisualiseTwoIRanges is a function that visualise a pair of IRanges on a chromosome in two colors
-# $Id: MapRangesToGenomicIntervals.R 1717 2012-04-18 19:29:15Z favorov $
 
 
 

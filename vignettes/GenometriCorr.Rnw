@@ -20,6 +20,7 @@
 \usepackage{color}
 \usepackage{Sweave}
 
+%\usepackage{zi4}
 %\usepackage{graphicx}
 
 \begin{document}
@@ -178,23 +179,17 @@ library('GenometriCorr')
 
 \subsection{Let's load files}
 
-We will use the {\tt import} function from {\tt rtracklayer} package to read data for the query and reference intervals (the result will be used in later narration). The two files describe the coordinates of GpG islands and of RefSeq genes in human genome (v19). 
-
-<<load_rtracklayer_package,echo=false>>=
-if(!require("rtracklayer",quietly=TRUE))
-{
-	source("http://bioconductor.org/biocLite.R")
-	biocLite("rtracklayer")
-	require("rtracklayer")
-}
-@
+We will use the {\tt import} function from {\tt rtracklayer} package to read data for the query and reference intervals (the result will be used in later narration). The two files describe the coordinates of CpG islands and of RefSeq genes in human genome (v19). 
 
 
 <<read_files>>=
 library('rtracklayer')
+library('TxDb.Hsapiens.UCSC.hg19.knownGene')
 #cpgis<-import("../extdata/UCSCcpgis_hg19.bed")
-refseq<-as(import(system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "GenometriCorr")),'RangedData');
-cpgis<-as(import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr")),'RangedData');
+#refseq<-as(import(system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "GenometriCorr")),'RangedData');
+refseq<-transcripts(TxDb.Hsapiens.UCSC.hg19.knownGene)
+cpgis<-import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr"))
+seqinfo(cpgis)<-seqinfo(TxDb.Hsapiens.UCSC.hg19.knownGene)[seqnames(seqinfo(cpgis))]
 #refseq <- import("../extdata/UCSCrefseqgenes_hg19.bed")
 @
 
@@ -208,19 +203,9 @@ cpgis<-as(import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "Genomet
 %refseq
 %@
 
-We can specify the lengths of the chromosomes in our data (hg19):
+The information about lengths and names of chromosomes is coded in seqinfo provided by TxDb.Hsapiens.UCSC.hg19.knownGene. The refseq object contains it; the cpgis is read from a bed file and thus we set the seqinfo. If the query and reference oblects do not carry seqinfo, the information can be passed via {\tt chromosomes.length} parameter that is organised exactly as {\tt seqlenghts(GenomicRanges)} result. It is, a numeric vector with names, whic are chromosome names.
 
-<<chrom_length>>=
-human.chrom.length<-c(249250621,243199373,198022430,191154276,180915260,171115067,159138663,146364022,141213431,135534747,135006516,133851895,115169878,107349540,102531392,90354753,81195210,78077248,59128983,63025520,48129895,51304566,59373566,155270560)
-@
-
-and the chromosome names that we are using:
-
-<<chrom_names>>=
-names(human.chrom.length)<-c('chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrY','chrX')
-@
-
-If the chromosome lengths are not given, they are taken to be the maximum of the reference and query coordinates provided, per chromosome, and a warning is generated. You can suppress the warning with {\tt supress.evaluated.length.warning=TRUE}.
+If the chromosome lengths are not either given explicitely or coded in reference or in query, they are taken to be the maximum of the reference and query coordinates provided, per chromosome, and a warning is generated. You can suppress the warning with {\tt supress.evaluated.length.warning=TRUE}.
 
 \subsection{Visualize the query and reference intervals}
 
@@ -234,13 +219,13 @@ Sometimes, it is useful to examine a pair of interval sets by eye, to add inform
 \subsubsection{Examples}
 \newcommand{\picwidth}{4 in}
 
-Let's look at the CpG islands and RefSeq genes on chromosomes 1 (hg19).  
+Let's look at the CpG islands and KnownGenes genes on chromosomes 1 (hg19).  
 
 %The result is:
 
 \begin{centering}
 <<chr1_picture,fig=true,results=hide>>=
-VisualiseTwoIRanges(cpgis['chr1']$ranges,refseq['chr1']$ranges,nameA='CpG Islands',nameB='RefSeq Genes',chrom_length=human.chrom.length[['chr1']],title="CpGIslands and RefGenes on chr1 of Hg19")
+VisualiseTwoIRanges(ranges(cpgis[seqnames(cpgis)=='chr1']),ranges(refseq[seqnames(refseq)=='chr1']),nameA='CpG Islands',nameB='RefSeq Genes',chrom_length=seqlengths(TxDb.Hsapiens.UCSC.hg19.knownGene)['chr1'],title="CpGIslands and RefGenes on chr1 of Hg19")
 @
 \end{centering}
 
@@ -257,7 +242,7 @@ pn.area<-100
 pn.dist<-100
 pn.jacc<-100
 
-cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.length=human.chrom.length,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=TRUE,showProgressBar=FALSE)
+cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=TRUE,showProgressBar=FALSE)
 @
 
 The result is an object of the (S4) {\tt GenometriCorrResult} class. The class is actually (inferred from) a list of results with some useful functionality. The simplest is the {\tt show()} method.
@@ -328,7 +313,7 @@ As a simple illustration of using the config file we will use sequencing data, i
 
 The ChIPseq data are in .bed format; the expression data are also in .bed format (we have assigned an expression cutoff to compare highly expressed genes with the ChIPseq data).
 
-<<read_files>>=
+<<read_more_files>>=
 library('rtracklayer')
 histones<-import(system.file("extdata", "chr18.H3K4me3.bed", package = "GenometriCorr"));
 expr_genes<-import(system.file("extdata", "chr18.mRNAseq.bed", package = "GenometriCorr"));
@@ -400,7 +385,7 @@ print(mapped_result)
 
 Mapping config example is {\tt mapping-config.ini}:
 
-<<simple_config_file>>=
+<<simple_mapping_config_file>>=
 mapconfig<-new("GenometriCorrConfig",system.file("extdata", "mapping-config.ini", package = "GenometriCorr"))
 print(mapconfig)
 @

@@ -1,10 +1,8 @@
-% GenometriCorr (Genometric Correlation): an R package for spatial correlation of genome-wide interval datasets
-% (c) 2010-2011 Alexander Favorov, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov  
-%              Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan
+% GenometriCorrelation project evaluating two interval markups genomewide independence. 
+% (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+%               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+%               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 %
-% favorov@sensi.org
-
-% $Id: GenometriCorrelation.Rd 1939 2013-08-22 02:41:08Z favorov $
 \name{GenometriCorrelation}
 \alias{GenometriCorrelation}
 \alias{GenometricCorrelation}
@@ -122,7 +120,16 @@ The same thing as the \code{representing.point.function}, but the representation
 %%  \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
-The result is an istance of the \code{\link{GenometriCorrResult-class}} that describes the run parameters in its \code{\link{GenometriCorrResult-class}} \code{@config} slot and that extends a \code{\link{namedList}} list (created originally with a \code{list()} with the resilts of the run. Each element of the list is also a list that describes results for a space (chromosome); one of them is 'awhole' (or other \code{awhole.space.name} if given) that describes the genome awhole, all others are named the same as the chromosomes and describe the chromosomwise statistics. The elements of the 'awhole' and chromosomewide lists are statistical measures and some datasets. The statistical measures are desribed in the \code{\link{GenometriCorr}} package help. For more explanations, see the MarkupsIndependence vignette. 
+The result is an instance of the \code{\link{GenometriCorrResult-class}} that describes the run
+parameters in its \code{\link{GenometriCorrResult-class}} \code{@config} slot and that extends a
+\code{\linkS4class{namedList}}
+list (created originally with a \code{list()} call with the results of the run.
+Each element of the list is also a list that describes results for a space (chromosome); one of
+them is 'awhole' (or other \code{awhole.space.name} if given) that describes the genome awhole,
+all others are named the same as the chromosomes and describe the chromosomwise statistics.
+The elements of the 'awhole' and chromosomewide lists are statistical measures and some datasets.
+The statistical measures are desribed in the \code{\link{GenometriCorr}} package help.
+For further explanation, see the MarkupsIndependence vignette. 
 
 Below is the description of the values of the list returned for each chromosome. 
 \item{query.population}{Query points used in the comparisons.}
@@ -171,25 +178,19 @@ The additional values that are returned if \code{keep.distrubutions=TRUE}
 }
 \examples{
 
-library('GenometriCorr')
-
 library('rtracklayer')
+library('GenometriCorr')
+library('TxDb.Hsapiens.UCSC.hg19.knownGene')
 
-cpgis<-import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr"));
-
-refseq<-import(system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "GenometriCorr"));
-
-human.chrom.length<-c(249250621,243199373,198022430,191154276,180915260,171115067,159138663,146364022,141213431,135534747,135006516,133851895,115169878,107349540,102531392,90354753,81195210,78077248,59128983,63025520,48129895,51304566,59373566,155270560)
-
-
-names(human.chrom.length)<-c('chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrY','chrX')
-
+refseq<-transcripts(TxDb.Hsapiens.UCSC.hg19.knownGene)
+cpgis<-import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr"))
+seqinfo(cpgis)<-seqinfo(TxDb.Hsapiens.UCSC.hg19.knownGene)[seqnames(seqinfo(cpgis))]
 
 pn.area<-10
 pn.dist<-10
 pn.jacc<-10
 
-cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.length=human.chrom.length,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
 
 print(cpgi_to_genes)
 

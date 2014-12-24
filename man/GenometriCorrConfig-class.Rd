@@ -1,9 +1,8 @@
-% GenometriCorr (Genometric Correlation): an R package for spatial correlation of genome-wide interval datasets
-% (c) 2010-2011 Alexander Favorov, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov  
-%              Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan
+% GenometriCorrelation project evaluating two interval markups genomewide independence. 
+% (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+%               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+%               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 %
-% favorov@sensi.org
-%$Id: GenometriCorrConfig-class.Rd 1935 2013-08-22 00:52:03Z favorov $
 \name{GenometriCorrConfig-class}
 \Rdversion{1.1}
 \docType{class}

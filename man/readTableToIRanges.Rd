@@ -1,8 +1,8 @@
-% GenometriCorrelation project evaluating two markups genomwide independence. 
-% (c) 2010-2011 Alexander Favorov, Loris Mularoni, Leslie Cope,  
-%              Yulia Medvedeva, Vsevolod Makeev, Sarah Wheelan.
+% GenometriCorrelation project evaluating two interval markups genomewide independence. 
+% (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+%               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+%               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 %
-%$Id: readTableToIRanges.Rd 1894 2013-07-08 08:40:12Z favorov $
 \name{readTableToIRanges}
 \alias{readTableToIRanges}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -71,7 +71,7 @@ Returns an IRange or RangedData object. The type depends on parameters and the d
 
 \note{
 %%  ~~further notes~~
-If the data you have is standard UCSC-like .bed, do not use this fuction, use \code{import} from \code{rtraclayer}. \code{import} correctly accounts for the difference in base numbering: UCSC assumes 0-based interval starts and 1-based interval ends while IRanges assumes that all data are 1-based.
+If the data you have is standard UCSC-like .bed, do not use this fuction, use \code{import} from \code{rtracklayer}. \code{import} correctly accounts for the difference in base numbering: UCSC assumes 0-based interval starts and 1-based interval ends while IRanges assumes that all data are 1-based.
 The \code{readTableToIRanges} function is necessary when you work with nonstandard data in table form.
 }
 
@@ -84,8 +84,8 @@ The \code{readTableToIRanges} function is necessary when you work with nonstanda
 }
 
 \examples{
+library('rtracklayer')
 library("GenometriCorr")
-library("rtracklayer")
 
 cpgi_data<-system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr")
 

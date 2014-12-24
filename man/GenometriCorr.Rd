@@ -1,9 +1,8 @@
-% GenometriCorr (Genometric Correlation): an R package for spatial correlation of genome-wide interval datasets
-% (c) 2010-2012 Alexander Favorov, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov  
-%              Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan
+% GenometriCorrelation project evaluating two interval markups genomewide independence. 
+% (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+%               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+%               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 %
-% favorov@sensi.org
-%$Id: GenometriCorr.Rd 1939 2013-08-22 02:41:08Z favorov $
 \name{GenometriCorr}
 \alias{GenometriCorr}
 \alias{GenometriCorr-package}
@@ -54,17 +53,18 @@ The package also provides the \code{\link{VisualiseTwoIRanges}} function that cr
 \tabular{ll}{
 Package: \tab GenometriCorr\cr
 Type: \tab Package\cr
-Version: \tab 1.0.11\cr
-Date: \tab 2011-12-08\cr
+Title: \tab Genometric Correlation package \cr
+Version: \tab 1.1.11\cr
+Date: \tab 2014-11-19\cr
 License: \tab Artistic-2.0\cr
 LazyLoad: \tab yes\cr
-Depends: \tab R (>= 2.11.0), IRanges, GenomicRanges\cr
-Suggests: \tab rtracklayer,tcltk\cr
-biocViews: \tab Annotation, Genetics, Infrastructure, DataRepresentation \cr
+Depends: \tab R (>= 3.1.0), IRanges, GenomicRanges, methods, tcltk, S4Vectors\cr
+Imports: \tab grDevices, gplots, rtracklayer\cr
+biocViews: \tab Annotation, Genetics, Infrastructure, DataRepresentation, Bioinformatics\cr
 URL: \tab http://genometricorr.sourceforge.net/ \cr
-}
-}
-\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov,  Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan}
+}}
+
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 \references{
 \url{http://genometricorr.sourceforge.net/}
@@ -74,18 +74,16 @@ URL: \tab http://genometricorr.sourceforge.net/ \cr
 	The {../doc/GenometriCorr.pdf}{GenometriCorr package vingnette}.
 }
 \examples{
+library('rtracklayer')
 library('GenometriCorr')
 
 library('rtracklayer')
+library('TxDb.Hsapiens.UCSC.hg19.knownGene')
 
-cpgis<-as(import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr")),'RangedData');
+refseq<-transcripts(TxDb.Hsapiens.UCSC.hg19.knownGene)
 
-refseq<-as(import(system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "GenometriCorr")),'RangedData');
-
-human.chrom.length<-c(249250621,243199373,198022430,191154276,180915260,171115067,159138663,146364022,141213431,135534747,135006516,133851895,115169878,107349540,102531392,90354753,81195210,78077248,59128983,63025520,48129895,51304566,59373566,155270560)
-
-
-names(human.chrom.length)<-c('chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrY','chrX')
+cpgis<-import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr"))
+seqinfo(cpgis)<-seqinfo(TxDb.Hsapiens.UCSC.hg19.knownGene)[seqnames(seqinfo(cpgis))]
 
 pn.area<-0
 pn.dist<-0
@@ -93,16 +91,17 @@ pn.jacc<-0
 
 #it means permutations are off
 
-cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.length=human.chrom.length,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
 
 print(cpgi_to_genes)
 
-pdf('CpGi_vs_RefSeq_genes_chr1_hr19.pdf')
-VisualiseTwoIRanges(cpgis['chr1']$ranges,refseq['chr1']$ranges,nameA='CpG Islands',nameB='RefSeq Genes',chrom_length=human.chrom.length[['chr1']],title="CpGIslands and RefGenes on chr1 of Hg19 animal")
-dev.off()
+VisualiseTwoIRanges(cpgis['chr1']$ranges, refseq['chr1']$ranges,
+	nameA='CpG Islands', nameB='RefSeq Genes',
+	chrom_length=human.chrom.length[['chr1']],
+	title="CpGIslands and RefGenes on chr1 of Hg19 animal",
+	pdf='CpGi_vs_RefSeq_genes_chr1_hg19')
 
-
-#mapping example, same is in the vingnette
+#mapping example, same as in the vignette
 population<-1000
 
 chromo.length<-c(3000000)

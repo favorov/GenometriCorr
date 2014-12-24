@@ -1,9 +1,8 @@
-# GenometriCorrelation project evaluating two markups genomwide independence. 
-# (c) 2010-2011 Alexander Favorov, Leslie Cope, Yulia Medvedeva, 
-#               Loris Mularoni, Vsevolod Makeev, Sarah Wheelan.
-#
+# GenometriCorrelation project evaluating two interval markups genomewide independence. 
+# (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+#               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+#               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 # readTableToIRanges.R reads a variety of GFF- or BED-like  formats to an IRange or a RangedData object
-# $Id: readTableToIRanges.R 1717 2012-04-18 19:29:15Z favorov $
 
 
 ## file is the name of file to read
@@ -72,7 +71,7 @@ readTableToIRanges <- function(file=NA, space=NA, start=NA, end=NA, width=NA, se
 	}
 	else
 	{
-		columns_accounted<-rep(F,num_col)
+		columns_accounted<-rep(FALSE,num_col)
 	}
 	
 	space_names<-c('Chromosome','Chr','Space')
@@ -242,7 +241,7 @@ readTableToIRanges <- function(file=NA, space=NA, start=NA, end=NA, width=NA, se
 			arglist[a]<-col
 			read_array <- c(read_array,col)
 			names(read_array)[length(read_array)] <- a
-			columns_accounted[col]=T
+			columns_accounted[col]=TRUE
 		}
 		else
 		{

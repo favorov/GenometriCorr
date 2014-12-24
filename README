@@ -97,3 +97,10 @@ Wizard is consistent with current dir structure
 1.1.10
 The rtraclayer's import now returns GRanges only, so a lot of things were changed
 vignettes are move to vignettes
+1.1.11
+A lot of changes to be compliant with Bioconductor
+R CMD CHECK passes with no warnings
+We use seqlenthgs of TxDb.Hsapiens.UCSC.hg19.knownGene in the examples
+
+
+R CMD check passe

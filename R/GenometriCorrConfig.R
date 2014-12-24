@@ -1,10 +1,9 @@
-# GenometriCorrelation project evaluating two genometric annotations 
-#	correlation. Also provides some service IRanges-related procedures. 
-# (c) 2010-2011 Alexander Favorov, Leslie Cope, Yulia Medvedeva, 
-#              Loris Mularoni, Vsevolod Makeev, Sarah Wheelan.
+# GenometriCorrelation project evaluating two interval markups genomewide independence. 
+# (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+#               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+#               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 #
 # configuration - works with ini file format  
-# $Id: GenometriCorrConfig.R 1893 2013-07-08 08:10:12Z favorov $
 
 #.Parse.INI part of code is by: 
 #Earl F. Glynn
@@ -201,21 +200,24 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 		if(!query.as.is)
 		{
-			if(!require("rtracklayer",quietly=TRUE))
-			{
-				source("http://bioconductor.org/biocLite.R")
-				biocLite("rtracklayer")
-				require("rtracklayer")
-			}
+			# now Importing rtracklayer
+			#if(!require("rtracklayer",quietly=TRUE))
+			#{
+				#source("http://bioconductor.org/biocLite.R")
+				#biocLite("rtracklayer")
+				#require("rtracklayer")
+			#}
 
 			if (is.null(conf$data$query) || conf$data$query == '') stop ('Empty query filename\n')
 			if (! file.exists(conf$data$query)) stop(paste('Cannot read from query filename: ',conf$data$query))
 
 			if (is.null(conf$data$query.format)) 
-				query<-rtracklayer::import(conf$data$query)
+				#query<-rtracklayer::import(conf$data$query)
+				query<-import(conf$data$query)
 			else if (conf$data$query.format=='bed.like.with.header')
 				query<-readTableToIRanges(conf$data$query,header=TRUE)
-			else query<-rtracklayer::import(conf$data$query,format=conf$data$query.format)
+			#else query<-rtracklayer::import(conf$data$query,format=conf$data$query.format)
+			else query<-import(conf$data$query,format=conf$data$query.format)
 		}
 
 		#object cannot be NA
@@ -266,21 +268,24 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 		if(!reference.as.is)
 		{
-			if(!require("rtracklayer",quietly=TRUE))
-			{
-				source("http://bioconductor.org/biocLite.R")
-				biocLite("rtracklayer")
-				require("rtracklayer")
-			}
+			# now Importing rtracklayer
+			#if(!require("rtracklayer",quietly=TRUE))
+			#{
+				#source("http://bioconductor.org/biocLite.R")
+				#biocLite("rtracklayer")
+				#require("rtracklayer")
+			#}
 
 			if (is.null(conf$data$reference) || conf$data$reference == '') stop ('Empty reference filename\n')
 			if (! file.exists(conf$data$reference)) stop(paste('Cannot read from reference filename: ',conf$data$reference))
 
 
-			if (is.null(conf$data$reference.format)) reference<-rtracklayer::import(conf$data$reference)
+			#if (is.null(conf$data$reference.format)) reference<-rtracklayer::import(conf$data$reference)
+			if (is.null(conf$data$reference.format)) reference<-import(conf$data$reference)
 			else if (conf$data$reference.format=='bed.like.with.header')
 				reference<-readTableToIRanges(conf$data$reference,header=TRUE)
-			else reference<-rtracklayer::import(conf$data$reference,format=conf$data$reference.format)
+			#else reference<-rtracklayer::import(conf$data$reference,format=conf$data$reference.format)
+			else reference<-import(conf$data$reference,format=conf$data$reference.format)
 		}
 
 		#default is false; paramter overrides file; if default value is used, we do not 
@@ -350,21 +355,24 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 			if(!mapping.as.is)
 			{
-				if(!require("rtracklayer",quietly=TRUE))
-				{
-					source("http://bioconductor.org/biocLite.R")
-					biocLite("rtracklayer")
-					require("rtracklayer")
-				}
+				# now Importing rtracklayer
+				#if(!require("rtracklayer",quietly=TRUE))
+				#{
+					#source("http://bioconductor.org/biocLite.R")
+					#biocLite("rtracklayer")
+					#require("rtracklayer")
+				#}
 
 				if (is.null(conf$data$mapping) || conf$data$mapping == '') stop ('Empty mapping filename\n')
 				if (! file.exists(conf$data$mapping)) stop(paste('Cannot read from mapping filename: ',conf$data$mapping))
 
 
-				if (is.null(conf$data$mapping.format)) mapping<-rtracklayer::import(conf$data$mapping)
+				#if (is.null(conf$data$mapping.format)) mapping<-rtracklayer::import(conf$data$mapping)
+				if (is.null(conf$data$mapping.format)) mapping<-import(conf$data$mapping)
 				else if (conf$data$mapping.format=='bed.like.with.header')
 					mapping<-readTableToIRanges(conf$data$mapping,header=TRUE)
-				else mapping<-rtracklayer::import(conf$data$mapping,format=conf$data$mapping.format)
+				#else mapping<-rtracklayer::import(conf$data$mapping,format=conf$data$mapping.format)
+				else mapping<-import(conf$data$mapping,format=conf$data$mapping.format)
 			}
 
 			chrom<-NA #default value means nothing

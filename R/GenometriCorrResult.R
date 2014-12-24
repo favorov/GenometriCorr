@@ -1,10 +1,9 @@
-# GenometriCorrelation project evaluating two genometric annotations 
-#	correlation. Also provides some service IRanges-related procedures. 
-# (c) 2010-2011 Alexander Favorov, Leslie Cope, Yulia Medvedeva, 
-#              Loris Mularoni, Vsevolod Makeev, Sarah Wheelan.
+# GenometriCorrelation project evaluating two interval markups genomewide independence. 
+# (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+#               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
+#               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 #
 # result - result of GenometriCorrelation function - works with ini file format  
-# $Id: GenometriCorrResult.R 1946 2013-08-31 13:41:54Z favorov $
 
 #if (!require('methods')) stop('GenometriCorrResult requires methods package!\n')
 #if (!require('graphics')) stop('GenometriCorrResult requires graphics package!\n')
@@ -161,7 +160,8 @@ setMethod('visualize',#'GenometriCorrResult',
 	signature(x='GenometriCorrResult'),
 	function(x, pdffile='',show.all=FALSE,show.chromosomes=c(), trustname=TRUE, make.new=TRUE, style="blue-white-red")
 	{
-		if (!require('gplots')) stop('GenometriCorr visualize requires gplots package\n')
+		# gplots is imported now
+		#if (!require('gplots')) stop('GenometriCorr visualize requires gplots package\n')
 		if (is.null(x@config$options$keep.distributions)) return()
 
 		if (!is.null(x@config$options$awhole.space.name))
@@ -430,7 +430,7 @@ setMethod('visualize',#'GenometriCorrResult',
 		mybreaks <- newbreaks-0.5
 	}
 	par(mar=c(3,3,1,1))
-	hist(seq(1:(length(allcols)-1)), breaks=mybreaks[mybreaks<=(length(allcols))], col=allcols, border=allcols, axes=F, labels=F, main=plottitle, xlab="", ylab="", cex.main=1.2)
+	hist(seq(1:(length(allcols)-1)), breaks=mybreaks[mybreaks<=(length(allcols))], col=allcols, border=allcols, axes=FALSE, labels=FALSE, main=plottitle, xlab="", ylab="", cex.main=1.2)
 	par(new=TRUE)
 	par(mar=c(3,3,1,1))
 	uprange <- max(densities)/sum(densities)
