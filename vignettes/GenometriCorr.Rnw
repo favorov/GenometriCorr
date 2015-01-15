@@ -303,6 +303,7 @@ config$tests$ecdf.area.permut.number<-10
 config$tests$mean.distance.permut.number<-10
 config$tests$jaccard.measure.permut.number<-10
 config$chromosomes <- "chr18"
+config$showTkProgressBar=FALSE
 @
 
 The {\tt GenometriCorrConfig} object contains all parameters for the {\tt GenometriCorrelation}. They are arranged in four groups: {\tt [chromosomes]}, {\tt [chromosomes.length]}, {\tt [options]} and {\tt [tests]} in the file and in correspondng lists in the {\tt GenometriCorrConfig} .
