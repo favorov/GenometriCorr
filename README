@@ -101,6 +101,5 @@ vignettes are move to vignettes
 A lot of changes to be compliant with Bioconductor
 R CMD CHECK passes with no warnings
 We use seqlenthgs of TxDb.Hsapiens.UCSC.hg19.knownGene in the examples
-
-
-R CMD check passe
+1.1.11
+Strange cycles are replaced with findOverlaps. ~10 times faster.

@@ -677,12 +677,14 @@ GenometriCorrelation <- function(
 			result[[space]][['relative.distances.ecdf.deviation.area.null.list']]<-c()
 		}
 
-		relative.ecdf.area<-
-			integrate(
-					ecdf(result[[space]]$relative.distances.data),
-					lower=0,upper=rel.dist.top,
-					subdivisions=length(result[[space]]$relative.distances.data)*100,
-					rel.tol=integr_rel_tol)$value
+		relative.ecdf.area<-rel.dist.top-mean(result[[space]]$relative.distances.data)
+			#rel.dist.top is integral(1) over (0..rel.dist.top)
+			
+			#integrate(
+			#		ecdf(result[[space]]$relative.distances.data),
+			#		lower=0,upper=rel.dist.top,
+			#		subdivisions=length(result[[space]]$relative.distances.data)*100,
+			#		rel.tol=integr_rel_tol)$value
 		indep_area=rel.dist.top/2
 		result[[space]][['relative.distances.ecdf.area.correlation']]=(relative.ecdf.area-indep_area)/indep_area
 		#it is Exp(dist)
@@ -837,12 +839,14 @@ GenometriCorrelation <- function(
 				result[[space]][['relative.distances.ecdf.deviation.area.null.list']]<-c()
 			}
 
-			relative.ecdf.area<-
-				integrate(
-						ecdf(result[[space]]$relative.distances.data),
-						lower=0,upper=rel.dist.top,
-						subdivisions=length(result[[space]]$relative.distances.data)*100,
-						rel.tol=integr_rel_tol)$value
+			relative.ecdf.area<-rel.dist.top-mean(result[[space]]$relative.distances.data)
+				#rel.dist.top is integral(1) over (0..rel.dist.top)
+				
+				#integrate(
+				#		ecdf(result[[space]]$relative.distances.data),
+				#		lower=0,upper=rel.dist.top,
+				#		subdivisions=length(result[[space]]$relative.distances.data)*100,
+				#		rel.tol=integr_rel_tol)$value
 			indep_area=rel.dist.top/2
 
 			result[[space]][['relative.distances.ecdf.area.correlation']]=(relative.ecdf.area-indep_area)/indep_area
@@ -1438,39 +1442,14 @@ query.to.ref.projection.statistics<-function(query,ref,is_query_sorted=F,chrom_l
 	projection_data<-c()
 	projection_data[['reference.length']]<-chrom_length
 	projection_data[['reference.coverage']]<-0
-	projection_data[['query.hits']]<-0
-	for (quindex in 1:length(query))
-	#we like to calculate wheb current ref < current query <= next ref
-	{
-		#cat('^',currentref,':',length(ref),'   ',quindex,':',length(query),"\n")
-		if (query[quindex] < start(ref[currentref])) next # we are left from current ref, next
-		#if we are here, we jumped over the start of the current
-		
-		#let's move the ref pointer until the range is over
-		while (query[quindex]<=end(ref[currentref])&&quindex<=length(query))
-		{
-			projection_data[['query.hits']]<-projection_data[['query.hits']]+1
-			quindex<-quindex+1
-		}
-		if (quindex==length(query)+1) break; # the query is over
-		#so, now we are higher than current ref; we did not add it to coverage yet,,,,
-		#cat ('$',currentref,length(ref),end(ref[currentref]),quindex,length(query),query[quindex],"\n")
-		while(currentref<=length(ref)&&query[quindex]>end(ref[currentref]))
-		{
-			projection_data[['reference.coverage']]<-projection_data[['reference.coverage']]+width(ref[currentref])
-			currentref <- currentref+1
-		}
-		if (currentref>length(ref)) break #the reference IRanges is over
-		if (query[quindex]>=start(ref[currentref])) # the current is inside
-			projection_data[['query.hits']]<-projection_data[['query.hits']]+1
+	
+	#now, we revert our q to IRanges. If qu[i] in integer then IRange has lentgh 1 and its start and end are q[i]
+	#if q[i] is integer+0.5 we assign it to [integer,integer+1] interval
 
-		#cat('*',currentref,':',length(ref),"   ",quindex,':',length(query),"  hits=  ",projection_data[['query.hits']],"\n")
-	}
-	if (currentref<=length(ref)) # no more quieries, but some refs are not counted
-		for (cur in currentref:length(ref))
-			projection_data[['reference.coverage']]<-projection_data[['reference.coverage']]+width(ref[cur])
+	ir_query<-IRanges(start=as.integer(query),width=ifelse(query %% 1 == 0,1,2))
 
-	#cat('%',currentref,':',length(ref),"   ",quindex,':',length(query),"\n")
+	projection_data[['query.hits']]<-sum(overlapsAny(ir_query,ref))
+
 	return(projection_data)
 } #query.to.ref.projection.statistics<-function(query,ref,is_query_sorted=F,chrom_length=NA)
 

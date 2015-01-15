@@ -54,13 +54,13 @@ The package also provides the \code{\link{VisualiseTwoIRanges}} function that cr
 Package: \tab GenometriCorr\cr
 Type: \tab Package\cr
 Title: \tab Genometric Correlation package \cr
-Version: \tab 1.1.11\cr
-Date: \tab 2014-11-19\cr
+Version: \tab 1.1.12\cr
+Date: \tab 2015-01-16\cr
 License: \tab Artistic-2.0\cr
 LazyLoad: \tab yes\cr
-Depends: \tab R (>= 3.1.0), IRanges, GenomicRanges, methods, tcltk, S4Vectors\cr
-Imports: \tab grDevices, gplots, rtracklayer\cr
-biocViews: \tab Annotation, Genetics, Infrastructure, DataRepresentation, Bioinformatics\cr
+Depends: \tab R (>= 3.1.0), IRanges, GenomicRanges, methods, tcltk, S4Vectors, TxDb.Hsapiens.UCSC.hg19.knownGene\cr
+Imports: \tab grDevices, gplots,GenomeInfoDb, rtracklayer\cr
+biocViews: \tab Annotation, Genetics, Infrastructure, DataRepresentation, Bioinformatics, StatisticalMethod\cr
 URL: \tab http://genometricorr.sourceforge.net/ \cr
 }}
 

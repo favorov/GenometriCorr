@@ -1,7 +1,7 @@
 Package: GenometriCorr
 Type: Package
 Title: Genometric Correlation package
-Version: 1.1.11
+Version: 1.1.12
 Author@R: c( person("Alexander", "Favorov",email = "favorov@sensi.org"), 
 		person("Loris", "Mularoni"),
 		person("Yulia","Medvedeva"),
@@ -20,4 +20,4 @@ Depends: R (>= 3.1.0), IRanges, GenomicRanges, methods, tcltk, S4Vectors, TxDb.H
 Imports: grDevices, gplots, GenomeInfoDb, rtracklayer
 biocViews: Annotation, Genetics, Infrastructure, DataRepresentation, GenomeAnnotation, StatisticalMethod
 URL: http://genometricorr.sourceforge.net/
-Packaged: 2014-10-16 19:55:48 UTC; hjaffee
+Packaged: 2015-01-16 19:55:48 UTC; favorov
