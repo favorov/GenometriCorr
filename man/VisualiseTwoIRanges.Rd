@@ -67,7 +67,9 @@ VisualiseTwoIRanges(irA, irB,
 %% ~put references to the literature/web site here ~
 \url{http://genometricorr.sourceforge.net/}
 }
-\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov,  Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan}
+
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
+
 %\note{
 %}
 

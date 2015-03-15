@@ -79,7 +79,7 @@ GenometriCorrelation <- function(
 	showProgressBar=TRUE,
 	showTkProgressBar=FALSE,
 	chromosomes.length=c(),
-	supress.evaluated.length.warning=FALSE,
+	suppress.evaluated.length.warning=FALSE,
 	cut.all.over.length=FALSE,
 	ecdf.area.permut.number=100,
 	mean.distance.permut.number=100,
@@ -89,7 +89,8 @@ GenometriCorrelation <- function(
 	keep.distributions=FALSE,
 	representing.point.function=mitl,
 	query.representing.point.function=representing.point.function,
-	reference.representing.point.function=representing.point.function
+	reference.representing.point.function=representing.point.function,
+	supress.evaluated.length.warning
 	)
 {
 	#query and reference are two data sets that are under analysis
@@ -106,7 +107,7 @@ GenometriCorrelation <- function(
 	#showTkProgressBar whether to show a Tk progress indicator; work only if tcltk is loaded
 	#chromosomes.length is an array of length of chromosomes, names are the names of chromosomes
 	#cut.all.over.length if the length is given and there is any interval coord that is higher than the lenght, the default behavoiur (when cut.all.over.length is FALSE) is to show an error and stop. If it is TRUE, the interval will be just truncated.
-	#	supress.evaluated.length.warning supresses the warning that a chromosome lenght is eveluated rather then given. The evaluation is just the rightmost coord in all the intervals, it is used is the length is NA.
+	#suppress.evaluated.length.warning suppresses the warning that a chromosome lenght is eveluated rather then given. The evaluation is just the rightmost coord in all the intervals, it is used is the length is NA.
 	#ecdf.area.permut.number is number of permutations for ecdf area method
 	#mean.distance.permut.number is the same thing about the mean ref-to-query distance
 	#awhole.space.name is the space name for this operation
@@ -116,7 +117,18 @@ GenometriCorrelation <- function(
 	#the function is to look like mitl<-function(start,end,chromosome.length,space); the additional parameters that do not depend on chrom, etc are in ..
 	#query.representing.point.function=representing.point.function for query
 	#reference.representing.point.function=representing.point.function for reference
-	
+	#supress.evaluated.length.warning is a historical typo
+
+	#fixing typo
+	if('supress.evaluated.length.warning' %in% names(as.list(match.call())))
+	{
+		warning("Please use \'suppress.evaluated.length.warning\' instead of \'supress.evaluated.length.warning\'")
+		if(supress.evaluated.length.warning==TRUE) 
+		{
+			suppress.evaluated.length.warning=TRUE
+		}
+	}
+	#
 	nameQ<-"query"
 	nameR<-"reference"	# HJ fixed typo
 	if (!is.object(query))  
@@ -263,7 +275,7 @@ GenometriCorrelation <- function(
 
 	wrong_diff<-setdiff(chromosomes.to.proceed,list.of.spaces)
 	if (length(wrong_diff)>0)
-		warning("Some spaces are in chromosomes.to.proceed but the they are not in the input data.\n They are:\n",paste(wrong_diff,collapse="\n"),"\n")
+		warning("Some spaces are in chromosomes.to.proceed but they are not in the input data.\n They are:\n",paste(wrong_diff,collapse="\n"),"\n")
 
 	#if the include list is empty, it is set to whole list
 	if(length(chromosomes.to.include.in.awhole)==0) chromosomes.to.include.in.awhole<-list.of.spaces
@@ -304,7 +316,7 @@ GenometriCorrelation <- function(
 		reference<-as(reference,'RangedData')
 	}
 	
-	# we do not intereasted in lengthes of those chromosomes that are
+	# we do not intereasted in lengths of those chromosomes that are
 	# not in intersection of spacesA and spacesB;
 	# if we have information in chromosomes.length, we do not care
 	# about what was given in seqlengths of A and B
@@ -335,7 +347,7 @@ GenometriCorrelation <- function(
 			showProgressBar=showProgressBar,
 			showTkProgressBar=showTkProgressBar,
 			chromosomes.length=chromosomes.length,
-			supress.evaluated.length.warning=supress.evaluated.length.warning,
+			suppress.evaluated.length.warning=suppress.evaluated.length.warning,
 			cut.all.over.length=cut.all.over.length,
 			ecdf.area.permut.number=ecdf.area.permut.number,
 			mean.distance.permut.number=mean.distance.permut.number,
@@ -361,7 +373,7 @@ GenometriCorrelation <- function(
 	result@config$options$showProgressBar=showProgressBar
 	result@config$options$showTkProgressBar=showTkProgressBar
 	result@config$chromosomes.length=as.list(chromosomes.length)
-	result@config$options$supress.evaluated.length.warning=supress.evaluated.length.warning
+	result@config$options$suppress.evaluated.length.warning=suppress.evaluated.length.warning
 	result@config$options$cut.all.over.length=cut.all.over.length
 	result@config$tests=list()
 	result@config$tests$ecdf.area.permut.number=ecdf.area.permut.number
@@ -383,7 +395,7 @@ GenometriCorrelation <- function(
 	showProgressBar=TRUE,
 	showTkProgressBar=FALSE,
 	chromosomes.length=c(),
-	supress.evaluated.length.warning=FALSE,
+	suppress.evaluated.length.warning=FALSE,
 	cut.all.over.length=FALSE,
 	ecdf.area.permut.number=100,
 	mean.distance.permut.number=100,
@@ -457,7 +469,7 @@ GenometriCorrelation <- function(
 	#	setTkProgressBar(tk_pb,value=done,title=paste('GenometriCorrelation:',done_info),label=done_info)
 	#}
 	
-	#we need to know all the chrom lengthes or at least to mark it as NA
+	#we need to know all the chrom lengths or at least to mark it as NA
 	for ( space in list.of.spaces )
 	{
 		if (! space %in% names(chromosomes.length))
@@ -465,7 +477,7 @@ GenometriCorrelation <- function(
 		if ( is.na(chromosomes.length[space]) ) #if it was absent, now it is NA as well as if it was NA
 		{
 			chromosomes.length[space]=chromosomes.length.eval(rd_query,rd_reference)
-			if (! (supress.evaluated.length.warning))
+			if (! (suppress.evaluated.length.warning))
 				warning(paste("Length for chromosome",space,"is evaluated rather than pre-given."))
 		}
 		else
@@ -558,7 +570,8 @@ GenometriCorrelation <- function(
 			result[[awhole.space.name]][['scaled.absolute.min.distance.sum.null.list']]<-c()
 		}
 		# we initialise relative.distances.ecdf.deviation.area.null.list 
-		# and jaccard.measure.null.list later, in the do_awhole after main chromwise cycle 
+		# and jaccard.measure.null.list and jaccard.intersection.null.list later, 
+		# in the do_awhole after main chromwise cycle 
 		result[[awhole.space.name]][['relative.distances.data']]<-c()
 
 		if (keep.distributions) # we need it only if we want distribution
@@ -708,8 +721,11 @@ GenometriCorrelation <- function(
 		else
 			result[[space]][['jaccard.measure']]<-0
 
-		if (jaccard.measure.permut.number>0) result[[space]][['jaccard.measure.null.list']]<-c()
-
+		if (jaccard.measure.permut.number>0) 
+		{
+			result[[space]][['jaccard.measure.null.list']]<-c()
+			result[[space]][['jaccard.intersection.null.list']]<-c()
+		}
 		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 
 		if (showTkProgressBar)
@@ -882,7 +898,11 @@ GenometriCorrelation <- function(
 			else
 				result[[space]][['jaccard.measure']]<-0
 
-			if (jaccard.measure.permut.number>0) result[[space]][['jaccard.measure.null.list']]<-c()
+			if (jaccard.measure.permut.number>0)
+			{
+				result[[space]][['jaccard.measure.null.list']]<-c()
+				result[[space]][['jaccard.intersection.null.list']]<-c()
+			}
 
 		}
 
@@ -1022,8 +1042,11 @@ GenometriCorrelation <- function(
 					space.jaccard.measure<-0
 
 				result[[space]][['jaccard.measure.null.list']]<-
-					c(result[[space]][['jaccard.measure.null.list']],space.jaccard.measure) #save the result
+					c(result[[space]][['jaccard.measure.null.list']],space.jaccard.measure)
 
+				result[[space]][['jaccard.intersection.null.list']]<-
+					c(result[[space]][['jaccard.intersection.null.list']],space.intersection) 
+				
 				if (space %in% awhole.chromosomes)
 				{
 					awhole.union<-awhole.union+space.union
@@ -1046,7 +1069,9 @@ GenometriCorrelation <- function(
 				awhole.jaccard.measure<-0
 			space<-awhole.space.name
 			result[[space]][['jaccard.measure.null.list']]<-
-				c(result[[space]][['jaccard.measure.null.list']],awhole.jaccard.measure) #save the result
+				c(result[[space]][['jaccard.measure.null.list']],awhole.jaccard.measure)
+			result[[space]][['jaccard.intersection.null.list']]<-
+				c(result[[space]][['jaccard.intersection.null.list']],awhole.intersection) 
 			if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 			if (showTkProgressBar)
 			{
@@ -1150,6 +1175,7 @@ GenometriCorrelation <- function(
 			result[[space]][['absolute.min.distance.data']]<-NULL
 			result[[space]][['absolute.inter.reference.distance.data']]<-NULL
 			result[[space]][['jaccard.measure.null.list']]<-NULL
+			result[[space]][['jaccard.intersection.null.list']]<-NULL
 		}
 	}
 	
@@ -1443,7 +1469,7 @@ query.to.ref.projection.statistics<-function(query,ref,is_query_sorted=F,chrom_l
 	projection_data[['reference.length']]<-chrom_length
 	projection_data[['reference.coverage']]<-0
 	
-	#now, we revert our q to IRanges. If qu[i] in integer then IRange has lentgh 1 and its start and end are q[i]
+	#now, we revert our q to IRanges. If qu[i] in integer then the range has lentgh 1 and its start and end are q[i]
 	#if q[i] is integer+0.5 we assign it to [integer,integer+1] interval
 
 	ir_query<-IRanges(start=as.integer(query),width=ifelse(query %% 1 == 0,1,2))

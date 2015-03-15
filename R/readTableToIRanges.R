@@ -2,7 +2,7 @@
 # (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 #               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 #               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
-# readTableToIRanges.R reads a variety of GFF- or BED-like  formats to an IRange or a RangedData object
+# readTableToIRanges.R reads a variety of GFF- or BED-like  formats to an IRanges or a RangedData object
 
 
 ## file is the name of file to read

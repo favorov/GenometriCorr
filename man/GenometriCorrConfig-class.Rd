@@ -12,7 +12,7 @@
 
 \title{Configuration class \code{"GenometriCorrConfig"}: a list of parameters for GenometriCorrelation, and input file names}
 
-\description{An object of this class can be initialised by an \code{.ini} file; it is inherited form a \code{namedList}lthat contains the full structure of \code{.ini} file. It restores the structure by call to \code{print}. The \code{\link{GenometriCorr}} - specific call is \code{run.config(conf)} that runs \code{\link{GenometriCorrelation}} with parameters that are stored in the configuration file, as shown in \code{template-config.ini} file in the \code{extdata} directory of the \code{\link{GenometriCorr}} package. For a usage example, see \code{\link{GenometriCorrResult-class}}}
+\description{An object of this class can be initialized by an \code{.ini} file; it is inherited form a \code{namedList}lthat contains the full structure of \code{.ini} file. It restores the structure by call to \code{print}. The \code{\link{GenometriCorr}} - specific call is \code{run.config(conf)} that runs \code{\link{GenometriCorrelation}} with parameters that are stored in the configuration file, as shown in \code{template-config.ini} file in the \code{extdata} directory of the \code{\link{GenometriCorr}} package. For a usage example, see \code{\link{GenometriCorrResult-class}}}
 
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("GenometriCorrConfig", src)}.
@@ -52,7 +52,7 @@ Class \code{"\linkS4class{vector}"}, by class "namedList", distance 3.
 \url{http://genometricorr.sourceforge.net/}
 }
 
-\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov,  Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan}
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 \note{
 %%  ~~further notes~~
@@ -101,7 +101,7 @@ chrM=16571
 [options]
 add.chr.as.prefix=FALSE
 awhole.only=FALSE
-supress.evaluated.length.warning=FALSE
+suppress.evaluated.length.warning=FALSE
 cut.all.over.length=FALSE
 keep.distributions=TRUE
 showTkProgressBar=TRUE
@@ -118,7 +118,7 @@ jaccard.measure.permut.number=100
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-	The \code{\link{GenometriCorrResult-class}} class; the \code{\link{GenometriCorr}} documentation and the \href{../doc/GenometriCorr.pdf}{GenometriCorr package vingnette}.
+	The \code{\link{GenometriCorrResult-class}} class; the \code{\link{GenometriCorr}} documentation and the \href{../doc/GenometriCorr.pdf}{GenometriCorr package vignette}.
 }
 
 \keyword{classes}

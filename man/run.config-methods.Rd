@@ -20,11 +20,11 @@ The \code{run.config} function runs on a \code{"\linkS4class{GenometriCorrConfig
 		\code{conf} is the \code{"\linkS4class{GenometriCorrConfig}"} class. Its slots correspond to the configuration file sections. Below is the list of the sections and the variables of the file and the corresponding parameters of the \link{GenometriCorrelation}} call. 
 		\tabular{rll}{
 		Section \tab Value \tab Role\cr
-		\code{[chromosomes]} \tab \tab this section contatins the list of chromosomes, it is passed as \code{chromosomes.to.proceed}\cr
+		\code{[chromosomes]} \tab \tab this section contains the list of chromosomes, it is passed as \code{chromosomes.to.proceed}\cr
 		\code{[chromosomes.length]}\tab \code{name=length} \tab this length will be passed in the \code{chromosomes.length} parameter in the \code{['name']} element\cr
 		\code{[options]} \tab \code{add.chr.as.prefix} \tab \code{add.chr.as.prefix}\cr
 		\code{[options]} \tab \code{awhole.only} \tab \code{awhole.only}\cr
-		\code{[options]} \tab \code{supress.evaluated.length.warning} \tab \code{supress.evaluated.length.warning}\cr
+		\code{[options]} \tab \code{suppress.evaluated.length.warning} \tab \code{suppress.evaluated.length.warning}\cr
 		\code{[options]} \tab \code{cut.all.over.length} \tab \code{cut.all.over.length}\cr
 		\code{[options]} \tab \code{keep.distributions} \tab \code{keep.distributions}\cr
 		\code{[options]} \tab \code{showTkProgressBar} \tab \code{showTkProgressBar}\cr
@@ -49,6 +49,9 @@ The \code{run.config} function runs on a \code{"\linkS4class{GenometriCorrConfig
 
 		Other formats are interpreted as \code{format} parameters for the {\code{\link[rtracklayer]{import}}} function from \code{rtracklayer} package. A useful option is \code{bed.like.with.header} that calls \code{\link{readTableToIRanges}} with \code{header=TRUE} parameter to read the file rather than the standard {\code{\link[rtracklayer]{import}}}.
 }}
+
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
+
 \note{See an example at \code{\linkS4class{GenometriCorrResult}} help.}
 
 \keyword{methods}

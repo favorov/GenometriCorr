@@ -27,7 +27,8 @@ readTableToIRanges is not exported any more.
 It is available as GenometriCorr:::readTableToIRanges
 1.0.10
 Three options are added to GenometricCorrelation: 
-add.chr.as.prefix to treat say '34' and 'chr34' as synonyms; supress.evaluated.length.warning to supress the warning; 
+add.chr.as.prefix to treat say '34' and 'chr34' as synonyms; supress.evaluated.length.warning to suppress the warning;
+suppress.evaluated.length.warning replaced the typo supress.evaluated.length.warning in 1.1.13
 cut.all.over.length to remove overlegnth data rather that to generate error. 
 Some bugs fixed.
 1.0.11
@@ -87,19 +88,26 @@ visualize now use red-white-blue color scheme, the old one can be called by styl
 graphical.report format improved
 graphical.report default file name creation improved
 GenometricCorrelation help error (awhole.only options were swapped) fixed.
-graphical.report error tried to refere to obsoleted reference.middles in GenometriCorrResult - fixed
-thanks to Mike Parfenov from Harvard and to Youri Kravatsky from IMB RAS
+graphical.report error tried to refer to obsoleted reference.middles in GenometriCorrResult - fixed
+Thanks to Mike Parfenov from Harvard and to Youri Kravatsky from IMB RAS
 relative.ecdf.deviation.area returned to list of obligatory values
 help for package now reflects classes
 the same in Wizard and in Galaxy integration fixed: we called plot() instead of graphical.report()
 graphical.report test whether keep.distributions is defined rather than to start an error
 Wizard is consistent with current dir structure
 1.1.10
-The rtraclayer's import now returns GRanges only, so a lot of things were changed
+The rtracklayer's import now returns GRanges only, so a lot of things were changed
 vignettes are move to vignettes
 1.1.11
 A lot of changes to be compliant with Bioconductor
 R CMD CHECK passes with no warnings
 We use seqlenthgs of TxDb.Hsapiens.UCSC.hg19.knownGene in the examples
-1.1.11
+1.1.12
 Strange cycles are replaced with findOverlaps. ~10 times faster.
+1.1.13
+A lot of typos in documentation fixed.
+Starting and trailing spaces are now trimmed in configuration file values and tags.
+MapRangesToGenomicIntervals rewritten. Two more bugs removed. 
+Thanks to Ruth McCole from Harvard.
+$jaccard.intersection.null.list added to the result is keep.distribution=TRUE. 
+Thanks to Promita Bose from Memorial Sloan Kettering 

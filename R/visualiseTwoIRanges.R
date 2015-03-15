@@ -140,7 +140,7 @@ VisualiseTwoIRanges<-function(irA, irB, start=1, end=NA, nameA='RangesA', nameB=
 	img_len<-length(maskA)
 	if (img_len != length(maskB))
 	{
-		stop("Image lengthes are different, something went wrong.");
+		stop("Image lengths are different, something went wrong.");
 	}
 	if (maxintenseA==0)  #not to divide by 0 in as.raster
 		image_red<-

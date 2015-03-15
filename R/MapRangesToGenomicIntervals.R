@@ -44,11 +44,10 @@ MapRangesToGenomicIntervals<-function(
 	{
 		chromosome.names.what<-as.character(unique(space(what.to.map)))
 	}
-	ranges<-IRanges()
 	seqnames<-c()
 	seqleninfo<-c()
-	mapped_start=c()
-	mapped_end=c()
+	start=c()
+	end=c()
 	for (chr in chromosome.names.what)
 	{
 		if (!is.na(chromosomes.to.proceed) && ! chr %in% chromosomes.to.proceed) next;
@@ -59,59 +58,52 @@ MapRangesToGenomicIntervals<-function(
 			next;
 		}
 		whereranges<-sort(ranges(where.to.map)[[chr]])
-		if (! isNormal(IRanges(start=start(whereranges),end=end(whereranges)-1)))
+		if (! isNormal(IRanges(start=start(whereranges),end=end(whereranges))))
 		{
 			warning(paste("The chromosome",chr,"is not normalised in where.to.map; skipped."))
 			next;
 		}
 		whatranges<-sort(ranges(what.to.map)[[chr]])
-		#we decide what to do with the chromosome lengths
-		ind_where<-0
-		ind_what<-0
-		#print('What')
-		#print(whatranges)
-		#print('Where')
-		#print(whereranges)
-		while (ind_where < length(whereranges))
-		{
-			ind_where<-ind_where+1
-			mapped_range_name=paste(chr,start(whereranges)[ind_where],sep='_');
-			#cat(chr,mapped_range_name,ind_where,"\n")
-			this_pseudocromosome_population<-0
-			while((ind_what < length(whatranges)) && (start(whatranges)[ind_what+1] < end(whereranges)[ind_where]))
-			{
-				ind_what<-ind_what+1
-				if ( end(whatranges)[ind_what] < start(whereranges)[ind_where] ) next; 
-				#moving 'what' cursor up to get current 'where' interval
-				cur_start<-max(1,start(whatranges)[ind_what]-start(whereranges)[ind_where]+1)
-				cur_end<-min(end(whatranges)[ind_what]-start(whereranges)[ind_where]+1,width(whereranges)[ind_where])
-				mapped_start<-c(mapped_start,cur_start)
-				mapped_end<-c(mapped_end,cur_end)
-				this_pseudocromosome_population<-this_pseudocromosome_population+1
-				#cat('chr:',chr,'\n')
-				#cat('wha: ',ind_what,':',start(whatranges)[ind_what],end(whatranges)[ind_what],"\n")
-				#cat('whe: ',ind_where,':',start(whereranges)[ind_where],end(whereranges)[ind_where],"\n")
-				#cat('res: ',length(mapped_end),':',cur_start,cur_end,"\n")
+		
+		mapping.mat<-as.matrix(findOverlaps(whatranges,whereranges))
+
+		map.result<-apply(mapping.mat,1,
+			function(hit){
+				ind.what<-hit[1]
+				ind.where<-hit[2]
+				start<-max(1,start(whatranges)[ind.what]-start(whereranges)[ind.where]+1)
+				end<-min(end(whatranges)[ind.what]-start(whereranges)[ind.where]+1,width(whereranges)[ind.where])
+				seqnames<-paste0(chr,':',start(whereranges)[ind.where],'-',end(whereranges)[ind.where])
+				c(seqnames=seqnames,end=end,start=start)
 			}
-			seqleninfo<-c(seqleninfo,width(whereranges)[ind_where])
-			names(seqleninfo)[[length(seqleninfo)]]<-mapped_range_name
-			seqnames<-c(seqnames,rep(mapped_range_name,this_pseudocromosome_population))
-		}
+		)
+		
+		seqnames<-c(seqnames,map.result['seqnames',])
+		start<-c(start,as.integer(map.result['start',]))
+		end<-c(end,as.integer(map.result['end',]))
 	}
-	if(unmapped.range.warning && ( length(space(what.to.map)) > length(mapped_start) ))
+	if(unmapped.range.warning && ( length(space(what.to.map)) > length(start) ))
 		warning("Some ranges remained unmapped.\n")
 	if (length(seqnames)==0)
 	{
 		warning("Empty mapping result.\n");
 		return (GRanges())
 	}
+	#prepare seqlength info
+	seqlenames<-unique(seqnames)
+	seqlengths<-sapply(as.vector(strsplit(seqlenames,':')), #list, we need
+		function(splt){
+			startend<-as.integer(strsplit(splt[2],'-')[[1]])
+			startend[2]-startend[1]+1	
+		}
+	)
+	names(seqlengths)<-seqlenames
 	return
 	(
 		GRanges(
 			seqnames=seqnames,
-			ranges=IRanges(start=mapped_start,end=mapped_end),
-			seqlengths=seqleninfo)
+			ranges=IRanges(start=start,end=end),
+			seqlengths=seqlengths)
 	)
 }
 
-#isNormal(ranges(cpgis)[as.vector(unique(space(cpgis)))])

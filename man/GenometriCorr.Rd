@@ -11,7 +11,7 @@
 GenometriCorr (Genometric Correlation) package 
 }
 \description{
-\code{GenometriCorr} evaluates the spatial correlation between two types of features (experimental or annotated) in genomic coordinates. Several different approaches are implemented, each intended to evaluate a different biologially relevant spatial relationship. The genomic features are split into intervals and correlations are evaluated as described in the package vignette. 
+\code{GenometriCorr} evaluates the spatial correlation between two types of features (experimental or annotated) in genomic coordinates. Several different approaches are implemented, each intended to evaluate a different biologically relevant spatial relationship. The genomic features are split into intervals and correlations are evaluated as described in the package vignette. 
 
 Most standard genomic feature annotation file formats are accepted as input. Each feature type is given in a separate file, one used as a query and the other used as a reference. The statistical comparisons that are made are not symmetric; that is, they are sensitive to which file is the query and which is the reference, so we recommend running the comparisons twice, switching the status of the input files for the second run. This is intentional, as biological relationships can be asymmetric. Once the files are read, the annotations are stored as \code{\link{GRanges}}, \code{\link{RangedData}} or \code{\link{IRanges-class}} objects (\code{IRanges}, \code{GenomicRanges} packages).
 
@@ -25,7 +25,7 @@ Below we describe the statistical comparisons implemented in this package. One s
 Query and reference intervals that are often separated by the same distance will have significant \emph{p-values}; the magnitude of the \emph{p-value} depends on the number of permutations performed. To determine whether a significant result indicates a small or large distance, we provide the \code{scaled.absolute.min.distance.sum.lower.tail}, a boolean that is \code{TRUE} when the actual absolute distances are smaller than expected and \code{FALSE} if they are higher.
 
 	\item{relative.distances.ks.p.value}
-This \emph{p-value} will be low when the query and refernce intervals have similar spatial distributions. This test is hypersensitive and is most useful when the \emph{p-value} is high.
+This \emph{p-value} will be low when the query and reference intervals have similar spatial distributions. This test is hypersensitive and is most useful when the \emph{p-value} is high.
 
 	\item{relative.distances.ecdf.deviation.area.p.value} 
 If the query and reference reference intervals are closer or farther apart than expected, this \emph{p-value} will be lo
@@ -71,7 +71,7 @@ URL: \tab http://genometricorr.sourceforge.net/ \cr
 }
 \keyword{ package }
 \seealso{
-	The {../doc/GenometriCorr.pdf}{GenometriCorr package vingnette}.
+	The {../doc/GenometriCorr.pdf}{GenometriCorr package vignette}.
 }
 \examples{
 library('rtracklayer')
@@ -116,7 +116,7 @@ rref<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width
 
 unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.length,ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
 
-#correlate them on the whole cromosome: 1...3 000 000
+#correlate them on the whole chromosome: 1...3 000 000
 
 cat('Unmapped result:\n')
 print(unmapped_result)

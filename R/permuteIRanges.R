@@ -38,7 +38,7 @@
 		stop("The IRanges given for random rearramgement has a range in the that sticks out given chromosome lentgh.
   Not sure what to do.\n")		
 	if(max(coverage(ir))>1)
-		stop("You asked to rearrange an IRange with overlaps.\n  Not sure what to do.\n")
+		stop("You asked to rearrange an IRanges with overlaps.\n  Not sure what to do.\n")
 	widths<-width(ir)
 	addgap<-min(start(ir))+chrom.length-right_end #it is the sum of the left and right flanks
 	gappes<-c(width(gaps(ir)),addgap) #we add it to the tail or the gaps

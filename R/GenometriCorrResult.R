@@ -24,6 +24,7 @@ setMethod('show','GenometriCorrResult',function(object)
 				'relative.distances.ecdf.deviation.area.null.list',
 				'scaled.absolute.min.distance.sum.null.list',
 				'jaccard.measure.null.list',
+				'jaccard.intersection.null.list',
 				'projection.test',
 				'scaled.absolute.min.distance.sum')
 		#we remove the do_not_show list from namelist

@@ -28,7 +28,7 @@ The GenometriCorrelation function compares two interval annotations on a chromos
 		showProgressBar=TRUE,
 		showTkProgressBar=FALSE,
 		chromosomes.length=c(),
-		supress.evaluated.length.warning=FALSE,
+		suppress.evaluated.length.warning=FALSE,
 		cut.all.over.length=FALSE,
 		ecdf.area.permut.number=100,
 		mean.distance.permut.number=100,
@@ -50,7 +50,7 @@ The \code{IRanges} or \code{RangedData} or \code{GRanges} object that contains t
 The \code{IRanges} or \code{RangedData} or \code{GRanges} object that contains the reference interval set coordinates and spaces. The \code{GenometriCorrelation} function tests whether \code{query} is positioned independently relative to \code{reference}.
 }
   \item{chromosomes.to.proceed}{
-This vector of strings contains the names of spaces (chromosomes) to analyze. If both \code{query} and \code{reference} are \code{RangedData} or \code{GRanges} if the parameter is not given (its default is c()), the initial list of spaces to proceed is the intersection of the the space lists of query and reference names, if \code{chromosomes.to.proceed} is given, it restricts the list so that only those names from the intersection that are in \code{chromosomes.to.proceed} are analyzed. If one or both of the  \code{query} and \code{reference} is an IRange, only the first element of \code{chromosomes.to.proceed} is used. It actually overrides the \code{space} argument (see below for explanation). If both \code{chromosomes.to.proceed} and \code{space} are given and \code{space != chromosomes.to.proceed[1]}, an error is generated. If after parsing all arguments, less than \code{2} chromosomes are included in the analysis, the overall (awhole) statistics will not be produced.
+This vector of strings contains the names of spaces (chromosomes) to analyze. If both \code{query} and \code{reference} are \code{RangedData} or \code{GRanges} if the parameter is not given (its default is c()), the initial list of spaces to proceed is the intersection of the space lists of query and reference names, if \code{chromosomes.to.proceed} is given, it restricts the list so that only those names from the intersection that are in \code{chromosomes.to.proceed} are analyzed. If one or both of the  \code{query} and \code{reference} is an IRange, only the first element of \code{chromosomes.to.proceed} is used. It actually overrides the \code{space} argument (see below for explanation). If both \code{chromosomes.to.proceed} and \code{space} are given and \code{space != chromosomes.to.proceed[1]}, an error is generated. If after parsing all arguments, less than \code{2} chromosomes are included in the analysis, the overall (awhole) statistics will not be produced.
 }
   \item{chromosomes.to.include.in.awhole}{
 This vector of strings contains the names of spaces to be included in the overall (awhole) statistics. Its default is c(), meaning that all the analysed genes are included.}
@@ -77,8 +77,8 @@ Toggle the Tk progress bar. If it is \code{TRUE} but the Tcl/Tk is not loadable 
   \item{chromosomes.length}{
 A vector of lengths of the chromosomes to be tested; each chromosome is given a name and a numerical length. The order of the chromosomes does not matter.
 }
-	\item{supress.evaluated.length.warning}{
-If there is a chromosome that is included in the evaluation but its length is not given in \code{chromosome.length}, the length of the chromosome is calculated as the maximal position mentioned in the data. If this parameter is \code{FALSE}, this will generate a warning, which is suppressed when thie parameter is \code{TRUE}. The default is \code{FALSE}.
+	\item{suppress.evaluated.length.warning}{
+If there is a chromosome that is included in the evaluation but its length is not given in \code{chromosome.length}, the length of the chromosome is calculated as the maximal position mentioned in the data. If this parameter is \code{FALSE}, this will generate a warning, which is suppressed when the parameter is \code{TRUE}. The default is \code{FALSE}.
 }
 	\item{cut.all.over.length}{If the chromosome is shorter than a position given in the interval data, an error is posted, except if this argument is \code{TRUE}, in which case the position is replaced by the length of the chromosome, or removed altogether. The default is \code{FALSE}.
 }
@@ -125,10 +125,9 @@ parameters in its \code{\link{GenometriCorrResult-class}} \code{@config} slot an
 \code{\linkS4class{namedList}}
 list (created originally with a \code{list()} call with the results of the run.
 Each element of the list is also a list that describes results for a space (chromosome); one of
-them is 'awhole' (or other \code{awhole.space.name} if given) that describes the genome awhole,
-all others are named the same as the chromosomes and describe the chromosomwise statistics.
-The elements of the 'awhole' and chromosomewide lists are statistical measures and some datasets.
-The statistical measures are desribed in the \code{\link{GenometriCorr}} package help.
+them is 'awhole' (or other \code{awhole.space.name} if given) that describes the genome awhole, all others are named the same as the chromosomes and describe the chromosomewise statistics.
+The elements of the 'awhole' and chromosomewise lists are statistical measures and some datasets.
+The statistical measures are described in the \code{\link{GenometriCorr}} package help.
 For further explanation, see the MarkupsIndependence vignette. 
 
 Below is the description of the values of the list returned for each chromosome. 
@@ -148,16 +147,16 @@ Below is the description of the values of the list returned for each chromosome.
 \item{jaccard.measure.lower.tail}{If \code{TRUE}, then Jaccard measure is lower that the expectation (overlap less than expected)}
 
 
-The additional values that are returned if \code{keep.distrubutions=TRUE}
+The additional values that are returned if \code{keep.distributions=TRUE}
 \item{relative.distances.data}{The original relative distances}
-\item{relative.distances.ecdf.deviation.area}{The real value of the ECDF deviation area to be compared with the permutatoin to obtain the p-value}
+\item{relative.distances.ecdf.deviation.area}{The real value of the ECDF deviation area to be compared with the permutation to obtain the p-value}
 \item{relative.distances.ecdf.deviation.area.null.list}{The null distribution}
 \item{projection.test}{List of three values: \code{reference.length} is length of a chromosome; \code{reference.coverage} is length of that chromosome covered by reference intervale, and \code{query.hits} is the number of query points that fall into the reference intervals.}
 \item{absolute.min.distance.data}{The distribution of query-reference distances}
 \item{absolute.inter.reference.distance.data}{The distribution of reference-reference distances}
 \item{scaled.absolute.min.distance.sum}{The value of the sum (i.e. mean) of scaled absolute distances}
 \item{scaled.absolute.min.distance.sum.null.list}{The null distribution for the scaled absolute distances}
-\item{jaccard.measure.null.list}{The null distribution of Jaccard maesures in permutations}
+\item{jaccard.measure.null.list}{The null distribution of Jaccard measures in permutations}
 
 }
 \references{
@@ -165,7 +164,7 @@ The additional values that are returned if \code{keep.distrubutions=TRUE}
 \url{http://genometricorr.sourceforge.net/}
 }
 
-\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov,  Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan}
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 %\note{
 %%  ~~further notes~~
@@ -174,7 +173,7 @@ The additional values that are returned if \code{keep.distrubutions=TRUE}
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-	The \code{\link{GenometriCorr}} documentation and the \href{../doc/GenometriCorr.pdf}{GenometriCorr package vingnette}.
+	The \code{\link{GenometriCorr}} documentation and the \href{../doc/GenometriCorr.pdf}{GenometriCorr package vignette}.
 }
 \examples{
 

@@ -26,7 +26,9 @@
 \begin{document}
 
 \title{GenometriCorr (Genometric Correlation): an R package for spatial correlation of genome-wide interval datasets}
-\author{Alexander Favorov\footnote{favorov@sensi.org}, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov\\ Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan}
+
+
+\author{Alexander Favorov\footnote{favorov@sensi.org}\ , Loris Mularoni, Yulia Medvedeva,\\Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope,\\Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 \maketitle
 
@@ -203,9 +205,9 @@ seqinfo(cpgis)<-seqinfo(TxDb.Hsapiens.UCSC.hg19.knownGene)[seqnames(seqinfo(cpgi
 %refseq
 %@
 
-The information about lengths and names of chromosomes is coded in seqinfo provided by TxDb.Hsapiens.UCSC.hg19.knownGene. The refseq object contains it; the cpgis is read from a bed file and thus we set the seqinfo. If the query and reference oblects do not carry seqinfo, the information can be passed via {\tt chromosomes.length} parameter that is organised exactly as {\tt seqlenghts(GenomicRanges)} result. It is, a numeric vector with names, whic are chromosome names.
+The information about lengths and names of chromosomes is coded in {\tt seqinfo} provided by {\tt TxDb.Hsapiens.UCSC.hg19.knownGene}. The {\tt refseq} object contains it; the {\tt cpgis} is read from a {\tt bed} file and thus we set the {\tt seqinfo}. If both the query and reference objects do not carry {\tt seqinfo}, the information can be passed via {\tt chromosomes.length} parameter that is organized exactly as {\tt seqlenghts(GenomicRanges)} result. It is, a numeric vector with names, which are chromosome names.
 
-If the chromosome lengths are not either given explicitely or coded in reference or in query, they are taken to be the maximum of the reference and query coordinates provided, per chromosome, and a warning is generated. You can suppress the warning with {\tt supress.evaluated.length.warning=TRUE}.
+If the chromosome lengths are not either given explicitly or coded in reference or in query, they are taken to be the maximum of the reference and query coordinates provided, per chromosome, and a warning is generated. You can suppress the warning with {\tt suppress.evaluated.length.warning=TRUE}.
 
 \subsection{Visualize the query and reference intervals}
 
@@ -251,14 +253,14 @@ The result is an object of the (S4) {\tt GenometriCorrResult} class. The class i
 print(cpgi_to_genes)
 @
 
-The {\tt GenometriCorrelation} function calculates the correlation statistics previously described, on each chromosome separately, and then on the genome as a whole ("awhole"). The visualization above suggested that the query and reference intervals are correlated. The resulting list is structured by the names of the chromosomes used and an additional {\tt 'awhole'} pseudochromosome. For each of them, it contains the folowing data:
+The {\tt GenometriCorrelation} function calculates the correlation statistics previously described, on each chromosome separately, and then on the genome as a whole ("awhole"). The visualization above suggested that the query and reference intervals are correlated. The resulting list is structured by the names of the chromosomes used and an additional {\tt 'awhole'} pseudochromosome. For each of them, it contains the following data:
 \begin{itemize}
 \item The very low p-value calculated in {\tt relative.distances.ks.p.value} is in accordance with the observation. {\tt relative.distances.ecdf.area.correlation} is positive, so the query and reference are in general closer to each other than we would expect if they are independent. 
 \item The {\tt projection.test.p.value} is zero, indicating either significant overlap or significant lack of overlap. {\tt projection.test.lower.tail} is {\tt FALSE}, meaning that we are in the upper tail of the distribution and there is significantly more overlap of the query and reference intervals than we would expect if they were independent. 
 \item All three permutation tests give {\tt <0.01} meaning that the observed spatial relationships (absolute or relative distance apart) are significantly different than what is seen in the permutation distribution. 
-\item From the p-values of the permutation distributions we cannot tell whether the query and reference intervals are significantly close together or significantly far apart. As the value of the {\tt scaled.absolute.min.distance.sum.lower.tail} is {\tt TRUE}, we know that the absolute distances between query and reference are consistent and small, and, finally, the {\tt jaccard.measure.lower.tail} is {\tt FALSE}, indicating an unexpectively high overlap, as defined by the Jaccard measure. 
+\item From the p-values of the permutation distributions we cannot tell whether the query and reference intervals are significantly close together or significantly far apart. As the value of the {\tt scaled.absolute.min.distance.sum.lower.tail} is {\tt TRUE}, we know that the absolute distances between query and reference are consistent and small, and, finally, the {\tt jaccard.measure.lower.tail} is {\tt FALSE}, indicating an unexpectedly high overlap, as defined by the Jaccard measure. 
 \end{itemize}
-In this case, all tests indicate that the query and reference intervals are close together and/or overlapping. In other datasets, the values may be very different; for example, the query and reference intervals can be separated by a consistent and large distance, giving a significant absolute distance correlation with {\tt scaled.absolute.min.distance.sum.lower.tail} {\tt FALSE}, and the overlap measures may or may not indicate consistent nonoverlapping intervals, depending on the size of the genome and the distances involved. Thus the various tests are extremely useful as a whole, to determine the relationship between the query and reference data in a much more precise way.
+In this case, all tests indicate that the query and reference intervals are close together and/or overlapping. In other datasets, the values may be very different; for example, the query and reference intervals can be separated by a consistent and large distance, giving a significant absolute distance correlation with {\tt scaled.absolute.min.distance.sum.lower.tail} {\tt FALSE}, and the overlap measures may or may not indicate consistent non-overlapping intervals, depending on the size of the genome and the distances involved. Thus the various tests are extremely useful as a whole, to determine the relationship between the query and reference data in a much more precise way.
 
 It is helpful to use visualization tools like those shown in Figures 6 and 7. Two types of graphical output are available for the {\tt GenometriCorrResult} class. In both cases, use the {\tt keep.distributions=TRUE } parameter in the {\tt GenometriCorrelation} call so that the object returned by the call contains the distribution data needed to report anything more than the correlation statistics. Below is an example, generated by {\tt graphical.report} function, for chromosome 1.
 
@@ -306,9 +308,9 @@ config$chromosomes <- "chr18"
 config$showTkProgressBar=FALSE
 @
 
-The {\tt GenometriCorrConfig} object contains all parameters for the {\tt GenometriCorrelation}. They are arranged in four groups: {\tt [chromosomes]}, {\tt [chromosomes.length]}, {\tt [options]} and {\tt [tests]} in the file and in correspondng lists in the {\tt GenometriCorrConfig} .
+The {\tt GenometriCorrConfig} object contains all parameters for the {\tt GenometriCorrelation}. They are arranged in four groups: {\tt [chromosomes]}, {\tt [chromosomes.length]}, {\tt [options]} and {\tt [tests]} in the file and in corresponding lists in the {\tt GenometriCorrConfig} .
 
-Also, there is a group {\tt [data]} that describes the input for query, reference and mapping (see below) if any. It can be empty, or it can specify the filenames and formats of the input files, or the names of R objects in the current workpace, to be used as query, reference and mapping data sources. If an R variable name is used, the corresponding format is ''
+Also, there is a group {\tt [data]} that describes the input for query, reference and mapping (see below) if any. It can be empty, or it can specify the filenames and formats of the input files, or the names of R objects in the current workspace, to be used as query, reference and mapping data sources. If an R variable name is used, the corresponding format is ''
 
 As a simple illustration of using the config file we will use sequencing data, instead of known annotations. The analyses performed by the GenometriCorr package are applicable to any type of whole-genome data as long as it can be specified as points or intervals in genomic coordinates. This means that the functions can analyze sequencing data or microarray data as well as perform comparison between annotations (as above); the sequencing or microarray data must be presented either as points or as intervals as the package contains no functions to do alignment. In this short example we compare ChIPseq data with expression data on a single human chromosome.
 
@@ -326,7 +328,7 @@ And, finally, let's start the {\tt GenometriCorrelation} with this parameters:
 conf_res<-run.config(config,query=histones,reference=expr_genes)
 @
 
-Here, we passed {\tt query} and {\tt reference} to the {\tt run.config} call as {\tt RangedData} R objects, wo they will be pased to the {\tt GenometriCorrelation} as is. {\tt run.config} also accepts filenames, fileformats or the names or R variables to be used as query, reference and mapping. To show that a variable name is passed, the corresponding format idetifier is 'R.variable.name'. All the methods of passing data to {\tt run.config} except the direct pass of R object (as in the example) can be described in the configuration file.
+Here, we passed {\tt query} and {\tt reference} to the {\tt run.config} call as {\tt RangedData} R objects, wo they will be pased to the {\tt GenometriCorrelation} as is. {\tt run.config} also accepts filenames, file formats or the names or R variables to be used as query, reference and mapping. To show that a variable name is passed, the corresponding format identifier is 'R.variable.name'. All the methods of passing data to {\tt run.config} except the direct pass of R object (as in the example) can be described in the configuration file.
 
 The {\tt run.config} returns a {\tt GenometriCorrResult} object that was obtained from {\tt GenometriCorrResult}. The {\tt @config} slot of the returned object is a {\tt GenometriCorrConfig} describing the run. 
 
@@ -343,7 +345,7 @@ If we test the correlation of a reference and query that are consistently found 
 
 The MapRangesToGenomicIntervals accepts two RangedData or GRanges, and maps the intervals from the second interval set that are contained in the first interval set, recalculating the coordinates so that within each new interval the coordinates range from 1 to the length of the interval. 
 
-Let's see how it works. In this artifical example, we create two random feature sets that reside only in bases $[1000000..2000000]$ in a chromosome of length 3000000. First, we correlate these two features as is, not accounting for their restricted range. Next we will run the correlation again, this time using the mapping functions to test their relationship only within the $[1000000..2000000]$ chromosomal range.
+Let's see how it works. In this artificial example, we create two random feature sets that reside only in bases $[1000000..2000000]$ in a chromosome of length 3000000. First, we correlate these two features as is, not accounting for their restricted range. Next we will run the correlation again, this time using the mapping functions to test their relationship only within the $[1000000..2000000]$ chromosomal range.
 
 In the first test, the query and reference appear to be correlated, and all of the correlations disappear when the test is confined to the correct genomic interval, except the {\tt relative.distances} family of tests that identify the features as independent in both cases.
 
@@ -362,7 +364,7 @@ rref<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width
 
 unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.length,ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
 
-#correlate them on the whole cromosome: 1...3 000 000
+#correlate them on the whole chromosome: 1...3 000 000
 
 map_space<-RangedData(ranges=IRanges(start=c(1000000),end=c(2000000)),space='the_chromosome')
 

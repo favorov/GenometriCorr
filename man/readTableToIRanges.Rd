@@ -11,7 +11,7 @@ readTableToIRanges
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-readTableToIRanges.R reads a variety of GFF- or BED-like (text table) formats to an IRange or a RangedData object.
+readTableToIRanges.R reads a variety of GFF- or BED-like (text table) formats to an IRanges or a RangedData object.
 It tries to interpret the header line if \code{header} parameter is TRUE.
 }
 \usage{
@@ -26,7 +26,7 @@ readTableToIRanges(file = NA, space = NA,
 		\code{file} is the name of file or URL; it is passed to read.table so it was be anything that read.table allows as a file parameter.    
 	}
   \item{header}{
-		\code{header} indicates whether the first noncomment row should be interpreted as a header row. If header is TRUE, each column is named by the its label in the header raw. Also, if a header is given, the function tries to fit the given column names to the expected chrom, end, start, etc. The default is \code{FALSE}, if there is a header is the data, the function should be called with \code{header=TRUE} or with \code{skip=an integer} parameter.  
+		\code{header} indicates whether the first non-comment row should be interpreted as a header row. If header is TRUE, each column is named by the its label in the header raw. Also, if a header is given, the function tries to fit the given column names to the expected chrom, end, start, etc. The default is \code{FALSE}, if there is a header is the data, the function should be called with \code{header=TRUE} or with \code{skip=an integer} parameter.  
 	}
   \item{space}{
 		\code{space} is the number (1-based) or the name in the header of the column containing the chromosome name in the RangedData notation (the 'space'). If space is NA or is not given and not found in the header, the data are read to IRanges object with exceptions as listed below.
@@ -61,13 +61,14 @@ readTableToIRanges(file = NA, space = NA,
 %%  ~~ If necessary, more details than the description above ~~
 %}
 \value{
-Returns an IRange or RangedData object. The type depends on parameters and the data file. Data that span chromosomes will have \code{space}, or \code{autofeatures=TRUE}, or \code{\dots}, to break the given intervals into subsets based on \code{spaces}. If \code{space} is not given or is NA, then all intervals are taken to be on the same chromosome (in the same space), and the name of the space is the ile name.
+Returns an IRanges or RangedData object. The type depends on parameters and the data file. Data that span chromosomes will have \code{space}, or \code{autofeatures=TRUE}, or \code{\dots}, to break the given intervals into subsets based on \code{spaces}. If \code{space} is not given or is NA, then all intervals are taken to be on the same chromosome (in the same space), and the name of the space is the file name.
 }
 \references{
 %% ~put references to the literature/web site here ~
 \url{http://genometricorr.sourceforge.net/}
 }
-\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Leslie M. Cope, Andrey A. Mironov,  Yulia Medvedeva, Vsevolod J. Makeev, Sarah J. Wheelan}
+
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 \note{
 %%  ~~further notes~~
@@ -79,7 +80,7 @@ The \code{readTableToIRanges} function is necessary when you work with nonstanda
 
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
-	The \code{\link{GenometriCorr}} documentation and the \href{../doc/GenometriCorr.pdf}{GenometriCorr package vingnette}.
+	The \code{\link{GenometriCorr}} documentation and the \href{../doc/GenometriCorr.pdf}{GenometriCorr package vignette}.
 	Import function from \code{rtracklayer}: {\code{\link[rtracklayer]{import}}} 
 }
 
