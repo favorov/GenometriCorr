@@ -19,6 +19,7 @@
 \usepackage[font=small]{caption}
 \usepackage{color}
 \usepackage{Sweave}
+\usepackage{url}
 
 %\usepackage{zi4}
 %\usepackage{graphicx}
@@ -107,7 +108,7 @@ If the reference and query intervals are independent, the query points are posit
 	\caption{Area between \textcolor{blue}{uniform ECDF for unrelated feature sets (blue)} and \textcolor{black}{experimental ECDF for related feature sets (black)} is a measure of correlation of the query and reference feature sets.}
 \end{figure*}
 
-The Kolmogorov-Smirnov test \(K-S test\) is accompanied by permutation tests to determine the level and direction of deviation from the null expectation. The ECDF (Empirical Distribution Cumulative Function) of the relative distances $d_i$ is a straight line between $(0,0)$ and $(0.5,1)$ if the query and reference points are perfectly independent, so we compare our data to this line.
+The Kolmogorov-Smirnov test (K-S test) is accompanied by permutation tests to determine the level and direction of deviation from the null expectation. The ECDF (Empirical Distribution Cumulative Function) of the relative distances $d_i$ is a straight line between $(0,0)$ and $(0.5,1)$ if the query and reference points are perfectly independent, so we compare our data to this line.
 
 The area between the ECDF for the reference and query points and the ideal straight line \[S=\displaystyle\int_0^{0.5} \! \left| ECDF(d)-ECDF_{ideal}(d) \right| \, dd \] is a measure of the correlation between the query and reference. So, by drawing $N$ sets of values that model uniform distribution of $d_i$ we get $N$ outcomes of a null distribution for $S$ and thus we can evaluate the $p-value$ for S.   
 
@@ -161,9 +162,9 @@ All the tests described above are applicable to a single chromosomes or a set of
 \subsection{GenometriCorr (Genometric Correlation) package}
 The package {\tt GenometriCorr} provides functions to load interval data from a plain text file (any accepted format), as well as the main procedure that tests whether the interval sets are spatially independent, and plotting functions to generate graphical representations of the relationships between the features.
 
-\section{Utilities}
+\section{Using GenometriCorr: examples}
 
-\subsection{R objects used by {\tt GenometriCorr}}
+\subsection{R objects that {\tt GenometriCorr} understands}
 
 The interval sets are represented by the {\tt IRanges} or {\tt RangedData} or {\tt GRanges} objects, which are interval data representation classes defined by {\tt IRanges } package.  {\tt IRanges} is a set of intervals in one space (chromosome). {\tt RangedData} is a set of intervals defined over different spaces (here, chromosomes), so it is suitable for encoding a full-genome annotation.  {\tt GRanges} is very simlar to {\tt RangedData} but it contains the chromosome length information and ensures that operations do not return intervals beyond the length of the chromosomes.
 
@@ -218,7 +219,6 @@ If the chromosome lengths are not either given explicitly or coded in reference 
 
 Sometimes, it is useful to examine a pair of interval sets by eye, to add information to the statistical results. Three visualization procedures are provided.
 
-\subsubsection{Examples}
 \newcommand{\picwidth}{4 in}
 
 Let's look at the CpG islands and KnownGenes genes on chromosomes 1 (hg19).  
@@ -232,10 +232,8 @@ VisualiseTwoIRanges(ranges(cpgis[seqnames(cpgis)=='chr1']),ranges(refseq[seqname
 \end{centering}
 
 
-\section{The main procedure}
+\subsection{The main procedure}
 {\tt GenometriCorrelation} tests the null hypothesis that the query and reference intervals are spatially independent; that is, that they have no significant relationship in terms of genomic coordinates.
-
-\subsection{Using the function:}
 
 
 <<test_chromosome_123,cache=TRUE>>=
@@ -284,7 +282,7 @@ visualize(cpgi_to_genes,pdffile="CpGi_to_RefSeq_chr1_picture_vis.pdf",show.chrom
         \caption{More colorful graphics with observed/expected trends for chromosome 1}
 \end{figure*}
 
-\section{Configuration file}
+\subsection{Configuration file}
 	The main function can be called in two ways. First, the arguments can be supplied directly to {\tt GenometriCorrelation} function as before.
 	
 	The second, S4-compliant way to run the main function is to create an S4 GenometriCorrConfig object from a configuration file, and then to pass the object to the {\tt run.config} function with or without changes. This enables reproducibility and a simple interface. A file template is provided:
@@ -339,7 +337,6 @@ quickconfig<-new("GenometriCorrConfig",system.file("extdata", "quick-config.ini"
 print(quickconfig)
 @
 
-\section{More utilities}
 \subsection{Mapping}
 If we test the correlation of a reference and query that are consistently found in the same chromosomal regions (e.g. in genes), we will always achieve what looks like extremely high correlation on a genomic scale and we are unable to ask questions about finer-scale associations. To use the Genometric Correlation statistical tests on data such as these, we can convert the regions (that the query and reference occupy) to pseudochromosomes, and then run the {\tt GenometriCorrelation} test. The mapping is available in the package as {\tt MapRangesToGenomicIntervals.}
 
@@ -392,6 +389,31 @@ Mapping config example is {\tt mapping-config.ini}:
 mapconfig<-new("GenometriCorrConfig",system.file("extdata", "mapping-config.ini", package = "GenometriCorr"))
 print(mapconfig)
 @
+
+\subsection{One more example: aligned reads in query}
+
+Let's try to work with aligned reads. The example file we contains reads from the ChIP-Seq Analysis of H3K4me3 in hESC H1 Cells, sample GSM433170,	from GEO. The data is restricted to chr15:73842345-83842344 interval. We test the hypothesis of statistical collocation of the reads with RefSeq genes. As far as we are intersted only in the interval we have data for, we map both reads and genes to the interval.
+
+<<H3K4ME3_example_random,cache=TRUE>>=
+reads<-import(con=system.file("extdata", "GSM433170_BI.H1.H3K4me3.Solexa-8038_chr15.bed", package = "GenometriCorr"),format='bed')
+interval<-GRanges(seqnames=c('chr15'),ranges=IRanges(start=c(73842345),width=c(10000000)))
+reads.in.interval<-MapRangesToGenomicIntervals(interval,reads)
+genes.in.interval<-MapRangesToGenomicIntervals(interval,refseq,unmapped.chromosome.warning = FALSE)
+H3K4Me3.vs.genes<-GenometriCorrelation(reads.in.interval,genes.in.interval,showProgressBar = FALSE)
+
+cat('H3K4Me3 vs genes in chr15:73842345-83842344:\n')
+print(H3K4Me3.vs.genes)
+@
+
+Let's visualise first Mbp of the interval.
+
+\begin{centering}
+<<chr15_picture,fig=true,results=hide>>=
+VisualiseTwoIRanges(ranges(reads.in.interval),ranges(genes.in.interval),end=1000000,,nameA='H3K4ME3 reads',nameB='RefSeq Genes',title="H3K4Me3 vs RefGenes in chr15:73842345-83842344@Hg19")
+@
+\end{centering}
+
+
 \end{document}
 
 

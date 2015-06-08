@@ -25,8 +25,8 @@ setMethod('show','GenometriCorrResult',function(object)
 				'scaled.absolute.min.distance.sum.null.list',
 				'jaccard.measure.null.list',
 				'jaccard.intersection.null.list',
-				'projection.test',
-				'scaled.absolute.min.distance.sum')
+				'projection.test')
+				#'scaled.absolute.min.distance.sum'
 		#we remove the do_not_show list from namelist
 		namelist<-setdiff(namelist,do_not_show)
 		print(sapply(object,function(x){

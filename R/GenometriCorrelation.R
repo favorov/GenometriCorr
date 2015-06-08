@@ -562,10 +562,10 @@ GenometriCorrelation <- function(
 		result[[awhole.space.name]][['projection.test']][['query.hits']]<-0
 		result[[awhole.space.name]][['query.reference.intersection']]<-0
 		result[[awhole.space.name]][['query.reference.union']]<-0
+		result[[awhole.space.name]][['scaled.absolute.min.distance.sum']]<-0
 		#makes no sense if no (mean.distance.permut==0) relative distance permutations done
 		if (mean.distance.permut.number) 
 		{
-			result[[awhole.space.name]][['scaled.absolute.min.distance.sum']]<-0
 			#we initialise it here because we are goin to calculate it as a chomosomewise sum
 			result[[awhole.space.name]][['scaled.absolute.min.distance.sum.null.list']]<-c()
 		}
@@ -762,27 +762,28 @@ GenometriCorrelation <- function(
 			setTkProgressBar(tk_pb,value=done,title=paste('GenometriCorrelation:',done_info),label=done_info)
 		}
 
+		result[[space]][['absolute.min.distance.data']]<-
+			query_to_ref_min_absolute_distances(
+				qu,ref,map.to.half,is_query_sorted=T,is_ref_sorted=T,chrom_length=chromosomes.length[space]
+		)
+		result[[space]][['scaled.absolute.min.distance.sum']]<-
+			sum(result[[space]][['absolute.min.distance.data']])*length(ref)/(chromosomes.length[[space]])
+
 		if(mean.distance.permut.number>0 || keep.distributions) 
 		# makes sense only if permutation test on absolute distances test is ordered or if we want to keep
 		# the distribution of absolute min distances 
 		{
-
-			result[[space]][['absolute.min.distance.data']]<-
-				query_to_ref_min_absolute_distances(qu,ref,map.to.half,is_query_sorted=T,is_ref_sorted=T,chrom_length=chromosomes.length[space])
-
 			result[[space]][['absolute.inter.reference.distance.data']]<-ref[2:length(ref)]-ref[1:length(ref)-1]
 			#collect all ref-ref distances
 			result[[space]][['absolute.inter.reference.distance.data']]<-c(result[[space]][['absolute.inter.reference.distance.data']],chromosomes.length[[space]]+ref[1]-ref[length(ref)])	
 			#add the circilar one	
 
 			#makes no sense if no (mean.distance.permut==0) absolute distance permutations done
+			
 			if (mean.distance.permut.number>0) 
 			{
 				result[[space]][['reference.middles']]<-ref #we will need it for permutations 
 					
-				result[[space]][['scaled.absolute.min.distance.sum']]<-sum(result[[space]][['absolute.min.distance.data']])*length(ref)/
-					(chromosomes.length[[space]])
-
 				result[[space]][['scaled.absolute.min.distance.sum.null.list']]<-c()
 				#result[[space]][['unscaled.absolute.min.distance.sum.null.list']]<-c()
 			}
@@ -821,13 +822,13 @@ GenometriCorrelation <- function(
 			result[[awhole.space.name]][['query.population']]<-result[[awhole.space.name]][['query.population']]+result[[space]][['query.population']]
 			result[[awhole.space.name]][['reference.population']]<-result[[awhole.space.name]][['reference.population']]+result[[space]][['reference.population']]
 
-			#makes no sense if no (mean.distance.permut==0) absolute distance permutations done
-			if(mean.distance.permut.number>0) 
-			{
+			#makes sense even if no (mean.distance.permut==0) absolute distance permutations done
+			#if(mean.distance.permut.number>0) 
+			#{
 				result[[awhole.space.name]][['scaled.absolute.min.distance.sum']]<-
 					result[[awhole.space.name]][['scaled.absolute.min.distance.sum']]+
 					result[[space]][['scaled.absolute.min.distance.sum']]
-			}
+			#}
 		}
 	}
 	
@@ -1171,7 +1172,6 @@ GenometriCorrelation <- function(
 			#result[[space]][['relative.distances.ecdf.deviation.area']]<-NULL
 			result[[space]][['relative.distances.ecdf.deviation.area.null.list']]<-NULL
 			result[[space]][['scaled.absolute.min.distance.sum.null.list']]<-NULL
-			result[[space]][['scaled.absolute.min.distance.sum']]<-NULL
 			result[[space]][['absolute.min.distance.data']]<-NULL
 			result[[space]][['absolute.inter.reference.distance.data']]<-NULL
 			result[[space]][['jaccard.measure.null.list']]<-NULL

@@ -95,11 +95,12 @@ cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1'
 
 print(cpgi_to_genes)
 
-VisualiseTwoIRanges(cpgis['chr1']$ranges, refseq['chr1']$ranges,
-	nameA='CpG Islands', nameB='RefSeq Genes',
-	chrom_length=human.chrom.length[['chr1']],
-	title="CpGIslands and RefGenes on chr1 of Hg19 animal",
-	pdf='CpGi_vs_RefSeq_genes_chr1_hg19')
+VisualiseTwoIRanges(
+	ranges(cpgis[seqnames(cpgis)=='chr1']),
+	ranges(refseq[seqnames(refseq)=='chr1']),
+	nameA='CpG Islands',nameB='RefSeq Genes',
+	chrom_length=seqlengths(TxDb.Hsapiens.UCSC.hg19.knownGene)['chr1'],
+	title="CpGIslands and RefGenes on chr1 of Hg19 animal")
 
 #mapping example, same as in the vignette
 population<-1000

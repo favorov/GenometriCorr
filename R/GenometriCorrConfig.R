@@ -457,7 +457,3 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 	})
 
 
-#setMethod('run.config',signature(conf='GenometriCorrConfig'),function(conf)
-#	{
-#	})
-#run.config<-function(conf)

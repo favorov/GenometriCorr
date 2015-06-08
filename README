@@ -111,3 +111,7 @@ MapRangesToGenomicIntervals rewritten. Two more bugs removed.
 Thanks to Ruth McCole from Harvard.
 $jaccard.intersection.null.list added to the result is keep.distribution=TRUE. 
 Thanks to Promita Bose from Memorial Sloan Kettering 
+1.1.14
+Some bugs in vignette
+We add the 'scaled.absolute.min.distance.sum' to the result even if there is no permutation test on it.
+Thanks to mikhail.dozmorov from Virginia Commonwealth University

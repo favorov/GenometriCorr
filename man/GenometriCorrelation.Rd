@@ -38,7 +38,8 @@ The GenometriCorrelation function compares two interval annotations on a chromos
 		keep.distributions=FALSE,
 		representing.point.function=mitl,
 		query.representing.point.function=representing.point.function,
-		reference.representing.point.function=representing.point.function
+		reference.representing.point.function=representing.point.function,
+		supress.evaluated.length.warning
 		)
 }
 
@@ -110,6 +111,10 @@ The same thing as the \code{representing.point.function}, but the representation
   \item{reference.representing.point.function}{
 The same thing as the \code{representing.point.function}, but the representation point calculation is overloaded only for query intervals.
 }
+	\item{supress.evaluated.length.warning}{
+It was a typo for \code{suppress.evaluated.length.warning}. Now obsoleted, use \code{suppress.evaluated.length.warning}
+}
+
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~

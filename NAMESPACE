@@ -1,5 +1,4 @@
-import('IRanges', 'GenomicRanges', 'methods')
-importFrom('S4Vectors', 'nrun', 'runValue')
+import('IRanges', 'GenomicRanges', 'GenomicFeatures', 'methods','TxDb.Hsapiens.UCSC.hg19.knownGene')
 importFrom('rtracklayer', 'import')
 importFrom('grDevices', 'as.raster', 'rainbow')
 importFrom('gplots', 'colorpanel')

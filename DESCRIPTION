@@ -1,7 +1,7 @@
 Package: GenometriCorr
 Type: Package
 Title: Genometric Correlation package
-Version: 1.1.13
+Version: 1.1.14
 Author@R: c( person("Alexander", "Favorov",email = "favorov@sensi.org"), 
 		person("Loris", "Mularoni"),
 		person("Yulia","Medvedeva"),
@@ -16,8 +16,8 @@ Maintainer: Alexander Favorov <favorov@sensi.org>
 Description: The package computes correlations between two genome annotations (known features, experimental data etc) that are represented as intervals on chromosomes. The package provides several different tests, each chosen for its particular sensitivity to a type of spatial correlation. The overarching question is whether the two interval sets are spatially related in any way. Tests can also be restricted to genomic intervals (chromosomes, chromosome arms, genes only, etc) when appropriate. Various visualization methods are provided. We emphasize that the package is intended to be a hypothesis generator; users should plan to follow up on any correlations suggested by the software.
 License: Artistic-2.0
 LazyLoad: yes
-Depends: R (>= 3.1.0), IRanges, GenomicRanges, methods, tcltk, S4Vectors, TxDb.Hsapiens.UCSC.hg19.knownGene
-Imports: grDevices, gplots, GenomeInfoDb, rtracklayer
+Depends: R (>= 3.1.0), IRanges, GenomicFeatures, GenomicRanges, methods, tcltk, TxDb.Hsapiens.UCSC.hg19.knownGene
+Imports: grDevices, gplots, GenomeInfoDb, rtracklayer, gdata
 biocViews: Annotation, Genetics, Infrastructure, DataRepresentation, GenomeAnnotation, StatisticalMethod
 URL: http://genometricorr.sourceforge.net/
-Packaged: 2015-03-12 19:55:48 UTC; favorov
+Packaged: 2015-05-08 19:55:48 UTC; favorov
