@@ -143,6 +143,7 @@ Below is the description of the values of the list returned for each chromosome.
 \item{relative.distances.ecdf.area.correlation}{Has the same sign with the relative distance-based local correlation. }
 \item{projection.test.p.value}{\emph{p-value} for chromosome-scale independence obtained by the projection test.}
 \item{projection.test.lower.tail}{If TRUE, projection test shows negative correlation, real overlap is less than the expectation.}
+\item{projection.test.obs.to.exp} To measure the effect size, the observed to expected ratio for the projection test statistics that is the number of query characteristic points (by default, midpoints) that fell into a reference features.
 \item{scaled.absolute.min.distance.sum.p.value}{\emph{p-value} for chromosome-scale null hypothesis as obtained by the permutations of the query points and the mean of the distances to the two closest reference points.}
 \item{scaled.absolute.min.distance.sum.lower.tail}{If TRUE, the query points are closer to the reference points than expected (the absolute distance is lower than the expectation). }
 \item{query.reference.intersection}{Intersection of reference and query, in bases.}
@@ -156,7 +157,7 @@ The additional values that are returned if \code{keep.distributions=TRUE}
 \item{relative.distances.data}{The original relative distances}
 \item{relative.distances.ecdf.deviation.area}{The real value of the ECDF deviation area to be compared with the permutation to obtain the p-value}
 \item{relative.distances.ecdf.deviation.area.null.list}{The null distribution}
-\item{projection.test}{List of three values: \code{reference.length} is length of a chromosome; \code{reference.coverage} is length of that chromosome covered by reference intervale, and \code{query.hits} is the number of query points that fall into the reference intervals.}
+\item{projection.test}{List of three values: \code{space.length} is length of a chromosome; \code{reference.coverage} is length of that chromosome covered by reference intervale, and \code{query.hits} is the number of query points that fall into the reference intervals.}
 \item{absolute.min.distance.data}{The distribution of query-reference distances}
 \item{absolute.inter.reference.distance.data}{The distribution of reference-reference distances}
 \item{scaled.absolute.min.distance.sum}{The value of the sum (i.e. mean) of scaled absolute distances}

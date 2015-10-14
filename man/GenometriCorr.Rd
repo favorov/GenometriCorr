@@ -35,7 +35,7 @@ w.
 This value will be negative when the query and reference intervals are anticorrelated and positive when they are positively correlated. This value has no relation to the \emph{p-value} of correlation.
 
 	\item{projection.test.p.value}
-If overlaps between query and reference features occur less often than expected, the \code{projection.test.lower.tail} is \code{TRUE}; if they are more common than expected, it is \code{FALSE}.
+If overlaps between query characteristic points (by default, midpoints) and the reference features occur less often than expected, the \code{projection.test.lower.tail} is \code{TRUE}; if they are more common than expected, it is \code{FALSE}. To measure the effect size, the observed to expected ratio is calculated as \code{projection.test.obs.to.exp}
 
 	\item{jaccard.measure}
 The Jaccard test compares the length of the union of all query and reference features with the length of the intersection of the query and reference features.

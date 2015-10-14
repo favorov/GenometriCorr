@@ -556,8 +556,10 @@ GenometriCorrelation <- function(
 
 		result[[awhole.space.name]][['query.population']]<-0
 		result[[awhole.space.name]][['reference.population']]<-0
+		result[[awhole.space.name]][['query.coverage']]<-0
+		result[[awhole.space.name]][['reference.coverage']]<-0
 		result[[awhole.space.name]][['projection.test']]<-c()
-		result[[awhole.space.name]][['projection.test']][['reference.length']]<-0
+		result[[awhole.space.name]][['projection.test']][['space.length']]<-0
 		result[[awhole.space.name]][['projection.test']][['reference.coverage']]<-0
 		result[[awhole.space.name]][['projection.test']][['query.hits']]<-0
 		result[[awhole.space.name]][['query.reference.intersection']]<-0
@@ -654,6 +656,10 @@ GenometriCorrelation <- function(
 
 		result[[space]][['reference.population']]<-length(ref)
 
+	  result[[space]][['query.coverage']]<-sum(width(reduce(rd_query[space]$ranges)))
+
+		result[[space]][['reference.coverage']]<-sum(width(reduce(rd_reference[space]$ranges)))
+		
 		result[[space]][['relative.distances.data']]<-
 			query_to_ref_relative_distances(qu,ref,map.to.half,is_query_sorted=T,is_ref_sorted=T,chrom_length=chromosomes.length[space])
 
@@ -739,7 +745,7 @@ GenometriCorrelation <- function(
 			pbinom(
 				result[[space]][['projection.test']][['query.hits']],
 				result[[space]][['query.population']],
-				result[[space]][['projection.test']][['reference.coverage']]/result[[space]][['projection.test']][['reference.length']]
+				result[[space]][['projection.test']][['reference.coverage']]/result[[space]][['projection.test']][['space.length']]
 			)
 
 		if (proj.p.value<.5) # one-sided test
@@ -752,6 +758,8 @@ GenometriCorrelation <- function(
 			result[[space]][['projection.test.p.value']]<- 1.-proj.p.value
 			result[[space]][['projection.test.lower.tail']] <- FALSE
 		}
+
+		result[[space]][['projection.test.obs.to.exp']]<- (result[[space]][['projection.test']][['query.hits']]* result[[space]][['projection.test']][['space.length']]) / ( result[[space]][['query.population']]*result[[space]][['projection.test']][['reference.coverage']])
 
 		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 
@@ -822,6 +830,8 @@ GenometriCorrelation <- function(
 			result[[awhole.space.name]][['query.population']]<-result[[awhole.space.name]][['query.population']]+result[[space]][['query.population']]
 			result[[awhole.space.name]][['reference.population']]<-result[[awhole.space.name]][['reference.population']]+result[[space]][['reference.population']]
 
+			result[[awhole.space.name]][['query.coverage']]<-result[[awhole.space.name]][['query.coverage']]+result[[space]][['query.coverage']]
+			result[[awhole.space.name]][['reference.coverage']]<-result[[awhole.space.name]][['reference.coverage']]+result[[space]][['reference.coverage']]
 			#makes sense even if no (mean.distance.permut==0) absolute distance permutations done
 			#if(mean.distance.permut.number>0) 
 			#{
@@ -878,7 +888,7 @@ GenometriCorrelation <- function(
 				pbinom(
 					result[[space]][['projection.test']][['query.hits']],
 					result[[space]][['query.population']],
-					result[[space]][['projection.test']][['reference.coverage']]/result[[space]][['projection.test']][['reference.length']]
+					result[[space]][['projection.test']][['reference.coverage']]/result[[space]][['projection.test']][['space.length']]
 				)
 			if (proj.p.value<.5) # one-sided test
 			{
@@ -892,6 +902,8 @@ GenometriCorrelation <- function(
 			}
 		}
 
+		result[[space]][['projection.test.obs.to.exp']]<- (result[[space]][['projection.test']][['query.hits']]* result[[space]][['projection.test']][['space.length']]) / ( result[[space]][['query.population']]*result[[space]][['projection.test']][['reference.coverage']])
+		
 		if ('query.reference.union' %in% the.names && 'query.reference.intersection' %in% the.names)
 		{
 			if (result[[space]][['query.reference.union']] > 0)
@@ -1466,8 +1478,8 @@ query.to.ref.projection.statistics<-function(query,ref,is_query_sorted=F,chrom_l
 	currentref<-1
 #	nextcurrentref<-1
 	projection_data<-c()
-	projection_data[['reference.length']]<-chrom_length
-	projection_data[['reference.coverage']]<-0
+	projection_data[['space.length']]<-chrom_length
+	projection_data[['reference.coverage']]<-sum(width(reduce(ref)))
 	
 	#now, we revert our q to IRanges. If qu[i] in integer then the range has lentgh 1 and its start and end are q[i]
 	#if q[i] is integer+0.5 we assign it to [integer,integer+1] interval

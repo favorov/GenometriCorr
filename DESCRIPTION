@@ -1,7 +1,7 @@
 Package: GenometriCorr
 Type: Package
 Title: Genometric Correlation package
-Version: 1.1.14
+Version: 1.1.15
 Author@R: c( person("Alexander", "Favorov",email = "favorov@sensi.org"), 
 		person("Loris", "Mularoni"),
 		person("Yulia","Medvedeva"),
