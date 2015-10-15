@@ -141,9 +141,9 @@ Below is the description of the values of the list returned for each chromosome.
 \item{relative.distances.ks.p.value}{\emph{p-value} for local independence obtained by the Kolmogorov-Smirnov test for relative distances. }
 \item{relative.distances.ecdf.deviation.area.p.value}{\emph{p-value} for local independence obtained by the permutation test for relative distances. }
 \item{relative.distances.ecdf.area.correlation}{Has the same sign with the relative distance-based local correlation. }
-\item{projection.test.p.value}{\emph{p-value} for chromosome-scale independence obtained by the projection test.}
-\item{projection.test.lower.tail}{If TRUE, projection test shows negative correlation, real overlap is less than the expectation.}
-\item{projection.test.obs.to.exp} To measure the effect size, the observed to expected ratio for the projection test statistics that is the number of query characteristic points (by default, midpoints) that fell into a reference features.
+\item{projection.test.p.value}{\emph{p-value} for chromosome-scale independence obtained by the projection test. }
+\item{projection.test.lower.tail}{If TRUE, projection test shows negative correlation, real overlap is lessthan the expectation.}
+\item{projection.test.obs.to.exp}{To measure the effect size, the observed to expected ratio for the projection test statistics that is the number of query characteristic points (by default, midpoints) that fell into a reference features.}
 \item{scaled.absolute.min.distance.sum.p.value}{\emph{p-value} for chromosome-scale null hypothesis as obtained by the permutations of the query points and the mean of the distances to the two closest reference points.}
 \item{scaled.absolute.min.distance.sum.lower.tail}{If TRUE, the query points are closer to the reference points than expected (the absolute distance is lower than the expectation). }
 \item{query.reference.intersection}{Intersection of reference and query, in bases.}

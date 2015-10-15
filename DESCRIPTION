@@ -20,4 +20,4 @@ Depends: R (>= 3.1.0), IRanges, GenomicFeatures, GenomicRanges, methods, tcltk, 
 Imports: grDevices, gplots, GenomeInfoDb, rtracklayer, gdata
 biocViews: Annotation, Genetics, Infrastructure, DataRepresentation, GenomeAnnotation, StatisticalMethod
 URL: http://genometricorr.sourceforge.net/
-Packaged: 2015-05-08 19:55:48 UTC; favorov
+Packaged: 2015-10-15 19:55:48 UTC; favorov
