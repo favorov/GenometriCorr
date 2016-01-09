@@ -759,8 +759,18 @@ GenometriCorrelation <- function(
 			result[[space]][['projection.test.lower.tail']] <- FALSE
 		}
 
-		result[[space]][['projection.test.obs.to.exp']]<- (result[[space]][['projection.test']][['query.hits']]* result[[space]][['projection.test']][['space.length']]) / ( result[[space]][['query.population']]*result[[space]][['projection.test']][['reference.coverage']])
-
+		result[[space]][['projection.test.obs.to.exp']]<- 
+			(	
+				result[[space]][['projection.test']][['query.hits']]
+				/
+				result[[space]][['query.population']]
+			)*
+			(
+				result[[space]][['projection.test']][['space.length']] 
+				/ 
+				result[[space]][['projection.test']][['reference.coverage']]
+			)
+		
 		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 
 		if (showTkProgressBar)
@@ -902,8 +912,18 @@ GenometriCorrelation <- function(
 			}
 		}
 
-		result[[space]][['projection.test.obs.to.exp']]<- (result[[space]][['projection.test']][['query.hits']]* result[[space]][['projection.test']][['space.length']]) / ( result[[space]][['query.population']]*result[[space]][['projection.test']][['reference.coverage']])
-		
+		result[[space]][['projection.test.obs.to.exp']]<- 
+			(	
+				result[[space]][['projection.test']][['query.hits']]
+				/
+				result[[space]][['query.population']]
+			)*
+			(
+				result[[space]][['projection.test']][['space.length']] 
+				/ 
+				result[[space]][['projection.test']][['reference.coverage']]
+			)
+	
 		if ('query.reference.union' %in% the.names && 'query.reference.intersection' %in% the.names)
 		{
 			if (result[[space]][['query.reference.union']] > 0)

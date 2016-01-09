@@ -118,3 +118,6 @@ Thanks to mikhail.dozmorov from Virginia Commonwealth University
 1.1.15
 Bug in projection test fixed
 added query.coverage and reference.coverage to the GenometriCorrResult
+1.1.16
+Oveflow bug in projection test fixed, 
+thanks to Tyler Funnell from BCCRC, Vancouver
