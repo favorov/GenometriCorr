@@ -1,5 +1,5 @@
 # GenometriCorrelation project evaluating two interval markups genomewide independence. 
-# (c) 2010-2014 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+# (c) 2010-2016 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 #               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 #               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 #
@@ -19,14 +19,13 @@ setMethod('show','GenometriCorrResult',function(object)
 			c(
 				'relative.distances.data',
 				'absolute.min.distance.data',
-				'absolute.min.distance.data',
 				'absolute.inter.reference.distance.data',
 				'relative.distances.ecdf.deviation.area.null.list',
 				'scaled.absolute.min.distance.sum.null.list',
 				'jaccard.measure.null.list',
 				'jaccard.intersection.null.list',
 				'projection.test')
-				#'scaled.absolute.min.distance.sum'
+				#scaled.absolute.min.distance.sum
 		#we remove the do_not_show list from namelist
 		namelist<-setdiff(namelist,do_not_show)
 		print(sapply(object,function(x){
@@ -45,7 +44,6 @@ setMethod('graphical.report',
 	function(x, pdffile='',show.all=FALSE,show.chromosomes=c(),trustname=TRUE,make.new=TRUE)
 	# if show.all == TRUE, show all of them
 	# if show.all == FALSE, show only awhole+show.chromosomes; if it leads to showing nothing, show.all turns back to TRUE
-
 	{
 		if (!is.null(x@config$options$awhole.space.name))
 			awhole.space.name=x@config$options$awhole.space.name
@@ -127,22 +125,34 @@ setMethod('graphical.report',
 				mtext(paste("Relative ecdf deviation area p-value :", sprintf(formstring_s,data$relative.distances.ecdf.deviation.area.p.value), sep=" "), line=-9, cex=0.7)
 			if('scaled.absolute.min.distance.sum.p.value' %in% names(data))
 				mtext(paste("Scaled Absolute min. distance p-value :", sprintf(formstring_s,data$scaled.absolute.min.distance.sum.p.value), sep=" "), line=-10, cex=0.7)
+				mtext(paste("Scaled Absolute min. lower tail :", data$scaled.absolute.min.distance.sum.lower.tail, sep=" "), line=-11, cex=0.7)
 			if('jaccard.measure.p.value'%in% names(data))
-				mtext(paste("Jaccard Measure p-value :", sprintf(formstring_s,data$jaccard.measure.p.value), sep=" "), line=-11, cex=0.7)
+				mtext(paste("Jaccard Measure p-value :", sprintf(formstring_s,data$jaccard.measure.p.value), sep=" "), line=-12, cex=0.7)
 			if('jaccard.measure.lower.tail'%in% names(data))
-				mtext(paste("Jaccard Measure lower tail :", data$jaccard.measure.lower.tail, sep=" "), line=-12, cex=0.7)
+				mtext(paste("Jaccard Measure lower tail :", data$jaccard.measure.lower.tail, sep=" "), line=-13, cex=0.7)
 			if('projection.test.p.value'%in% names(data))
-				mtext(paste("Projection test p-value :", sprintf(formstring_g,data$projection.test.p.value), sep=" "), line=-13, cex=0.7)
+				mtext(paste("Projection test p-value :", sprintf(formstring_g,data$projection.test.p.value), sep=" "), line=-14, cex=0.7)
 			if('projection.test.lower.tail'%in% names(data))
-				mtext(paste("Projection test lower tail :", data$projection.test.lower.tail, sep=" "), line=-14, cex=0.7)
+				mtext(paste("Projection test lower tail :", data$projection.test.lower.tail, sep=" "), line=-15, cex=0.7)
 			if('projection.test.obs.to.exp'%in% names(data))
-				mtext(paste("Projection test observed to expected ratio :", sprintf(formstring_g,data$projection.test.p.value), sep=" "), line=-15, cex=0.7)
+				mtext(paste("Projection test observed to expected ratio :", sprintf(formstring_g,data$projection.test.obs.to.exp), sep=" "), line=-16, cex=0.7)
 
 			if (! is.null(x@config$options$keep.distributions) && x@config$options$keep.distributions)
 			{
 				twotimes<-function(x){2*x}
-				plot(ecdf(data$absolute.inter.reference.distance.data), col="blue", main="Absolute distances", xlab="Distance (bp)", ylab="Cumulative fraction")
-				lines(ecdf(data$absolute.min.distance.data))
+				plot(ecdf(data$absolute.min.distance.data),col="black",lty='solid',lwd=2, main="Absolute distances", xlab="Distance (bp)", ylab="Cumulative fraction")
+				#plot(ecdf(data$absolute.inter.reference.distance.data), col="grey",lty='solid',lwd=2, main="Absolute distances", xlab="Distance (bp)", ylab="Cumulative fraction")
+				#plot abs.data? no sense :)
+				#create the null-hypothesis cdf function for absolute.min.distance.data
+				cdf.x<-sort(data$absolute.inter.reference.distance.data)/2
+				cdf.y<-cdf.x #to init
+				L.half<-sum(cdf.x) #just to remember it is half-sum 
+				for(i in 1:length(cdf.x)) #it is sorted, a=x_i=r/2; after the loop, we will 2/L
+					cdf.y[i]<-sum(cdf.x[1:i])+ # x is r/2 and sum is L/2
+						(length(cdf.x)-i)*cdf.x[i]
+				cdf.y<-cdf.y/L.half
+				lines(cdf.x,cdf.y,col="blue") #plot expetation with blue
+				#ok. start plot 2 with expetation
 				plot(twotimes, xlim=c(0,0.5), col="blue", main="Relative distances", xlab="Fractional distance", ylab="Cumulative fraction")
 				lines(ecdf(data$relative.distances.data))
 			}
@@ -158,8 +168,7 @@ setMethod('graphical.report',
 setGeneric('visualize',function(x,pdffile='',show.all=TRUE,show.chromosomes=c(), trustname=TRUE, make.new=TRUE, style="blue-white-red")
                                 standardGeneric('visualize'))
 
-setMethod('visualize',#'GenometriCorrResult',
-#signature(x='GenometriCorrResult',pdffile='',show.all='logical',show.chromosomes='logical',trustname='logical'),
+setMethod('visualize',
 	signature(x='GenometriCorrResult'),
 	function(x, pdffile='',show.all=FALSE,show.chromosomes=c(), trustname=TRUE, make.new=TRUE, style="blue-white-red")
 	{

@@ -121,3 +121,8 @@ added query.coverage and reference.coverage to the GenometriCorrResult
 1.1.16
 Oveflow bug in projection test fixed, 
 thanks to Tyler Funnell from BCCRC, Vancouver
+1.1.17
+graphical.report() bug fixed, 
+thanks to Meharji Arumilli from Helsinki University, Finland
+the correct expected curve for absolute.disdances added to graphical.report() 
+the documentation updated

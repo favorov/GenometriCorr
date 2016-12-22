@@ -101,7 +101,7 @@ Now, we can characterize each query point by its relative distance, as illustrat
 Formally, the relative distance $d_i$ for a query point $i$ is: 
 \[d_i=\displaystyle\frac{\min\left(\left|q_i-r_k\right|,\left|r_{k+1}-q_i\right|\right)}{\left|r_{k+1}-r_k\right|}, k=\arg\min_{q_i \geq r_k}(q_i-r_k).\]
 
-If the reference and query intervals are independent, the query points are positioned randomly with respect to the reference, and the $d_i$'s will be distributed uniformly in $\left[0..0.5\right]$. The corresponding $p-value$ is obtained by using the Kolmogorov-Smirnov test.
+If the reference and query intervals are independent, the query points are positioned randomly with respect to the reference, and the $d_i$'s will be distributed uniformly in $\left[0, 0.5\right]$. The corresponding $p-value$ is obtained by using the Kolmogorov-Smirnov test.
 
 \begin{figure*}[h!]
 	\centering\includegraphics[scale=\picscale]{png/fig6}
@@ -231,6 +231,7 @@ VisualiseTwoIRanges(ranges(cpgis[seqnames(cpgis)=='chr1']),ranges(refseq[seqname
 @
 \end{centering}
 
+Actually, we can look at all the choromomes, one per page, in a milti-page pdf the is created by {\tt VisualiseTwoGRanges} function.
 
 \subsection{The main procedure}
 {\tt GenometriCorrelation} tests the null hypothesis that the query and reference intervals are spatially independent; that is, that they have no significant relationship in terms of genomic coordinates.
@@ -267,7 +268,7 @@ graphical.report(cpgi_to_genes,pdffile="CpGi_to_RefSeq_chr1_picture.pdf",show.ch
 @
 
 \begin{figure*}
-	\centering\includegraphics[scale=1.5]{CpGi_to_RefSeq_chr1_picture.pdf}
+	\centering\includegraphics[scale=2.5]{CpGi_to_RefSeq_chr1_picture.pdf}
 	\caption{Simple graphical output for chromosome 1}
 \end{figure*}
 
@@ -278,9 +279,21 @@ visualize(cpgi_to_genes,pdffile="CpGi_to_RefSeq_chr1_picture_vis.pdf",show.chrom
 @
 
 \begin{figure*}
-        \centering\includegraphics[scale=1.25]{CpGi_to_RefSeq_chr1_picture_vis.pdf}
+        \centering\includegraphics[scale=2]{CpGi_to_RefSeq_chr1_picture_vis.pdf}
         \caption{More colorful graphics with observed/expected trends for chromosome 1}
 \end{figure*}
+
+The two panes represent absolute (left) and relative (right) distance distribution. The absolute distances aje not scaled by chromosome length, they are just distances, so the picture sometimes can be not in agreement with the scaled absolute distance statistics. Here, the observed distribitions are shown by black lines, while the expected are blue. The expected $cdf$ for relative (right pane) distance is diagonal, and it correspond to uniform in $\left[0, 0.5\right]$. For the expected $cdf(a)$ for the absolute distance, we notice that 
+$$cdf(a)=p(x<a)=\sum_{i}{p(x<a|x \in R_i)p(x \in R_i)},$$
+where $R_i$ is $i$-th reference interval. If $x$ is the closest distance between a query point and the $R_i$ border and the query point that is known to be in the $R_i$ interval, the distribition of $x$ is uniform in $\left[ 0, |R_i|/2 \right]$.
+$$p(x<a|x \in R_i) = \left\{ \begin{array}{rcl} 1 & \mbox{for} & a \geq R_i/2 \\ 2a/R_i & \mbox{for} & a < R_i/2 \end{array} \right.$$
+$p(x \in R_i)$ in the expected case is proprtional to $|R_i|$, $$p(x \in R_i)=|R_i|/\sum_i{R_i}=|R_i|/L .$$ What we denote as $L$ here equals to the space length is we circled the reference. 
+So,
+$$cdf(a) = \sum_{2a \geq R_i}{R_i/L}+\sum_{2a < R_i}{p(x \in R_i)(2a/R_i)} = $$
+$$\frac{\sum_{2a \geq R_i}{|R_i|}}{L}+\sum_{2a < R_i}{2a}= $$
+$$\frac{\sum_{2a \geq R_i}{|R_i|}}{L}+2a \left| \left\{ i: 2a < R_i \right\} \right|,$$
+where $\left| \left\{ \ldots \right\} \right|$ denotes the power (number of elenemts) ot a set.
+
 
 \subsection{Configuration file}
 	The main function can be called in two ways. First, the arguments can be supplied directly to {\tt GenometriCorrelation} function as before.
@@ -342,7 +355,7 @@ If we test the correlation of a reference and query that are consistently found 
 
 The MapRangesToGenomicIntervals accepts two RangedData or GRanges, and maps the intervals from the second interval set that are contained in the first interval set, recalculating the coordinates so that within each new interval the coordinates range from 1 to the length of the interval. 
 
-Let's see how it works. In this artificial example, we create two random feature sets that reside only in bases $[1000000..2000000]$ in a chromosome of length 3000000. First, we correlate these two features as is, not accounting for their restricted range. Next we will run the correlation again, this time using the mapping functions to test their relationship only within the $[1000000..2000000]$ chromosomal range.
+Let's see how it works. In this artificial example, we create two random feature sets that reside only in bases $\left[1000000, 2000000\right]$ in a chromosome of length 3000000. First, we correlate these two features as is, not accounting for their restricted range. Next we will run the correlation again, this time using the mapping functions to test their relationship only within the $\left[1000000, 2000000\right]$ chromosomal range.
 
 In the first test, the query and reference appear to be correlated, and all of the correlations disappear when the test is confined to the correct genomic interval, except the {\tt relative.distances} family of tests that identify the features as independent in both cases.
 
