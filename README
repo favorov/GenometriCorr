@@ -127,8 +127,8 @@ thanks to Meharji Arumilli from Helsinki University, Finland
 the correct expected curve for absolute.disdances added to graphical.report() 
 the documentation updated
 1.1.18
-if map space is not normalized, the mapping code normalizes it and warns instead of error
+If map space is not normalized, the mapping code normalizes it and warns instead of error
 Thanks to Alla and Vanja from VIGG
 Doc links fixed
-empty GenometriCorrResult produce error on show(), fixed
-do.awhole=TRUE is it is not set explicitely and mapping is on
+An empty GenometriCorrResult produce error on show(), fixed
+awhole.only=TRUE if it is not set explicitely and the mapping is on
