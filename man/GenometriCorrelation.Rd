@@ -1,5 +1,5 @@
 % GenometriCorrelation project evaluating two interval markups genomewide independence. 
-% (c) 2010-2013 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+% (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 %               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 %               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 %
@@ -61,7 +61,7 @@ List of chromosomes (spaces) to be excluded from the overall statistics.
 	\item{add.chr.as.prefix}{The correlation is only performed on chromosomes that have exactly the same name, so by default, a chromosome named chr1 will not be considered the same chromosome as one simply labeled 1. This argument is provided so that if the chromosome names in the \code{query}, \code{reference} and the \code{chromosomes*} parameters, or the names of the chromosomes in \code{chromosome.length}) have no prefix \code{'chr'} (lower-, upper-, or mixed case), this prefix will be added, and all strings matching \code{'chr'} in uppercase or partly uppercase are changed to lowercase. This way, comparisons can be made even if the chromosome names differ by any variation of the word \code{'chr'}. The default is FALSE.
 }
   \item{awhole.only}{
-If FALSE, all the considered chromosomes statistics and the summary (awhole) information are returned (default). If TRUE, only the summary (awhole) information is returned. Useful for pipelines.
+If \code{FALSE}, all the considered chromosomes statistics and the summary (awhole) information are returned (default). If \code{TRUE}, only the summary (awhole) information is returned. Useful for pipelines. The \code{TRUE} value is default that is posted by \code{run.config} if the data is processed through mapping.
 }
   \item{space}{
 If both \code{query} and \code{reference} are \code{RangedData}, the parameter is not too useful. It works as \code{chromosomes.to.proceed} of length 1. If one of the two first paramtetesrs is \code{IRanges}, it shows what space from the other one is to be used in the procedure (only one can be used). If both are, it gives the name of the space to be shown in the result.

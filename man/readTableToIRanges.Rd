@@ -1,5 +1,5 @@
 % GenometriCorrelation project evaluating two interval markups genomewide independence. 
-% (c) 2010-2016 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+% (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 %               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 %               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 %
@@ -81,7 +81,7 @@ The \code{readTableToIRanges} function is necessary when you work with nonstanda
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 	The \code{\link{GenometriCorr}} documentation and the \href{../doc/GenometriCorr.pdf}{GenometriCorr package vignette}.
-	Import function from \code{rtracklayer}: {\code{\link[rtracklayer]{import}}} 
+	\code{\link[rtracklayer:export]{Import}} import function from \code{rtracklayer} 
 }
 
 \examples{

@@ -1,5 +1,5 @@
 # GenometriCorrelation project evaluating two interval markups genomewide independence. 
-# (c) 2010-2016 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+# (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 #               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 #               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 #
@@ -384,13 +384,11 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 				MapRangesToGenomicIntervals(
 					where.to.map=mapping,
 					what.to.map=query,
-					unmapped.chromosome.warning=FALSE,
 					chromosomes.to.proceed=chrom)
 			reference<-
 				MapRangesToGenomicIntervals(
 					where.to.map=mapping,
 					what.to.map=reference,
-					unmapped.chromosome.warning=FALSE,
 					chromosomes.to.proceed=chrom)
 		}
 		else
@@ -412,7 +410,9 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 		if (!is.null(conf$options$awhole.only))
 			todo<-paste(todo,',awhole.only=',conf$options$awhole.only,sep='')
-		
+		else if (!is.null(conf$data$do.mapping) && conf$data$do.mapping) #mapping
+			todo<-paste(todo,',awhole.only=TRUE',sep='')
+
 		if (!is.null(conf$options$showProgressBar))
 			todo<-paste(todo,',showProgressBar=',conf$options$showProgressBar,sep='')
 

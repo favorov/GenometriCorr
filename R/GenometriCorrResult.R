@@ -1,5 +1,5 @@
 # GenometriCorrelation project evaluating two interval markups genomewide independence. 
-# (c) 2010-2016 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+# (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 #               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 #               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 #
@@ -12,7 +12,10 @@ setClass('GenometriCorrResult',contains='namedList',representation(config="Genom
 
 setMethod('show','GenometriCorrResult',function(object)
 	{
-		if (length(object) == 0) return;
+		if (length(object) == 0) {
+			cat("It is an empty GenometriCorrResult.")
+			return()
+		}
 		namelist<-names(object[[1]])
 		#possible operations with namelist here
 		do_not_show<-

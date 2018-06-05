@@ -1,5 +1,5 @@
 # GenometriCorrelation project evaluating two interval markups genomewide independence. 
-# (c) 2010-2016 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+# (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 #               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 #               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 # VisualiseTwoIRanges is a function that visualise a pair of IRanges on a chromosome in two colors
@@ -10,7 +10,8 @@ MapRangesToGenomicIntervals<-function(
 	where.to.map, what.to.map,
 	chromosomes.to.proceed=NA,
 	unmapped.chromosome.warning=TRUE,
-	unmapped.range.warning=FALSE
+	unmapped.range.warning=FALSE,
+	nonnormalised.mapping.warning=TRUE
 )
 #subgenome and rd are suppose to be RangedData or GRanges
 #in the second case, we test the lenthg equivalence
@@ -58,15 +59,18 @@ MapRangesToGenomicIntervals<-function(
 			next;
 		}
 		whereranges<-sort(ranges(where.to.map)[[chr]])
-		if (! isNormal(IRanges(start=start(whereranges),end=end(whereranges))))
+
+		if (! isNormal(whereranges))
 		{
-			warning(paste("The chromosome",chr,"is not normalised in where.to.map; skipped."))
-			next;
+			if (nonnormalised.mapping.warning) 
+				warning(paste("The chromosome",chr,"is not normalised in where.to.map; I do it for you."))
+			whereranges <- asNormalIRanges(whereranges)
 		}
+	
 		whatranges<-sort(ranges(what.to.map)[[chr]])
 		
 		mapping.mat<-as.matrix(findOverlaps(whatranges,whereranges))
-
+		
 		map.result<-apply(mapping.mat,1,
 			function(hit){
 				ind.what<-hit[1]
@@ -77,7 +81,7 @@ MapRangesToGenomicIntervals<-function(
 				c(seqnames=seqnames,end=end,start=start)
 			}
 		)
-		
+	
 		seqnames<-c(seqnames,map.result['seqnames',])
 		start<-c(start,as.integer(map.result['start',]))
 		end<-c(end,as.integer(map.result['end',]))

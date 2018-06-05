@@ -1,5 +1,5 @@
 % GenometriCorrelation project evaluating two interval markups genomewide independence. 
-% (c) 2010-2016 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+% (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 %               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 %               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 %
@@ -23,7 +23,9 @@ MapRangesToGenomicIntervals(
 	where.to.map, what.to.map, 
 	chromosomes.to.proceed=NA, 
 	unmapped.chromosome.warning=TRUE, 
-	unmapped.range.warning=FALSE)
+	unmapped.range.warning=FALSE,
+	nonnormalised.mapping.warning=TRUE
+)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -40,7 +42,10 @@ MapRangesToGenomicIntervals(
 		For each chromosome that is represented in \code{what.to.map} and that is included in \code{chromosomes.to.proceed} if it is given and that is not represented in \code{where.to.map}, a warning is generated if \code{unmapped.chromosome.warning} is \code{TRUE}. The default is \code{TRUE}.
 	}
 	\item{unmapped.range.warning}{
-		If a genomic region in \code{what.to.map} cannot be mapped and is contained in \code{chromosomes.to.proceed}, a warning is generated if \code{unmapped.range.warning} is \code{TRUE}. The default is \code{FALSE}.  
+		If a genomic region in \code{what.to.map} cannot be mapped and is in one of the \code{chromosomes.to.proceed}, a warning is generated if \code{unmapped.range.warning} is \code{TRUE}. The default is \code{FALSE}.  
+	}
+	\item{nonnormalised.mapping.warning}{
+		If the input mapping space is not normalised (e.g. contains overlapping intervals), it is normalised before the mapping. A warning is generated if \code{nonnormalised.mapping.warning} is \code{TRUE}. The default is \code{TRUE}.  
 	}
 }
 \details{

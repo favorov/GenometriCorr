@@ -1,5 +1,5 @@
 % GenometriCorrelation project evaluating two interval markups genomewide independence. 
-% (c) 2010-2016 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+% (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 %               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 %               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 %
@@ -47,7 +47,7 @@ The \code{run.config} function runs on a \code{"\linkS4class{GenometriCorrConfig
 		}
 		Each of the data (\code{query}, \code{reference}, \code{mapping}) parameters may instead be data of one of the accepted formats ( \code{\link{GRanges}} or \code{\link{RangedData}} or \code{\link{IRanges-class}}). In this case, the corresponding format value is omitted and nothing is written to the \code{config} slot of the result, and the data are used for the function calls. If the format parameter is \code{'R.variable.name'}, the input is taken from that variable. The calculation is the same as for \code{\link{GRanges}} or \code{\link{RangedData}} or \code{\link{IRanges-class}} parameter, but the name of the variable and the \code{'R.variable.name'} are saved in \code{config} slot of the result.
 
-		Other formats are interpreted as \code{format} parameters for the {\code{\link[rtracklayer]{import}}} function from \code{rtracklayer} package. A useful option is \code{bed.like.with.header} that calls \code{\link{readTableToIRanges}} with \code{header=TRUE} parameter to read the file rather than the standard {\code{\link[rtracklayer]{import}}}.
+		Other formats are interpreted as \code{format} parameters for the {\code{\link[rtracklayer:export]{import}}} function from \code{rtracklayer} package. A useful option is \code{bed.like.with.header} that calls \code{\link{readTableToIRanges}} with \code{header=TRUE} parameter to read the file rather than the standard {\code{\link[rtracklayer:export]{import}}}.
 }}
 
 \author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}

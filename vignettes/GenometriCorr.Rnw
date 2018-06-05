@@ -403,6 +403,8 @@ mapconfig<-new("GenometriCorrConfig",system.file("extdata", "mapping-config.ini"
 print(mapconfig)
 @
 
+When the mapping is called via the config file, only the whole-genome result is calcualted by default ({\tt awhole.only} default is {\tt TRUE}).
+
 \subsection{One more example: aligned reads in query}
 
 Let's try to work with aligned reads. The example file we contains reads from the ChIP-Seq Analysis of H3K4me3 in hESC H1 Cells, sample GSM433170,	from GEO. The data is restricted to chr15:73842345-83842344 interval. We test the hypothesis of statistical collocation of the reads with RefSeq genes. As far as we are intersted only in the interval we have data for, we map both reads and genes to the interval.
