@@ -81,9 +81,10 @@ GenometriCorrelation <- function(
 	chromosomes.length=c(),
 	suppress.evaluated.length.warning=FALSE,
 	cut.all.over.length=FALSE,
-	ecdf.area.permut.number=100,
-	mean.distance.permut.number=100,
-	jaccard.measure.permut.number=100,
+	permut.number=100,
+	ecdf.area.permut.number=permut.number,
+	mean.distance.permut.number=permut.number,
+	jaccard.measure.permut.number=permut.number,
 	jaccard.permut.is.rearrangement=FALSE,
 	awhole.space.name="awhole",
 	keep.distributions=FALSE,
@@ -109,7 +110,9 @@ GenometriCorrelation <- function(
 	#cut.all.over.length if the length is given and there is any interval coord that is higher than the lenght, the default behavoiur (when cut.all.over.length is FALSE) is to show an error and stop. If it is TRUE, the interval will be just truncated.
 	#suppress.evaluated.length.warning suppresses the warning that a chromosome lenght is eveluated rather then given. The evaluation is just the rightmost coord in all the intervals, it is used is the length is NA.
 	#ecdf.area.permut.number is number of permutations for ecdf area method
+	#permut.number is the common default for all the permutation parameters
 	#mean.distance.permut.number is the same thing about the mean ref-to-query distance
+	#jaccard.measure.permut.number is the same for Jaccard measure,
 	#awhole.space.name is the space name for this operation
 	#keep.distributions if TRUE, the result list includes a the distributions that were used to obtain p-valies
 	#representing.point.function is the function that calculates the representing point for any interval 
@@ -375,13 +378,13 @@ GenometriCorrelation <- function(
 	result@config$chromosomes.length=as.list(chromosomes.length)
 	result@config$options$suppress.evaluated.length.warning=suppress.evaluated.length.warning
 	result@config$options$cut.all.over.length=cut.all.over.length
-	result@config$tests=list()
-	result@config$tests$ecdf.area.permut.number=ecdf.area.permut.number
-	result@config$tests$mean.distance.permut.number=mean.distance.permut.number
-	result@config$tests$jaccard.measure.permut.number=jaccard.measure.permut.number
 	result@config$options$keep.distributions=keep.distributions
 	if (awhole.space.name!="awhole") result@config$options$awhole.space.name=awhole.space.name
-
+	result@config$tests=list()
+	result@config$tests$permut.number=permut.number
+	if (ecdf.area.permut.number!=permut.number) result@config$tests$ecdf.area.permut.number=ecdf.area.permut.number
+	if (mean.distance.permut.number!=permut.number) result@config$tests$mean.distance.permut.number=mean.distance.permut.number
+	if (jaccard.measure.permut.number!=permut.number) result@config$tests$jaccard.measure.permut.number=jaccard.measure.permut.number
 	#print(result@config)
 
 	return(result)

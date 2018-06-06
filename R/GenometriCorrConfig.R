@@ -434,7 +434,10 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 		if (!is.null(conf$options$cut.all.over.length))
 			todo<-paste(todo,',cut.all.over.length=',conf$options$cut.all.over.length,sep='')
-
+		
+		if (!is.null(conf$tests$permut.number))
+			todo<-paste(todo,',permut.number=',conf$tests$permut.number,sep='')
+	
 		if (!is.null(conf$tests$jaccard.measure.permut.number))
 			todo<-paste(todo,',jaccard.measure.permut.number=',conf$tests$jaccard.measure.permut.number,sep='')
 

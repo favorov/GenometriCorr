@@ -54,8 +54,8 @@ The package also provides the \code{\link{VisualiseTwoIRanges}} function that cr
 Package: \tab GenometriCorr\cr
 Type: \tab Package\cr
 Title: \tab Genometric Correlation package \cr
-Version: \tab 1.1.12\cr
-Date: \tab 2015-01-16\cr
+Version: \tab 1.1.19\cr
+Date: \tab 2018-06-06\cr
 License: \tab Artistic-2.0\cr
 LazyLoad: \tab yes\cr
 Depends: \tab R (>= 3.1.0), IRanges, GenomicRanges, methods, tcltk, S4Vectors, TxDb.Hsapiens.UCSC.hg19.knownGene\cr
@@ -85,13 +85,14 @@ refseq<-transcripts(TxDb.Hsapiens.UCSC.hg19.knownGene)
 cpgis<-import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr"))
 seqinfo(cpgis)<-seqinfo(TxDb.Hsapiens.UCSC.hg19.knownGene)[seqnames(seqinfo(cpgis))]
 
-pn.area<-0
-pn.dist<-0
-pn.jacc<-0
+permut.number<-0
 
-#it means permutations are off
+#permut.number=0 means all the permutations are off
+#permut.number is the common default for ecdf.area.permut.number, mean.distance.permut.number, and jaccard.measure.permut.number
+#these three can be set separetely; explicit set overrloads the default
 
-cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+
+cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1','chr2','chr3'),permut.number=permut.number,keep.distributions=FALSE,showProgressBar=FALSE)
 
 print(cpgi_to_genes)
 
@@ -115,7 +116,7 @@ rref<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width
 
 #create two features, they are randomly scattered in 1 000 000...2 000 000
 
-unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.length,ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.length,permut.number=permut.number,keep.distributions=FALSE,showProgressBar=FALSE)
 
 #correlate them on the whole chromosome: 1...3 000 000
 
@@ -130,7 +131,7 @@ mapped_rref<-MapRangesToGenomicIntervals(what.to.map=rref,where.to.map=map_space
 
 #map them into 1 000 000...2 000 000
 
-mapped_result<-GenometriCorrelation(mapped_rquery,mapped_rref,ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+mapped_result<-GenometriCorrelation(mapped_rquery,mapped_rref,permut.number=permut.number,keep.distributions=FALSE,showProgressBar=FALSE)
 
 #then, correlate again
 

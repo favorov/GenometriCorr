@@ -108,9 +108,11 @@ showTkProgressBar=TRUE
 showProgressBar=FALSE
 
 [tests]
-ecdf.area.permut.number=100
-mean.distance.permut.number=100
-jaccard.measure.permut.number=100
+permut.number=100
+#the same as
+#ecdf.area.permut.number=100
+#mean.distance.permut.number=100
+#jaccard.measure.permut.number=100
 }
 
 }

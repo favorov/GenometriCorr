@@ -29,6 +29,7 @@ The \code{run.config} function runs on a \code{"\linkS4class{GenometriCorrConfig
 		\code{[options]} \tab \code{keep.distributions} \tab \code{keep.distributions}\cr
 		\code{[options]} \tab \code{showTkProgressBar} \tab \code{showTkProgressBar}\cr
 		\code{[options]} \tab \code{showProgressBar} \tab \code{showProgressBar}\cr
+		\code{[tests]} \tab \code{permut.number} \tab \code{permut.number}\cr
 		\code{[tests]} \tab \code{ecdf.area.permut.number} \tab \code{ecdf.area.permut.number}\cr
 		\code{[tests]} \tab \code{mean.distance.permut.number} \tab \code{mean.distance.permut.number}\cr
 		\code{[tests]} \tab \code{jaccard.measure.permut.number} \tab \code{jaccard.measure.permut.number}\cr

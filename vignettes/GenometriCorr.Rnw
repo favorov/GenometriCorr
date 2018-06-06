@@ -239,11 +239,9 @@ Actually, we can look at all the choromomes, one per page, in a milti-page pdf t
 
 <<test_chromosome_123,cache=TRUE>>=
 
-pn.area<-100
-pn.dist<-100
-pn.jacc<-100
+permut.number<-100
 
-cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=TRUE,showProgressBar=FALSE)
+cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1','chr2','chr3'),permut.number=permut.number,keep.distributions=TRUE,showProgressBar=FALSE)
 @
 
 The result is an object of the (S4) {\tt GenometriCorrResult} class. The class is actually (inferred from) a list of results with some useful functionality. The simplest is the {\tt show()} method.
@@ -294,6 +292,11 @@ $$\frac{\sum_{2a \geq R_i}{|R_i|}}{L}+\sum_{2a < R_i}{2a}= $$
 $$\frac{\sum_{2a \geq R_i}{|R_i|}}{L}+2a \left| \left\{ i: 2a < R_i \right\} \right|,$$
 where $\left| \left\{ \ldots \right\} \right|$ denotes the power (number of elenemts) ot a set.
 
+
+\subsection{Fast usecase. Permutation parameters.}
+Sometimes, we need a fast estimation of correlation measure, for example, we make a lot of pairwise comparisons and we want to clusterise/compare the results. To do this, we can switch off all the permutations, in other words, to set {\tt mean.distance.permut.number},{\tt jaccard.measure.permut.number} and {\tt ecdf.area.permut.number} to zero. The simplest method to do it is to set the common permutation default parameter to zero, {\tt permut.number=0}, and not to set the three specific values. In this usecase, the result contains two $p-values$, namely, the Kolmogorov-Smirnov test result for relative distances and the binomial $p-value$ for the projections. In addition, the result contains two more numbers to be compared between different results: the observed-to-expected ratio for the projection test and the correlation-like measure for the relative distances.
+
+A user can can switch specific permutation types on by seting some of the {\tt mean.distance.permut.number},{\tt jaccard.measure.permut.number} and {\tt ecdf.area.permut.number} parameters to positive values along with {\tt permut.number=0}.
 
 \subsection{Configuration file}
 	The main function can be called in two ways. First, the arguments can be supplied directly to {\tt GenometriCorrelation} function as before.
@@ -372,7 +375,7 @@ rref<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width
 
 #create two features, they are randomly scattered in 1 000 000...2 000 000
 
-unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.length,ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.length,permut.number=permut.number,keep.distributions=FALSE,showProgressBar=FALSE)
 
 #correlate them on the whole chromosome: 1...3 000 000
 
@@ -384,7 +387,7 @@ mapped_rref<-MapRangesToGenomicIntervals(what.to.map=rref,where.to.map=map_space
 
 #map them into 1 000 000...2 000 000
 
-mapped_result<-GenometriCorrelation(mapped_rquery,mapped_rref,ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+mapped_result<-GenometriCorrelation(mapped_rquery,mapped_rref,permut.number=permut.number,keep.distributions=FALSE,showProgressBar=FALSE)
 
 #then, correlate again
 

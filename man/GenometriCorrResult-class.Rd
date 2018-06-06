@@ -76,9 +76,7 @@ refseq_bed<-system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "Genome
 config<-new("GenometriCorrConfig",system.file("extdata","template-config.ini", package = "GenometriCorr"))
 #creating the new config from the template-config.ini
 
-config$tests$ecdf.area.permut.number=10
-config$tests$mean.distance.permut.number=10
-config$tests$jaccard.measure.permut.number=10
+config$tests$permut.number=10
 
 #sets all permutation numbers to 10
 

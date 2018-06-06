@@ -127,8 +127,10 @@ thanks to Meharji Arumilli from Helsinki University, Finland
 the correct expected curve for absolute.disdances added to graphical.report() 
 the documentation updated
 1.1.18
-If map space is not normalized, the mapping code normalizes it and warns instead of error
-Thanks to Alla and Vanja from VIGG
-Doc links fixed
-An empty GenometriCorrResult produce error on show(), fixed
-awhole.only=TRUE if it is not set explicitely and the mapping is on
+If the map space is not normalized, the mapping code normalizes it and warns instead of error.
+Thanks to Alla and Vanja from VIGG.
+Doc links fixed.
+An empty GenometriCorrResult produced error on show(), fixed.
+awhole.only=TRUE if it is not set explicitely and if the mapping is on
+1.1.19
+permut.number parameter is added. It is a common default for all the three permutation numbers
