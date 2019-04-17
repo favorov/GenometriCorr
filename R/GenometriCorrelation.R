@@ -478,10 +478,10 @@ GenometriCorrelation <- function(
 		if (! space %in% names(chromosomes.length))
 			chromosomes.length[space]=NA
 		if ( is.na(chromosomes.length[space]) ) #if it was absent, now it is NA as well as if it was NA
-		{
-			chromosomes.length[space]=chromosomes.length.eval(rd_query,rd_reference)
+		{	
+			chromosomes.length[space]=chromosomes.length.eval(rd_query[space],rd_reference[space])
 			if (! (suppress.evaluated.length.warning))
-				warning(paste("Length for chromosome",space,"is evaluated rather than pre-given."))
+				warning(paste0("Length for chromosome ",space," is evaluated as ",as.character(chromosomes.length[space])," rather than pre-given."))
 		}
 		else
 		{
@@ -1265,13 +1265,13 @@ sorted.representing.points<-function(ranges,representing.point.function,chromoso
 #output: vector of represetating points
 
 
-chromosomes.length.eval<-function(rd_query,rd_reference)
+chromosomes.length.eval<-function(rd_query_space,rd_reference_space)
 {
 	#rd_query and rd_reference are IRange
-	min_coord<-min(start(rd_query),start(rd_reference),end(rd_query),end(rd_reference),0)
+	min_coord<-max(min(start(rd_query_space),start(rd_reference_space),end(rd_query_space),end(rd_reference_space)),0)
 	#we prefer this way rather than obvious 0
 	#to equal the error if everything is located in say right and left telomeres
-	max_coord<-max(start(rd_query),start(rd_reference),end(rd_query),end(rd_reference))
+	max_coord<-max(start(rd_query_space),start(rd_reference_space),end(rd_query_space),end(rd_reference_space))
 	return(max_coord-min_coord)
 }
 
@@ -1487,22 +1487,17 @@ query.to.ref.projection.statistics<-function(query,ref,is_query_sorted=F,chrom_l
 	if (is.na(chrom_length))
 		stop("query.to.ref.projection.statistics cannnot work if chrom_length is NA")
 
-	if (!is_query_sorted) 
-		query<-query[order(query)]
+	#if (!is_query_sorted) 
+	#	query<-query[order(query)]
 
 	#we reduce it, whatever!
 	ref<-reduce(ref) #remove duplication in coverage
 
-	ref<-ref[order(ref)]
+	#ref<-ref[order(ref)]
 	
-
-	#if chrom_length==0, we will loose all probes that fall out ref range, 
-	#otherwise we provide the chrom length and so circle the reference
-	currentref<-1
-#	nextcurrentref<-1
 	projection_data<-c()
 	projection_data[['space.length']]<-chrom_length
-	projection_data[['reference.coverage']]<-sum(width(reduce(ref)))
+	projection_data[['reference.coverage']]<-sum(width(ref))
 	
 	#now, we revert our q to IRanges. If qu[i] in integer then the range has lentgh 1 and its start and end are q[i]
 	#if q[i] is integer+0.5 we assign it to [integer,integer+1] interval

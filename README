@@ -134,3 +134,6 @@ An empty GenometriCorrResult produced error on show(), fixed.
 awhole.only=TRUE if it is not set explicitely and if the mapping is on
 1.1.19
 permut.number parameter is added. It is a common default for all the three permutation numbers
+1.1.20
+Chromosome lenght evaluation was with a bug. Fixed.
+Thanks to Ania and Vanja from VIGG.

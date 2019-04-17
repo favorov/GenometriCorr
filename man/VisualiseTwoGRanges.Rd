@@ -25,16 +25,14 @@ VisualiseTwoGRanges(grA, grB, nameA = "RangesA", nameB = "RangesB",
 \description{
 VisualiseTwoGRanges is a function that displays the markups that are contatined two GRanges, in a multi-page pdf, page per chromosome, by \code{\link{VisualiseTwoIRanges}} for aech chromosome. The intent is to show large-scale relationships between the two markups. All the chromosome lenght data is provided by the GRanges.
 }
-\author{
-Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
-}
 \references{
 \href{http://genometricorr.sourceforge.net/}{GenometriCorr home}
 }
 \seealso{
 The \code{\link{GenometriCorr}} documentation and vignette.
-
-Other res: \code{\link{VisualiseTwoIRanges}}
 }
+\author{
+Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+}
+\concept{GenometriCorr 2-range visualisations}
 \keyword{hplot}
-

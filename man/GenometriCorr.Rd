@@ -54,8 +54,8 @@ The package also provides the \code{\link{VisualiseTwoIRanges}} function that cr
 Package: \tab GenometriCorr\cr
 Type: \tab Package\cr
 Title: \tab Genometric Correlation package \cr
-Version: \tab 1.1.19\cr
-Date: \tab 2018-06-06\cr
+Version: \tab 1.1.20\cr
+Date: \tab 2019-04-15\cr
 License: \tab Artistic-2.0\cr
 LazyLoad: \tab yes\cr
 Depends: \tab R (>= 3.1.0), IRanges, GenomicRanges, methods, tcltk, S4Vectors, TxDb.Hsapiens.UCSC.hg19.knownGene\cr

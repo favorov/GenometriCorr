@@ -54,16 +54,14 @@ VisualiseTwoIRanges(cpgis['chr1']$ranges, refseq['chr1']$ranges,
 	pdf='CpGi_vs_RefSeq_genes_chr1_hg19')
 
 }
-\author{
-Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
-}
 \references{
 \href{http://genometricorr.sourceforge.net/}{GenometriCorr home}
 }
 \seealso{
 The \code{\link{GenometriCorr}} documentation and vignette.
-
-Other res: \code{\link{VisualiseTwoGRanges}}
 }
+\author{
+Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+}
+\concept{GenometriCorr 2-range visualisation}
 \keyword{hplot}
-
