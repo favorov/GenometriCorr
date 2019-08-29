@@ -3,7 +3,13 @@
 #               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 #               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 #
-# MarkupsIndependence is the main function of the package
+# GenomertiCorrelation is the main function of the package
+
+#'@import IRanges GenomicRanges GenomicFeatures methods 
+#'@importFrom tcltk tkProgressBar setTkProgressBar getTkProgressBar
+#'@importFrom GenomeInfoDb seqlevels seqlevels<- seqlengths
+#'@importFrom stats ecdf integrate ks.test pbinom punif runif 
+#'@importFrom utils getTxtProgressBar head packageDescription read.table setTxtProgressBar tail txtProgressBar 
 
 epsilon=1e-6
 integr_rel_tol=0.01
@@ -94,6 +100,7 @@ GenometriCorrelation <- function(
 	supress.evaluated.length.warning
 	)
 {
+	#' @export
 	#query and reference are two data sets that are under analysis
 	#each og them is IRanges or RangedData
 	#list.of.spaces is list of spaces to work with
@@ -135,24 +142,24 @@ GenometriCorrelation <- function(
 	nameQ<-"query"
 	nameR<-"reference"	# HJ fixed typo
 	if (!is.object(query))  
-		stop("The thing given as first (",nameQ,") range argument to\n  MarkupsIndependence is not an object!")
+		stop("The thing given as first (",nameQ,") range argument to\n  GenomertiCorrelation is not an object!")
 	if (!is.object(reference))  
-		stop("The thing given as second (",nameR,") range argument to\n  MarkupsIndependence is not an object!")
+		stop("The thing given as second (",nameR,") range argument to\n  GenomertiCorrelation is not an object!")
 	#they are both objects if we are here
 
 	irQ<-irR<-rdQ<-rdR<-grQ<-grR<-FALSE #initialise
 
 	if (!(irQ=inherits(query,"IRanges")) && !(rdQ=inherits(query,"RangedData")) && !(grQ=inherits(query,"GenomicRanges")))
-		stop("The thing given as first (",nameQ,") range argument to MarkupsIndependence is\n  nor an IRanges nor a RangedData nor a GRanges object!")
+		stop("The thing given as first (",nameQ,") range argument to GenomertiCorrelation is\n  nor an IRanges nor a RangedData nor a GRanges object!")
 	if (!(irR=inherits(reference,"IRanges")) && !(rdR=inherits(reference,"RangedData")) && !(grR=inherits(reference,"GenomicRanges")))
-		stop("The thing given as second (",nameR,") range argument to MarkupsIndependence is\n  nor an IRanges nor a RangedData nor a GRanges object!")
+		stop("The thing given as second (",nameR,") range argument to GenomertiCorrelation is\n  nor an IRanges nor a RangedData nor a GRanges object!")
 
 	#they both are IRanges or RangedData if we are here
 
 	#space is an old thing; currently, chromosomes.to.proceed is preferrable
 
 	if (length(chromosomes.to.proceed)>0 && !is.na(space) && space != chromosomes.to.proceed[1])
-		stop("Both chromosomes.to.proceed and space parameters are given to MarkupsIndependence.\nI do not know what to do")
+		stop("Both chromosomes.to.proceed and space parameters are given to GenomertiCorrelation.\nI do not know what to do")
 	
 	#if we are here, only one of chromosomes.to.proceed and space is given or chromosomes.to.proceed[1] == space
 	if (is.na(space) && length(chromosomes.to.proceed))
@@ -414,7 +421,7 @@ GenometriCorrelation <- function(
 {
 
 	#the thing actually calculates everything
-	#it is to called from MarkupsIndependence
+	#it is to called from GenomertiCorrelation
 	#rd_query,rd_reference are two RangedDatas that are under analysis
 	#list.of.spaces is list of spaces to work with
 	#map.to.half is whether to calculate relative distances in [0,0.5] or in [0,1]
@@ -432,8 +439,8 @@ GenometriCorrelation <- function(
 		do.awhole<-FALSE
 	
 	# HJ -- tcltk now part of R; we can Depends it
-	#if ((showTkProgressBar) && !require("tcltk",quietly=TRUE))
-		#showTkProgressBar=FALSE
+	if ((showTkProgressBar) && !require("tcltk",quietly=TRUE))
+		showTkProgressBar=FALSE
 
 	#if there is no loadable tcltk, switch showTkProgressBar off 
 
@@ -1269,10 +1276,11 @@ chromosomes.length.eval<-function(rd_query_space,rd_reference_space)
 {
 	#rd_query and rd_reference are IRange
 	min_coord<-max(min(start(rd_query_space),start(rd_reference_space),end(rd_query_space),end(rd_reference_space)),0)
-	#we prefer this way rather than obvious 0
+	#we prefer this way rather than obvious max
 	#to equal the error if everything is located in say right and left telomeres
+	#in other words, if everything starts at 10000 we will add 10000 to the max coord of any interval
 	max_coord<-max(start(rd_query_space),start(rd_reference_space),end(rd_query_space),end(rd_reference_space))
-	return(max_coord-min_coord)
+	return(max_coord+min_coord)
 }
 
 

@@ -47,6 +47,7 @@
 #'
 #'@family GenometriCorr 2-range visualisation
 #'@keywords hplot
+#'@export
 
 
 VisualiseTwoIRanges<-function(irA, irB, start=1, end=NA, nameA='RangesA', nameB='RangesB',
@@ -247,7 +248,8 @@ VisualiseTwoIRanges<-function(irA, irB, start=1, end=NA, nameA='RangesA', nameB=
 #'@seealso The \code{\link{GenometriCorr}} documentation and vignette.
 #'@family GenometriCorr 2-range visualisations
 #'@keywords hplot
-
+#'@export
+ 
 VisualiseTwoGRanges<-function(grA, grB, nameA='RangesA', nameB='RangesB', title=NA, pdf=NULL, close.device=NULL)
 {
 	if (!inherits(grA,"GRanges"))

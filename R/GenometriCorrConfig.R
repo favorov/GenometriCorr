@@ -17,6 +17,8 @@
 
 #if (!require('methods')) stop('GenometriCorrConfig requires methods package!\n')
 
+#'@importFrom rtracklayer import
+
 .Parse.INI <- function(INI.filename)
 {
   connection <- file(INI.filename)
@@ -81,6 +83,7 @@
 }
 
 
+#'@export
 setClass('GenometriCorrConfig',contains='namedList',representation(src='character'))
 
 setMethod('initialize', 'GenometriCorrConfig', function(.Object, src="")
@@ -100,6 +103,7 @@ setMethod('initialize', 'GenometriCorrConfig', function(.Object, src="")
 		.Object
 	})
 
+#'@export
 setMethod('show','GenometriCorrConfig',function(object)
 	{
 		for (name in names(object))
@@ -128,6 +132,7 @@ setGeneric('run.config',
 		do.mapping=NA
 		) standardGeneric('run.config'))
 
+#'@export
 setMethod('run.config', signature(conf='GenometriCorrConfig'),
 	function(
 		conf,

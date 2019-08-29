@@ -1,7 +1,7 @@
 Package: GenometriCorr
 Type: Package
 Title: Genometric Correlation package
-Version: 1.1.20
+Version: 1.1.21
 Author@R: c( person("Alexander", "Favorov",email = "favorov@sensi.org"),
     person("Loris", "Mularoni"),
     person("Yulia","Medvedeva"),
@@ -26,23 +26,24 @@ Description: The package computes correlations between two genome annotations
     should plan to follow up on any correlations suggested by the software.
 License: Artistic-2.0
 LazyLoad: yes
-Depends:
-    IRanges,
+Depends: IRanges,
     GenomicFeatures,
     GenomicRanges,
     methods,
-    tcltk,
-	S4Vectors,
+    S4Vectors,
     R (>= 3.1.0)
-Imports:
-    TxDb.Hsapiens.UCSC.hg19.knownGene,
-    grDevices,
-    gplots,
+Imports: 
     GenomeInfoDb,
     rtracklayer,
+    tcltk,
+    grDevices,
+    gplots,
     gdata
+Suggests:
+    TxDb.Hsapiens.UCSC.hg19.knownGene
 biocViews: Annotation, Genetics, Infrastructure, DataRepresentation,
     GenomeAnnotation, StatisticalMethod
 URL: http://genometricorr.sourceforge.net/
-Packaged: 2019-04-15 6:00:00 GMT; favorov
+Packaged: 2019-07-28 6:00:00 GMT; favorov
+Encoding: UTF-8
 RoxygenNote: 6.1.1

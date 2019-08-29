@@ -8,8 +8,14 @@
 #if (!require('methods')) stop('GenometriCorrResult requires methods package!\n')
 #if (!require('graphics')) stop('GenometriCorrResult requires graphics package!\n')
 
+#'@importFrom grDevices as.raster rainbow
+#'@importFrom grDevices colorRamp dev.off dev.size pdf rgb 
+#'@importFrom graphics axis hist layout lines mtext par plot plot.new rasterImage text xinch 
+
+#'@export
 setClass('GenometriCorrResult',contains='namedList',representation(config="GenometriCorrConfig"))
 
+#'@export
 setMethod('show','GenometriCorrResult',function(object)
 	{
 		if (length(object) == 0) {
@@ -42,6 +48,7 @@ setGeneric('graphical.report',function(x,pdffile='',show.all=TRUE,show.chromosom
                                 standardGeneric('graphical.report'))
 
 
+#'@export
 setMethod('graphical.report',
 	signature(x='GenometriCorrResult'),
 	function(x, pdffile='',show.all=FALSE,show.chromosomes=c(),trustname=TRUE,make.new=TRUE)
@@ -171,6 +178,7 @@ setMethod('graphical.report',
 setGeneric('visualize',function(x,pdffile='',show.all=TRUE,show.chromosomes=c(), trustname=TRUE, make.new=TRUE, style="blue-white-red")
                                 standardGeneric('visualize'))
 
+#'@export
 setMethod('visualize',
 	signature(x='GenometriCorrResult'),
 	function(x, pdffile='',show.all=FALSE,show.chromosomes=c(), trustname=TRUE, make.new=TRUE, style="blue-white-red")
@@ -433,7 +441,7 @@ setMethod('visualize',
 		for (v in 1:(length(allcols)-1))
 		{
 			newcols[(v-1)*colorinterpolation + 1] = allcols[v]
-			ramp <- colorpanel(colorinterpolation, allcols[v], allcols[v+1])
+			ramp <- gplots::colorpanel(colorinterpolation, allcols[v], allcols[v+1])
 			for (j in 1:colorinterpolation)
 			{
 				newcols[(v-1)*colorinterpolation + 1 + j] = ramp[j]

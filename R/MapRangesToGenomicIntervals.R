@@ -6,6 +6,7 @@
 
 
 
+#'@export
 MapRangesToGenomicIntervals<-function(
 	where.to.map, what.to.map,
 	chromosomes.to.proceed=NA,
