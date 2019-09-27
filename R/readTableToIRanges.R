@@ -1,5 +1,5 @@
 # GenometriCorrelation project evaluating two interval markups genomewide independence. 
-# (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+# (c) 2010-2019 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 #               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 #               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 # readTableToIRanges.R reads a variety of GFF- or BED-like  formats to an IRanges or a RangedData object

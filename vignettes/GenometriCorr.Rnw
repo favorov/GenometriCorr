@@ -296,7 +296,8 @@ where $\left| \left\{ \ldots \right\} \right|$ denotes the power (number of elen
 \subsection{Fast usecase. Permutation parameters.}
 Sometimes, we need a fast estimation of correlation measure, for example, we make a lot of pairwise comparisons and we want to clusterise/compare the results. To do this, we can switch off all the permutations, in other words, to set {\tt mean.distance.permut.number},{\tt jaccard.measure.permut.number} and {\tt ecdf.area.permut.number} to zero. The simplest method to do it is to set the common permutation default parameter to zero, {\tt permut.number=0}, and not to set the three specific values. In this usecase, the result contains two $p-values$, namely, the Kolmogorov-Smirnov test result for relative distances and the binomial $p-value$ for the projections. In addition, the result contains two more numbers to be compared between different results: the observed-to-expected ratio for the projection test and the correlation-like measure for the relative distances.
 
-A user can can switch specific permutation types on by seting some of the {\tt mean.distance.permut.number},{\tt jaccard.measure.permut.number} and {\tt ecdf.area.permut.number} parameters to positive values along with {\tt permut.number=0}.
+User can can switch specific permutation types on by seting some of the \\{\tt mean.distance.permut.number}, \\{\tt jaccard.measure.permut.number}, \\and {\tt ecdf.area.permut.number} 
+parameters to positive values along with {\tt permut.number=0}.
 
 \subsection{Configuration file}
 	The main function can be called in two ways. First, the arguments can be supplied directly to {\tt GenometriCorrelation} function as before.

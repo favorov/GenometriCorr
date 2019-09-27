@@ -1,5 +1,5 @@
 # GenometriCorrelation project evaluating two interval markups genomewide independence. 
-# (c) 2010-2018 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
+# (c) 2010-2019 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
 #               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
 #               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 #
@@ -102,7 +102,9 @@ GenometriCorrelation <- function(
 {
 	#' @export
 	#query and reference are two data sets that are under analysis
-	#each og them is IRanges or RangedData
+	#each of them is IRanges or GRanges or RangedData (going to be deprecated)
+	#If the lists of chromosomes in the query an in the reference differ,
+	#we procced only the intersection
 	#list.of.spaces is list of spaces to work with
 	#chromosomes.to.proceed is list of chromosomes to proceed
 	#chromosomes.to.include.in.awhole is a list of chromosomes to include in 'whole genome', default is all chromosomes.to.proceed()
@@ -154,7 +156,7 @@ GenometriCorrelation <- function(
 	if (!(irR=inherits(reference,"IRanges")) && !(rdR=inherits(reference,"RangedData")) && !(grR=inherits(reference,"GenomicRanges")))
 		stop("The thing given as second (",nameR,") range argument to GenomertiCorrelation is\n  nor an IRanges nor a RangedData nor a GRanges object!")
 
-	#they both are IRanges or RangedData if we are here
+	#they both are IRanges or RangedData or GRanges if we are here
 
 	#space is an old thing; currently, chromosomes.to.proceed is preferrable
 
@@ -534,22 +536,23 @@ GenometriCorrelation <- function(
 		rd_query<-RangedData(dA)
 		rd_reference<-RangedData(dB)
 	}
+	
+	#the code romoves all the chromosomes with empty r and empty q
 
 	good_space=rep(TRUE,length(list.of.spaces))
 
 	for (space_no in 1:length(list.of.spaces)) #calculate everything nonpermutted for each chromosomes
 	{
 		space<-list.of.spaces[space_no]
-		if (length(start(ranges(rd_query)[[space]]))==0)
+		if (length(start(ranges(rd_query)[[space]]))==0 &&
+			length(start(ranges(rd_reference)[[space]]))==0)
+		{
 			good_space[space_no]=FALSE
-		if (length(start(ranges(rd_reference)[[space]]))==0)
-			good_space[space_no]=FALSE
-		if (!good_space[space_no])
-			warning("The space: ",space, " is not populated, we omit it.")
+			warning("The space: ",space, " is not populated nor in query neither in reference, we omit it.")
+		}
 	}
 
 	list.of.spaces<-list.of.spaces[good_space];
-
 	#filtered....
 
 	#initialise it all
@@ -666,12 +669,39 @@ GenometriCorrelation <- function(
 
 		result[[space]][['reference.population']]<-length(ref)
 
-	  result[[space]][['query.coverage']]<-sum(width(reduce(rd_query[space]$ranges)))
+		result[[space]][['query.coverage']]<-sum(width(reduce(rd_query[space]$ranges)))
 
 		result[[space]][['reference.coverage']]<-sum(width(reduce(rd_reference[space]$ranges)))
+
+		qu_or_ref_is_empty<-(length(qu)==0 || length(ref)==0)
 		
-		result[[space]][['relative.distances.data']]<-
-			query_to_ref_relative_distances(qu,ref,map.to.half,is_query_sorted=T,is_ref_sorted=T,chrom_length=chromosomes.length[space])
+		if (!qu_or_ref_is_empty) {
+			result[[space]][['relative.distances.data']]<-
+				query_to_ref_relative_distances(
+						qu,ref,map.to.half,
+						is_query_sorted=T,
+						is_ref_sorted=T,
+						chrom_length=chromosomes.length[space]
+				)
+		} else {
+			result[[space]][['relative.distances.data']]<-c()
+		}
+		
+		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
+
+		if (showTkProgressBar)
+		{
+			done <- getTkProgressBar(tk_pb)[1]+1;
+			done_info <- sprintf('chromosome: %s ; %i of %i done',space,done,pb_capacity)
+			setTkProgressBar(tk_pb,value=done,title=paste('GenometriCorrelation:',done_info),label=done_info)
+		}
+		if (!qu_or_ref_is_empty) {
+			result[[space]][['relative.distances.ks.p.value']]<-
+				ks.test(untie(result[[space]]$relative.distances.data),
+					punif,min=0,max=rel.dist.top)$p.value
+		} else {
+			result[[space]][['relative.distances.ks.p.value']] <- 1.
+		} #empty distribution
 
 		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 
@@ -681,25 +711,20 @@ GenometriCorrelation <- function(
 			done_info <- sprintf('chromosome: %s ; %i of %i done',space,done,pb_capacity)
 			setTkProgressBar(tk_pb,value=done,title=paste('GenometriCorrelation:',done_info),label=done_info)
 		}
-
-		result[[space]][['relative.distances.ks.p.value']]<-
-			ks.test(untie(result[[space]]$relative.distances.data),punif,min=0,max=rel.dist.top)$p.value
-
-		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
-
-		if (showTkProgressBar)
-		{
-			done <- getTkProgressBar(tk_pb)[1]+1;
-			done_info <- sprintf('chromosome: %s ; %i of %i done',space,done,pb_capacity)
-			setTkProgressBar(tk_pb,value=done,title=paste('GenometriCorrelation:',done_info),label=done_info)
-		}
 		
-		result[[space]][['relative.distances.ecdf.deviation.area']]<-
-			integrate(
-					function(x){return(abs((ecdf(result[[space]]$relative.distances.data))(x)-x/rel.dist.top))},
+		if (!qu_or_ref_is_empty) {
+			result[[space]][['relative.distances.ecdf.deviation.area']]<-
+				integrate(
+					function(x){
+						return(abs((ecdf(result[[space]]$relative.distances.data))(x)-
+						x/rel.dist.top))
+					},
 					lower=0,upper=rel.dist.top,
 					subdivisions=length(result[[space]]$relative.distances.data)*100,
 					rel.tol=integr_rel_tol)$value
+		} else {
+			result[[space]][['relative.distances.ecdf.deviation.area']]<-0
+		}
 		#makes no sense if no (ecdf.area.permut.number==0) relative distance permutations done
 		if (ecdf.area.permut.number>0) 
 		{
@@ -727,7 +752,6 @@ GenometriCorrelation <- function(
 			setTkProgressBar(tk_pb,value=done,title=paste('GenometriCorrelation:',done_info),label=done_info)
 		}
 
-		result[[space]][['projection.test']]<-query.to.ref.projection.statistics(qu,rd_reference[space]$ranges,TRUE,chromosomes.length[space])	
 
 		result[[space]][['query.reference.intersection']]<-sum(width(reduce(intersect(rd_query[space]$ranges,rd_reference[space]$ranges))))
 		result[[space]][['query.reference.union']]<-sum(width(reduce(union(rd_query[space]$ranges,rd_reference[space]$ranges))))
@@ -750,36 +774,46 @@ GenometriCorrelation <- function(
 			done_info <- sprintf('chromosome: %s ; %i of %i done',space,done,pb_capacity)
 			setTkProgressBar(tk_pb,value=done,title=paste('GenometriCorrelation:',done_info),label=done_info)
 		}
+		
+		result[[space]][['projection.test']]<-
+				  query.to.ref.projection.statistics(qu,rd_reference[space]$ranges,TRUE,chromosomes.length[space])	
+				  
+		if(!qu_or_ref_is_empty) {	
+				  proj.p.value<-
+					  pbinom(
+						  result[[space]][['projection.test']][['query.hits']],
+						  result[[space]][['query.population']],
+						  result[[space]][['projection.test']][['reference.coverage']]/
+									 	result[[space]][['projection.test']][['space.length']]
+					  )
 
-		proj.p.value<-
-			pbinom(
-				result[[space]][['projection.test']][['query.hits']],
-				result[[space]][['query.population']],
-				result[[space]][['projection.test']][['reference.coverage']]/result[[space]][['projection.test']][['space.length']]
-			)
+				  if (proj.p.value<.5) # one-sided test
+				  {
+					  result[[space]][['projection.test.p.value']]<-proj.p.value
+					  result[[space]][['projection.test.lower.tail']] <- TRUE
+				  }
+				  else
+				  {
+					  result[[space]][['projection.test.p.value']]<- 1.-proj.p.value
+					  result[[space]][['projection.test.lower.tail']] <- FALSE
+				  }
 
-		if (proj.p.value<.5) # one-sided test
-		{
-			result[[space]][['projection.test.p.value']]<-proj.p.value
-			result[[space]][['projection.test.lower.tail']] <- TRUE
-		}
-		else
-		{
-			result[[space]][['projection.test.p.value']]<- 1.-proj.p.value
+				  result[[space]][['projection.test.obs.to.exp']]<- 
+					  (	
+						  result[[space]][['projection.test']][['query.hits']]
+						  /
+						  result[[space]][['query.population']]
+					  )*
+					  (
+						  result[[space]][['projection.test']][['space.length']] 
+						  / 
+						  result[[space]][['projection.test']][['reference.coverage']]
+					  )
+		} else {
+			result[[space]][['projection.test.p.value']] <- 1.
 			result[[space]][['projection.test.lower.tail']] <- FALSE
+			result[[space]][['projection.test.obs.to.exp']] <- 1.
 		}
-
-		result[[space]][['projection.test.obs.to.exp']]<- 
-			(	
-				result[[space]][['projection.test']][['query.hits']]
-				/
-				result[[space]][['query.population']]
-			)*
-			(
-				result[[space]][['projection.test']][['space.length']] 
-				/ 
-				result[[space]][['projection.test']][['reference.coverage']]
-			)
 		
 		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 
@@ -969,12 +1003,16 @@ GenometriCorrelation <- function(
 				#each choromosome
 				sample_size<-length(rd_query[space]$ranges)
 				sample<-runif(sample_size,0,rel.dist.top) #sample
+				if (length(sample)>0) {
 				dev_area<-
 					integrate(
 							function(x){return(abs((ecdf(sample)(x))-x/rel.dist.top))},
 							lower=0,upper=rel.dist.top,
 							subdivisions=sample_size*100,
 							rel.tol=integr_rel_tol)$value
+				} else {dev_area<-0}
+				#so if query is empty it returns 0
+				#if the reference is - we do not care here
 
 				result[[space]][['relative.distances.ecdf.deviation.area.null.list']]<-
 					c(result[[space]][['relative.distances.ecdf.deviation.area.null.list']],dev_area) #save the result
@@ -1060,7 +1098,6 @@ GenometriCorrelation <- function(
 		result[[space]][['reference.middles']]<-NULL
 		#we do need it any more
 	}
-	
 	#jaccard.measure permutation gathering
 	if (jaccard.measure.permut.number>0 )
 		for (permutaion.number in 1:jaccard.measure.permut.number)
@@ -1137,10 +1174,16 @@ GenometriCorrelation <- function(
 	{
 		for (space in c(list.of.spaces,awhole.space.name))
 		{
-			p.value<-
-				1-(ecdf(result[[space]][['relative.distances.ecdf.deviation.area.null.list']]))(result[[space]][['relative.distances.ecdf.deviation.area']]) #we treat only right side
-			if (p.value==0) 
-				p.value = paste("<",toString(1/ecdf.area.permut.number),sep='')
+			if ( result[[space]][['query.population']]==0 || result[[space]][['reference.population']]==0) {
+				p.value<-1.
+			} else {
+				p.value<-
+					1-(ecdf(result[[space]][['relative.distances.ecdf.deviation.area.null.list']]))(
+						result[[space]][['relative.distances.ecdf.deviation.area']]
+					) #we treat only right side
+				if (p.value==0) 
+					p.value = paste("<",toString(1/ecdf.area.permut.number),sep='')
+			}
 			result[[space]][['relative.distances.ecdf.deviation.area.p.value']]<-p.value
 		}
 	}
@@ -1151,48 +1194,61 @@ GenometriCorrelation <- function(
 		done_info <- sprintf('gathering results; %i of %i done',done,pb_capacity)
 		setTkProgressBar(tk_pb,value=done,title=paste('GenometriCorrelation:',done_info),label=done_info)
 	}
+	
+	
 	#min distance sum p-values
 	if (mean.distance.permut.number>0)
 	{
 		for (space in c(list.of.spaces,awhole.space.name))
 		{
-			p.value<-
-				(ecdf(result[[space]][['scaled.absolute.min.distance.sum.null.list']]))(result[[space]][['scaled.absolute.min.distance.sum']]) #we treat only right side
-			
-			if(p.value<=0.5)
-				lower.tail<-TRUE
-			else
-			{
-				lower.tail <- FALSE
-				p.value<-1-p.value
+			if ( result[[space]][['query.population']]==0 || result[[space]][['reference.population']]==0) {
+				p.value<-1.
+				lower.tail<-FALSE
+			} else {
+				p.value<-
+					(ecdf(result[[space]][['scaled.absolute.min.distance.sum.null.list']]))(result[[space]][['scaled.absolute.min.distance.sum']]) #we treat only right side
+				
+				if(p.value<=0.5)
+					lower.tail<-TRUE
+				else
+				{
+					lower.tail <- FALSE
+					p.value<-1-p.value
+				}
+
+				if (p.value==0) 
+					p.value = paste("<",toString(1/mean.distance.permut.number),sep='')
 			}
-
-			if (p.value==0) 
-				p.value = paste("<",toString(1/mean.distance.permut.number),sep='')
-
 			result[[space]][['scaled.absolute.min.distance.sum.p.value']]<-p.value
 			result[[space]][['scaled.absolute.min.distance.sum.lower.tail']] <- lower.tail 
 		}
 	}
+	
 	#jaccard distance sum p-values
 	if (jaccard.measure.permut.number>0)
 	{
 		for (space in c(list.of.spaces,awhole.space.name))
 		{
-			p.value<-
-				(ecdf(result[[space]][['jaccard.measure.null.list']]))(result[[space]][['jaccard.measure']]) #we treat only right side
+			if ( result[[space]][['query.population']]==0 || result[[space]][['reference.population']]==0) {
+				p.value<-1.
+				lower.tail<-FALSE
+			} else {
+				p.value<-
+				(ecdf(result[[space]][['jaccard.measure.null.list']]))(
+						result[[space]][['jaccard.measure']]
+				) #we treat only right side
 			
-			if(p.value<=0.5)
-				lower.tail<-TRUE
-			else
-			{
-				lower.tail <- FALSE
-				p.value<-1-p.value
+				if(p.value<=0.5)
+					lower.tail<-TRUE
+				else
+				{
+					lower.tail <- FALSE
+					p.value<-1-p.value
+				}
+
+				if (p.value==0) 
+					p.value = paste("<",toString(1/jaccard.measure.permut.number),sep='')
 			}
-
-			if (p.value==0) 
-				p.value = paste("<",toString(1/jaccard.measure.permut.number),sep='')
-
 			result[[space]][['jaccard.measure.p.value']]<-p.value
 			result[[space]][['jaccard.measure.lower.tail']] <- lower.tail 
 		}
@@ -1287,19 +1343,20 @@ chromosomes.length.eval<-function(rd_query_space,rd_reference_space)
 query_to_ref_relative_distances<-function(query,ref,map.to.half,is_query_sorted=F,is_ref_sorted=F,chrom_length=NA)
 #calculate distances for a pair of positions (points)  vectors: query, ref
 {
-
+	if (length(query)==0 || length(ref)==0) {
+		return (c())
+	}
 	if (!is_query_sorted) 
 		query<-query[order(query)]
 	if (!is_ref_sorted) 
 		ref<-ref[order(ref)]
-	rel_data<-list()
+	rel_data<-c()
 
 	#if chrom_length==0, we will loose all probes that fall out ref range, 
 	#otherwise we provide the chrom length and so circle the reference
 	refindex<-1
 	firstref<-ref[1]
 	lastref<-ref[length(ref)]
-	rel_data<-c()
 	for (quindex in 1:length(query))
 	#we like to calcilate wheb current ref < current query <= next ref
 	{
@@ -1356,12 +1413,14 @@ query_to_ref_relative_distances<-function(query,ref,map.to.half,is_query_sorted=
 query_to_ref_min_absolute_distances<-function(query,ref,map.to.half,is_query_sorted=F,is_ref_sorted=F,chrom_length=NA)
 #calculate distances for a pair of positions (points)  vectors: query, ref
 {
+	if (length(query)==0 || length(ref)==0) {
+		return (c())
+	}
 
 	if (!is_query_sorted) 
 		query<-query[order(query)]
 	if (!is_ref_sorted) 
 		ref<-ref[order(ref)]
-	rel_data<-list()
 
 	#if chrom_length==0, we will loose all probes that fall out ref range, 
 	#otherwise we provide the chrom length and so circle the reference
@@ -1425,11 +1484,14 @@ query_to_ref_min_absolute_distance_sum<-function(query,ref,map.to.half,is_query_
 #calculate distances for a pair of positions (points)  vectors: query, ref
 {
 
+	if (length(query)==0 || length(ref)==0) {
+		return (0)
+	}
+
 	if (!is_query_sorted) 
 		query<-query[order(query)]
 	if (!is_ref_sorted) 
 		ref<-ref[order(ref)]
-	rel_data<-list()
 
 	#if chrom_length==0, we will loose all probes that fall out ref range, 
 	#otherwise we provide the chrom length and so circle the reference
