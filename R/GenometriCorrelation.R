@@ -1,15 +1,18 @@
 # GenometriCorrelation project evaluating two interval markups genomewide independence. 
-# (c) 2010-2019 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
-#               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
-#               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+# (c) 2010-2020 Alexander Favorov, Loris Mularoni, 
+#               Yulia Medvedeva, Harris A. Jaffee, 
+#               Ekaterina V. Zhuravleva, Veronica Busa,
+#               Leslie M. Cope, Andrey A. Mironov, 
+#               Vsevolod J. Makeev, Sarah J. Wheelan.
 #
 # GenomertiCorrelation is the main function of the package
 
-#'@import IRanges GenomicRanges GenomicFeatures methods 
-#'@importFrom tcltk tkProgressBar setTkProgressBar getTkProgressBar
-#'@importFrom GenomeInfoDb seqlevels seqlevels<- seqlengths
-#'@importFrom stats ecdf integrate ks.test pbinom punif runif 
-#'@importFrom utils getTxtProgressBar head packageDescription read.table setTxtProgressBar tail txtProgressBar 
+#' @importFrom gtools mixedsort
+#' @importFrom tcltk tkProgressBar setTkProgressBar getTkProgressBar
+#' @importFrom GenomeInfoDb seqlevels seqlevels<- seqlengths
+#' @importFrom stats ecdf integrate ks.test pbinom punif runif 
+#' @importFrom utils getTxtProgressBar head packageDescription read.table setTxtProgressBar tail txtProgressBar 
+#' @import BiocGenerics magrittr GenomicRanges GenomicFeatures methods plyranges
 
 epsilon=1e-6
 integr_rel_tol=0.01
@@ -35,14 +38,15 @@ add.chr.prefix.to.names<-function(namelist)
 #adds 'chr' prefix to all names if they are not 'chr'-prefixed already;
 #lowercases the 'CHR','ChR', etc prefixes if any instead of adding 'chr'
 {
-	if (inherits(namelist,"RangedData"))# if it is RangedData 
-	{
-		names(namelist)<-add.chr.prefix.to.names(names(namelist))
-		return(namelist)
-	}
 	if (inherits(namelist,"GRanges"))
-	{
-		seqlevels(namelist)<-add.chr.prefix.to.names(seqlevels(namelist))
+	{	
+		sinf<-namelist@seqinfo
+		sinf@seqnames<-add.chr.prefix.to.names(sinf@seqnames)
+		namelist<-GRanges(
+			ranges=namelist@ranges,
+			seqnames=add.chr.prefix.to.names(namelist@seqnames),
+			seqinfo=sinf
+		)
 		return(namelist)
 	}
 	if (is.factor(namelist))
@@ -73,6 +77,86 @@ add.chr.prefix.to.names<-function(namelist)
 		return(result)
 }
 
+
+#' GenometriCorrelation
+#'
+#' The GenometriCorrelation function compares two interval annotations on a chromosome, set of chromosomes or on an entire genome, and performs various statistical tests to determine whether the two interval sets are independent or are positioned nonrandomly with respect to each other. For a complete description of the tests, refer to the the package vignette.
+#'
+#' @aliases GenometricCorrelation
+#' @param query GRanges object that contains the query interval set coordinates and spaces (generally, chromosomes). The \code{GenometriCorrelation} function tests whether it is positioned independently relative to the \code{reference} interval set.
+#' @param reference The \code{GRanges} object that contains the reference interval set coordinates and spaces. The \code{GenometriCorrelation} function tests whether \code{query} is positioned independently relative to \code{reference}.
+#' @param chromosomes.to.proceed This vector of strings contains the names of spaces (chromosomes) to analyze. If both \code{query} and \code{reference} are \code{GRanges} if the parameter is not given (its default is c()), the initial list of spaces to proceed is the intersection of the space lists of query and reference names, and a warning is rasied if the lists are different. if \code{chromosomes.to.proceed} is given, it restricts the list so that only those names from the intersection that are in \code{chromosomes.to.proceed} are analyzed. If it is a subset of the \code{query} and \code{reference} chromosone lists intersection, the warning that the lists are different is not raised.
+#' @param chromosomes.to.include.in.awhole ia a vector of strings contains the names of spaces to be included in the overall (awhole) statistics. Its default is c(), meaning that all the analysed genes are included.
+#' @param chromosomes.to.exclude.from.awhole is a list of chromosomes (spaces) to be excluded from the overall statistics.
+#' @param add.chr.as.prefix deals with the chr chromosome name prefix. The correlation is only performed on chromosomes that have exactly the same name, so by default, a chromosome named chr1 will not be considered the same chromosome as one simply labeled 1. This argument is provided so that if the chromosome names in the \code{query}, \code{reference} and the \code{chromosomes*} parameters, or the names of the chromosomes in \code{chromosome.length}) have no prefix \code{'chr'} (lower-, upper-, or mixed case), this prefix will be added, and all strings matching \code{'chr'} in uppercase or partly uppercase are changed to lowercase. This way, comparisons can be made even if the chromosome names differ by any variation of the word \code{'chr'}. The default is FALSE.
+#' @param awhole.only If \code{FALSE}, all the considered chromosomes statistics and the summary (awhole) information are returned (default). If \code{TRUE}, only the summary (awhole) information is returned. Useful for pipelines. The \code{TRUE} value is default that is posted by \code{run.config} if the data is processed through mapping.
+#' @param map.to.half Some of the tests we use are besed on distances between a query point and the closest reference point. If map.to.half is TRUE (default) we look for the closest reference point upstream or downstream, if it is \code{FALSE}, we look only downstream (left). Useful if you are mapping to intervals and want to preserve directionality.
+#' @param showProgressBar Toggle the text progress bar. Default is \code{TRUE}.
+#' @param showTkProgressBar Toggle the Tk progress bar. If it is \code{TRUE} but the Tcl/Tk is not loadable (e.g. \code{require('tcltk')} returns \code{FALSE}), the parameter is turned to \code{FALSE}. Default is \code{FALSE}.
+#' @param chromosomes.length A vector of lengths of the chromosomes to be tested; each chromosome is given a name and a numerical length. The order of the chromosomes does not matter.
+#' @param suppress.evaluated.length.warning If there is a chromosome that is included in the evaluation but its length is not given in \code{chromosome.length}, the length of the chromosome is calculated as the maximal position mentioned in the data. If this parameter is \code{FALSE}, this will generate a warning, which is suppressed when the parameter is \code{TRUE}. The default is \code{FALSE}.
+#' @param permut.number is the common default for \code{ecdf.area.permut.number}, \code{mean.distance.permut.number}, and \code{jaccard.measure.permut.number}. \code{permut.number=0} defaults all the permutations to off.
+#' @param ecdf.area.permut.number The number of permutations performed to get the \emph{p-value} for the area between the ecdf for relative distance distribution and the straight line representing the uniform relative area for the random case.
+#' @param mean.distance.permut.number The number of permutations to ascribe \emph{p-value} to minimal query-reference distance averaged over all query points.
+#' @param jaccard.measure.permut.number The number of permutations for Jaccard measure \emph{p-value} estimation. 
+#' @param jaccard.permut.is.rearrangement If \code{TRUE}, the permutations of the reference for the Jaccard test retain the lengths of all intervals and gaps in the query. All the permuted queries will mirror the original, so the \emph{p-value} is overestimated. If \code{FALSE} (the default), the permutation is a random resampling of starts of the query intervals.
+#' @param awhole.space.name The name of the pseudo-space that describes the overall genome statistics. Default is 'awhole'.
+#' @param keep.distributions It this is true, the procedure returns all points in th distributions calculated for comparison. This is useful for making figures. Default is \code{FALSE}.
+#' @param representing.point.function By default, the midpoint of each interval is used as the surrogate for the position of the interval. To force the program to use something other than the midpoint, define the function to use to return comparison points. The function must take the same parameters as the default \code{mitl} that returns the middle points. The function is to be passed as the \code{representing.point.function} parameter. The default for the parameter is: \code{mitl<-function(start,end,chromosome.length,space){return ((as.integer(start)+as.integer(end))/2)}} 
+#' @param query.representing.point.function The same thing as the \code{representing.point.function}, but the representation point calculation is overloaded only for query intervals.
+#' @param reference.representing.point.function The same thing as the \code{representing.point.function}, but the representation point calculation is overloaded only for query intervals.
+#' @param supress.evaluated.length.warning It was a typo for \code{suppress.evaluated.length.warning}. Now obsoleted, use \code{suppress.evaluated.length.warning}
+#' @return The result is an instance of the \code{\link{GenometriCorrResult-class}} that describes the run parameters in its \code{\link{GenometriCorrResult-class}} \code{@config} slot and that extends a \code{\linkS4class{namedList}} list (created originally with a \code{list()} call with the results of the run.  Each element of the list is also a list that describes results for a space (chromosome); one of them is 'awhole' (or other \code{awhole.space.name} if given) that describes the genome awhole, all others are named the same as the chromosomes and describe the chromosomewise statistics.  The elements of the 'awhole' and chromosomewise lists are statistical measures and some datasets. The statistical measures are described in the \code{\link{GenometriCorr}} package help.  For further explanation, see the the package vignette. 
+#'
+#' Below is the description of the values of the list returned for each chromosome. 
+#' \item{query.population}{Query points used in the comparisons.}
+#' \item{reference.population}{Reference points used in the comparisons.}
+#' \item{relative.distances.ks.p.value}{\emph{p-value} for local independence obtained by the Kolmogorov-Smirnov test for relative distances. }
+#' \item{relative.distances.ecdf.deviation.area.p.value}{\emph{p-value} for local independence obtained by the permutation test for relative distances. }
+#' \item{relative.distances.ecdf.area.correlation}{Has the same sign with the relative distance-based local correlation. }
+#' \item{projection.test.p.value}{\emph{p-value} for chromosome-scale independence obtained by the projection test. }
+#' \item{projection.test.lower.tail}{If TRUE, projection test shows negative correlation, real overlap is lessthan the expectation.}
+#' \item{projection.test.obs.to.exp}{To measure the effect size, the observed to expected ratio for the projection test statistics that is the number of query characteristic points (by default, midpoints) that fell into a reference features.}
+#' \item{scaled.absolute.min.distance.sum.p.value}{\emph{p-value} for chromosome-scale null hypothesis as obtained by the permutations of the query points and the mean of the distances to the two closest reference points.}
+#' \item{scaled.absolute.min.distance.sum.lower.tail}{If TRUE, the query points are closer to the reference points than expected (the absolute distance is lower than the expectation). }
+#' \item{query.reference.intersection}{Intersection of reference and query, in bases.}
+#' \item{query.reference.union}{Union of reference and query, in bases.}
+#' \item{jaccard.measure}{Jaccard measure of query and reference overlap.}
+#' \item{jaccard.measure.p.value}{The permutation-based evaluation of the \emph{p-value} for the obtained Jaccard measure, given the null hypothesis of independence.}
+#' \item{jaccard.measure.lower.tail}{If \code{TRUE}, then Jaccard measure is lower that the expectation (overlap less than expected)}
+#'
+#' The additional values that are returned if \code{keep.distributions=TRUE}
+#' \item{relative.distances.data}{The original relative distances}
+#' \item{relative.distances.ecdf.deviation.area}{The real value of the ECDF deviation area to be compared with the permutation to obtain the p-value}
+#' \item{relative.distances.ecdf.deviation.area.null.list}{The null distribution}
+#' \item{projection.test}{List of three values: \code{space.length} is length of a chromosome; \code{reference.coverage} is length of that chromosome covered by reference intervale, and \code{query.hits} is the number of query points that fall into the reference intervals.}
+#' \item{absolute.min.distance.data}{The distribution of query-reference distances}
+#' \item{absolute.inter.reference.distance.data}{The distribution of reference-reference distances}
+#' \item{scaled.absolute.min.distance.sum}{The value of the sum (i.e. mean) of scaled absolute distances}
+#' \item{scaled.absolute.min.distance.sum.null.list}{The null distribution for the scaled absolute distances}
+#' \item{jaccard.measure.null.list}{The null distribution of Jaccard measures in permutations}
+#' @author Alexander Favorov \email{favorov@@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Veronica Busa, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+#' @references \href{http://genometricorr.sourceforge.net/}{GenometriCorr home}
+#' @seealso The \code{\link{GenometriCorr}} documentation and vignette.
+#' @examples
+#' library('rtracklayer')
+#' library('GenometriCorr')
+#' library('TxDb.Hsapiens.UCSC.hg19.knownGene')
+#' 
+#' refseq<-transcripts(TxDb.Hsapiens.UCSC.hg19.knownGene)
+#' cpgis<-import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr"))
+#' seqinfo(cpgis)<-seqinfo(TxDb.Hsapiens.UCSC.hg19.knownGene)[seqnames(seqinfo(cpgis))]
+#' 
+#' pn.area<-10
+#' pn.dist<-10
+#' pn.jacc<-10
+#' 
+#' cpgi_to_genes<-GenometriCorrelation(cpgis,refseq,chromosomes.to.proceed=c('chr1','chr2','chr3'),ecdf.area.permut.number=pn.area,mean.distance.permut.number=pn.dist,jaccard.measure.permut.number=pn.jacc,keep.distributions=FALSE,showProgressBar=FALSE)
+#' 
+#' print(cpgi_to_genes)
+
+#' @keywords multivariate
+#' @export
 GenometriCorrelation <- function(
 	query,reference,
 	chromosomes.to.proceed=c(),
@@ -80,13 +164,11 @@ GenometriCorrelation <- function(
 	chromosomes.to.exclude.from.awhole=c(),
 	add.chr.as.prefix=FALSE,
 	awhole.only=FALSE,
-	space=NA,
 	map.to.half=TRUE,
 	showProgressBar=TRUE,
 	showTkProgressBar=FALSE,
 	chromosomes.length=c(),
 	suppress.evaluated.length.warning=FALSE,
-	cut.all.over.length=FALSE,
 	permut.number=100,
 	ecdf.area.permut.number=permut.number,
 	mean.distance.permut.number=permut.number,
@@ -100,36 +182,6 @@ GenometriCorrelation <- function(
 	supress.evaluated.length.warning
 	)
 {
-	#' @export
-	#query and reference are two data sets that are under analysis
-	#each of them is IRanges or GRanges or RangedData (going to be deprecated)
-	#If the lists of chromosomes in the query an in the reference differ,
-	#we procced only the intersection
-	#list.of.spaces is list of spaces to work with
-	#chromosomes.to.proceed is list of chromosomes to proceed
-	#chromosomes.to.include.in.awhole is a list of chromosomes to include in 'whole genome', default is all chromosomes.to.proceed()
-	#chromosomes.to.exclude.from.awhole excludes some chromosome from the list 
-	#add.chr.as.prefix adds 'chr' prefix to all chromosome spaces if there is no 'Chr', 'chr', etc prefix at any of the names of the names array; all the prefixes like 'CHR', 'chr' etc are lowercased to 'chr'
-	#space is the mane for one chromosome tested, it provides tha name if we compare IRanges,
-	#or it takes one name from the list exactly like if give one name in chromosomes.to.proceed()
-	#map.to.half is whether to calculate relative distances in [0,0.5] or in [0,1]
-	#showProgressBar whether to show a progress indicator
-	#showTkProgressBar whether to show a Tk progress indicator; work only if tcltk is loaded
-	#chromosomes.length is an array of length of chromosomes, names are the names of chromosomes
-	#cut.all.over.length if the length is given and there is any interval coord that is higher than the lenght, the default behavoiur (when cut.all.over.length is FALSE) is to show an error and stop. If it is TRUE, the interval will be just truncated.
-	#suppress.evaluated.length.warning suppresses the warning that a chromosome lenght is eveluated rather then given. The evaluation is just the rightmost coord in all the intervals, it is used is the length is NA.
-	#ecdf.area.permut.number is number of permutations for ecdf area method
-	#permut.number is the common default for all the permutation parameters
-	#mean.distance.permut.number is the same thing about the mean ref-to-query distance
-	#jaccard.measure.permut.number is the same for Jaccard measure,
-	#awhole.space.name is the space name for this operation
-	#keep.distributions if TRUE, the result list includes a the distributions that were used to obtain p-valies
-	#representing.point.function is the function that calculates the representing point for any interval 
-	#the default is mitl (calculates the middle),
-	#the function is to look like mitl<-function(start,end,chromosome.length,space); the additional parameters that do not depend on chrom, etc are in ..
-	#query.representing.point.function=representing.point.function for query
-	#reference.representing.point.function=representing.point.function for reference
-	#supress.evaluated.length.warning is a historical typo
 
 	#fixing typo
 	if('supress.evaluated.length.warning' %in% names(as.list(match.call())))
@@ -149,147 +201,59 @@ GenometriCorrelation <- function(
 		stop("The thing given as second (",nameR,") range argument to\n  GenomertiCorrelation is not an object!")
 	#they are both objects if we are here
 
-	irQ<-irR<-rdQ<-rdR<-grQ<-grR<-FALSE #initialise
 
-	if (!(irQ=inherits(query,"IRanges")) && !(rdQ=inherits(query,"RangedData")) && !(grQ=inherits(query,"GenomicRanges")))
-		stop("The thing given as first (",nameQ,") range argument to GenomertiCorrelation is\n  nor an IRanges nor a RangedData nor a GRanges object!")
-	if (!(irR=inherits(reference,"IRanges")) && !(rdR=inherits(reference,"RangedData")) && !(grR=inherits(reference,"GenomicRanges")))
-		stop("The thing given as second (",nameR,") range argument to GenomertiCorrelation is\n  nor an IRanges nor a RangedData nor a GRanges object!")
+	if (!(inherits(query,"GenomicRanges")))
+		stop("The thing given as first (",nameQ,") range argument to GenomertiCorrelation is\n  not an GRanges object!")
+	if (!(inherits(reference,"GenomicRanges")))
+		stop("The thing given as second (",nameR,") range argument to GenomertiCorrelation is\n  not an GRanges object!")
 
-	#they both are IRanges or RangedData or GRanges if we are here
+	#they both are  GRanges if we are here
 
-	#space is an old thing; currently, chromosomes.to.proceed is preferrable
+	if (!setequal(seqlevels(query),seqlevels(reference))) {
+		common_seqinfo<-intersect(seqinfo(query),seqinfo(reference))
+		common_seqs<-seqnames(common_seqinfo)
+		if ( length(chromosomes.to.proceed)==0 || !all(chromosomes.to.proceed %in% common_seqs)) {
+			warning("Query and referance has different chromosome lists.")
+		}
+		query<-plyranges::filter(query,seqnames %in% common_seqs)
+		reference<-plyranges::filter(reference, seqnames %in% common_seqs)
+		#actually, we just set seqinfo to common_seqinfo, but....
+		query<-GRanges(seqnames=as.character(query@seqnames),ranges=query@ranges,
+					strand=query@strand,mcols=mcols(query),seqinfo = common_seqinfo)
+		reference<-GRanges(seqnames=as.character(reference@seqnames),ranges=reference@ranges,
+					strand=reference@strand,mcols=mcols(reference),seqinfo = common_seqinfo)
+	} else {
+		common_seqs<-seqlevels(query) #they are equal, so quary and reference is the same
+	}
 
-	if (length(chromosomes.to.proceed)>0 && !is.na(space) && space != chromosomes.to.proceed[1])
-		stop("Both chromosomes.to.proceed and space parameters are given to GenomertiCorrelation.\nI do not know what to do")
-	
-	#if we are here, only one of chromosomes.to.proceed and space is given or chromosomes.to.proceed[1] == space
-	if (is.na(space) && length(chromosomes.to.proceed))
-		space<-chromosomes.to.proceed[1]
-	
-	if (!is.na(space) && length(chromosomes.to.proceed)==0)
-		chromosomes.to.proceed[1]<-space
+	if ( length(chromosomes.to.proceed)>0 ){chromosomes.to.proceed<-intersect(common_seqs,chromosomes.to.proceed)}
+	else {
+		chromosomes.to.proceed<-common_seqs
+	}
+	#now, we see only sequences that are in both annotations and in chrosomes.to.proceed
 
-	if (is.na(space) && length(chromosomes.to.proceed)==0 &&
-			length(chromosomes.length)==1 &&
-			!is.null(names(chromosomes.length)))
-			{
-				space<-names(chromosomes.length)
-				chromosomes.to.proceed<-c(space)
-			}
-
-	if ((length(chromosomes.length)==1) &&
-			(
-				is.null(names(chromosomes.length)) ||
-				is.na(names(chromosomes.length)[1])
-			))
-			{
-				names(chromosomes.length)<-c(space)
-			}
-	#now, chromosomes.to.proceed[1] and space are the same thing (possibly, space=="" and chromosomes.to.proceed is empty)
-	
 
 	if (add.chr.as.prefix)
 	{
-		space<-add.chr.prefix.to.names(space)
 		chromosomes.to.proceed<-add.chr.prefix.to.names(chromosomes.to.proceed)
 		chromosomes.to.exclude.from.awhole<-add.chr.prefix.to.names(chromosomes.to.exclude.from.awhole)
 		chromosomes.to.include.in.awhole<-add.chr.prefix.to.names(chromosomes.to.include.in.awhole)
 		names(chromosomes.length)<-add.chr.prefix.to.names(names(chromosomes.length))
-		if(rdQ || grQ)
-			query<-add.chr.prefix.to.names(query)
-		if(rdR || grR)
-			reference<-add.chr.prefix.to.names(reference)
+		query<-add.chr.prefix.to.names(query)
+		reference<-add.chr.prefix.to.names(reference)
 	}
 
-	#here, we define spacesA and spacesB	
-
-	spacesA<-c()
-	spacesB<-c()
-
-	if (rdQ) spacesA<-names(query)
-	if (grQ) spacesA<-seqlevels(query)
-	if (rdR) spacesB<-names(reference)
-	if (grR) spacesB<-seqlevels(reference)
-	#list of space names as character vector
-
-	if (irQ && !irR)
-	{
-		if(is.na(space))
-		{
-			if(length(spacesB)==1)
-			{
-				space<-spacesB[1]
-				chromosomes.to.proceed[1]<-space
-				query<-RangedData(space=c(space),ranges=query)
-			}
-			else
-				stop("The first (",nameQ,") range argument is IRanges.\n",
-				"  The second (",nameR,") range argument is RangedData with more than one chromosome (space).\n  The space argument is not defined.\n It's all lost!")
-		}
-		else
-			query<-RangedData(space=c(space),ranges=query)
-		spacesA<-spacesB<-c(space)
-	}
-
-	if (!irQ && irR)
-	{
-		if(is.na(space))
-		{
-			if(length(spacesA)==1)
-			{
-				space<-spacesA[1]
-				chromosomes.to.proceed<-space
-				reference<-RangedData(space=c(space),ranges=reference)
-			}
-			else
-				stop("The first (",nameQ,") range argument is RangeData with more than one chromosome (space).\n",
-				"  The second (",nameR,") range argument is IRanges.\n  The space argument is not defined.\n  It's all lost!")
-		}
-		else
-			reference<-RangedData(space=c(space),ranges=reference)
-		spacesA<-spacesB<-c(space)
-	}
+	list.of.nonempty.spaces<-mixedsort(union(as.character(query@seqnames),as.character(reference@seqnames)))
 	
-	if (irR && irQ)
-	{
-		if (space=="")	space<-"the_space"
-		reference<-RangedData(space=c(space),ranges=reference)
-		query<-RangedData(space=c(space),ranges=query)
-		spacesA<-spacesB<-c(space)
-	}
+	#to get here, chr is to have at least one represetative anywhere
+	list.of.spaces<-intersect(list.of.nonempty.spaces,chromosomes.to.proceed)
 
-	# here, all the data is RangedData's
-
-	list.of.spaces<-intersect(spacesA,spacesB)
-	
-	if (length(list.of.spaces)==0)
-			stop("The query and reference have to have some common chromosome names, and they do not.\n",
-			"  It's all lost!")
-
-	#list.of.spaces now is what we can proceed
-
-	#if chromosomes.to.proceed is empty, we proceed all
-	if(length(chromosomes.to.proceed)==0) chromosomes.to.proceed<-list.of.spaces
-	else chromosomes.to.proceed<-listtoString(chromosomes.to.proceed)
-
-	#test prints
-	#print(spacesA)
-	#print(spacesB)
-	#print(list.of.spaces)
-	#print(chromosomes.to.proceed)
-
-	list.of.spaces<-intersect(list.of.spaces,chromosomes.to.proceed)
 
 	# now, list.of.spaces is what we will really proceed	
-	if (length(list.of.spaces)==0)
+	if (length(intersect(as.character(query@seqinfo@seqnames),as.character(reference@seqinfo@seqnames)))==0)
 		stop("There is no intersection between input set of common\n  chromosome names of query and reference and chromosomes.to.proceed.\n  It's all lost!")
 
-	wrong_diff<-setdiff(chromosomes.to.proceed,list.of.spaces)
-	if (length(wrong_diff)>0)
-		warning("Some spaces are in chromosomes.to.proceed but they are not in the input data.\n They are:\n",paste(wrong_diff,collapse="\n"),"\n")
-
-	#if the include list is empty, it is set to whole list
+	#if the awhole include list is empty, it is set to whole list
 	if(length(chromosomes.to.include.in.awhole)==0) chromosomes.to.include.in.awhole<-list.of.spaces
 
 	#we test whether all the chromosomes.to.include.in.awhole is in chromosomes.to.proceed	
@@ -301,7 +265,7 @@ GenometriCorrelation <- function(
 
 	wrong_diff<-setdiff(chromosomes.to.exclude.from.awhole,chromosomes.to.include.in.awhole)
 	if (length(wrong_diff)>0)
-		stop("Some spaces are in chromosomes.to.exclude.from.awhole but they are not in the process list.\n  It's all lost!:\n",paste(wrong_diff,collapse="\n"), "\n")
+		stop("Some spaces are in chromosomes.to.exclude.from.awhole but they are not in the awhole inclusion list.\n  It's all lost!:\n",paste(wrong_diff,collapse="\n"), "\n")
 
 	#now, everyting is cheched
 	awhole.chromosomes<-setdiff(chromosomes.to.include.in.awhole,chromosomes.to.exclude.from.awhole)
@@ -316,51 +280,19 @@ GenometriCorrelation <- function(
 	if (awhole.only && length(awhole.chromosomes) == 0)
 		stop("The awhole.chromosomes list is empty and awhole.only switch is on.\n  It's all lost!")
 
-	if (grQ)
-	{
-		chromosomes.length.Q<-seqlengths(query)
-		query<-as(query,'RangedData')
-	}
-
-	if (grR)
-	{
-		chromosomes.length.R<-seqlengths(reference)
-		reference<-as(reference,'RangedData')
-	}
-	
 	# we do not intereasted in lengths of those chromosomes that are
 	# not in intersection of spacesA and spacesB;
 	# if we have information in chromosomes.length, we do not care
 	# about what was given in seqlengths of A and B
-
-	for (name in list.of.spaces)
-	{
-		if (name %in% names(chromosomes.length) && 
-				!is.na(chromosomes.length[name]) ) next
-		lQ<-NA
-		lR<-NA
-		if (grQ) lQ<-chromosomes.length.Q[name]
-		if (grR) lR<-chromosomes.length.R[name]
-
-		if (!is.na(lQ) && !is.na(lR) && lQ!=lR)
-		{
-			warning("The lengths of chromosome", name ,"is different in two input GRanges,\n")
-			next
-		}
-		if (!is.na(lQ)) chromosomes.length[name]<-lQ
-		if (!is.na(lR)) chromosomes.length[name]<-lR
-	}
-
-	result<-.RangedDataGenometricsCorrelation(
-			rd_query=query,
-			rd_reference=reference,
+	result<-.GRangesGenometricsCorrelation(
+			query=query,
+			reference=reference,
 			list.of.spaces=list.of.spaces,
 			map.to.half=map.to.half,
 			showProgressBar=showProgressBar,
 			showTkProgressBar=showTkProgressBar,
 			chromosomes.length=chromosomes.length,
 			suppress.evaluated.length.warning=suppress.evaluated.length.warning,
-			cut.all.over.length=cut.all.over.length,
 			ecdf.area.permut.number=ecdf.area.permut.number,
 			mean.distance.permut.number=mean.distance.permut.number,
 			jaccard.measure.permut.number=jaccard.measure.permut.number,
@@ -386,7 +318,6 @@ GenometriCorrelation <- function(
 	result@config$options$showTkProgressBar=showTkProgressBar
 	result@config$chromosomes.length=as.list(chromosomes.length)
 	result@config$options$suppress.evaluated.length.warning=suppress.evaluated.length.warning
-	result@config$options$cut.all.over.length=cut.all.over.length
 	result@config$options$keep.distributions=keep.distributions
 	if (awhole.space.name!="awhole") result@config$options$awhole.space.name=awhole.space.name
 	result@config$tests=list()
@@ -400,15 +331,16 @@ GenometriCorrelation <- function(
 }
 
 
-.RangedDataGenometricsCorrelation<-function(
-	rd_query,rd_reference,
+.space_ranges<-function(granges,seqname){(plyranges::filter(granges, seqnames==seqname))@ranges}
+
+.GRangesGenometricsCorrelation<-function(
+	query,reference,
 	list.of.spaces,
 	map.to.half=TRUE,
 	showProgressBar=TRUE,
 	showTkProgressBar=FALSE,
 	chromosomes.length=c(),
 	suppress.evaluated.length.warning=FALSE,
-	cut.all.over.length=FALSE,
 	ecdf.area.permut.number=100,
 	mean.distance.permut.number=100,
 	jaccard.measure.permut.number=100,
@@ -419,17 +351,16 @@ GenometriCorrelation <- function(
 	keep.distributions=FALSE,
 	query.representing.point.function,
 	reference.representing.point.function
-	)
+)
 {
-
 	#the thing actually calculates everything
 	#it is to called from GenomertiCorrelation
-	#rd_query,rd_reference are two RangedDatas that are under analysis
+	#query,reference are two GRanges that are under analysis
 	#list.of.spaces is list of spaces to work with
 	#map.to.half is whether to calculate relative distances in [0,0.5] or in [0,1]
 	#showProgressBar whether to show a progress indicator
 	#showTkProgressBar whether to show a Tk progress indicator; work only if tcltk is loaded
-	#chromosomes.length is an array of length of chromosomes, names are the names of chromosomes
+	#chromosomes.length is an array of length of chromosomes, names are the names of chromosomes (we use it historically)
 	#ecdf.area.permut.number is number of permutations for ecdf area method
 	#mean.distance.permut.number is the same thing about the mean ref-to-query distance
 	#awhole.chromosomes is list of chromosomes to be included in whole-genome calculation
@@ -484,80 +415,38 @@ GenometriCorrelation <- function(
 	#we need to know all the chrom lengths or at least to mark it as NA
 	for ( space in list.of.spaces )
 	{
-		if (! space %in% names(chromosomes.length))
-			chromosomes.length[space]=NA
-		if ( is.na(chromosomes.length[space]) ) #if it was absent, now it is NA as well as if it was NA
-		{	
-			chromosomes.length[space]=chromosomes.length.eval(rd_query[space],rd_reference[space])
+		my_space_length<-NA
+		if (!is.na(seqlengths(query)[space])){
+			my_space_length=seqlengths(query)[space]
+		}
+		if (!is.na(seqlengths(reference)[space])){
+			if (!is.na(my_space_length) && my_space_length != seqlengths(reference)[space]) {
+				stop(sprintf("Different length in query and reference for chromosone %s.\n",space),call.=FALSE)
+			}
+			my_space_length=seqlengths(reference)[space]
+		}
+		
+		if (space %in% names(chromosomes.length) && !is.na(chromosomes.length[space]))
+			my_space_length=chromosomes.length[space]
+	
+		if ( is.na(my_space_length) )
+		{
+			que_ranges<-.space_ranges(query,space)
+			ref_ranges<-.space_ranges(reference, space)
+			my_space_length<-chromosomes.length.eval(que_ranges,ref_ranges)
 			if (! (suppress.evaluated.length.warning))
 				warning(paste0("Length for chromosome ",space," is evaluated as ",as.character(chromosomes.length[space])," rather than pre-given."))
 		}
-		else
-		{
-			if (sum(end( (ranges(rd_query))[[space]] ) > chromosomes.length[space]))
-			{
-				if (!cut.all.over.length)
-				{
-					coord=end( (ranges(rd_query))[[space]] )[(end( (ranges(rd_query))[[space]] ) > chromosomes.length[space])][[1]]
-					stop('There is a query range (it ends at ',coord,') in chromosome ',space,' that spans out of the chromosome' )
-				}
+		chromosomes.length[space]=my_space_length
+		#here, we tested ends not to stick put, but now -- it is GRanges, it is already tested
 
-			}
-			if (sum(end( (ranges(rd_reference))[[space]] ) > chromosomes.length[space]))
-			{
-				if (!cut.all.over.length)
-				{
-					coord=end( (ranges(rd_reference))[[space]] )[(end( (ranges(rd_reference))[[space]] ) > chromosomes.length[space])][[1]]
-					stop('There is a query range (it ends at ',coord,') in chromosome ',space,' that spans out of the chromosome' )
-				}
-			}
-		}
-	}
+	}	
 	
-	if (cut.all.over.length)
-	{
-		dA<-as.data.frame(rd_query)
-		dB<-as.data.frame(rd_reference)
-		#converted to dataframe
-		used_names<-names(chromosomes.length)
-		dA<-dA[as.character(dA[,'space']) %in% used_names,]
-		dB<-dB[as.character(dB[,'space']) %in% used_names,]
-		#removed all the spaces that ar not in names(chromosomes.length)
-		dA<-dA[dA['start']<=as.vector(chromosomes.length[as.character(dA[,'space'])]),]
-		dB<-dB[dB['start']<=as.vector(chromosomes.length[as.character(dB[,'space'])]),]
-		#remove if start > length of the corresponging chromosome	
-		#set end; for is easier :)
-		for (row in 1:dim(dA)[1])
-			if(dA[row,'end']>chromosomes.length[as.character(dA[row,'space'])])
-				dA[row,'end']=chromosomes.length[as.character(dA[row,'space'])]
-		for (row in 1:dim(dB)[1])
-			if(dB[row,'end']>chromosomes.length[as.character(dB[row,'space'])])
-				dB[row,'end']=chromosomes.length[as.character(dB[row,'space'])]
-		rd_query<-RangedData(dA)
-		rd_reference<-RangedData(dB)
-	}
-	
-	#the code romoves all the chromosomes with empty r and empty q
-
-	good_space=rep(TRUE,length(list.of.spaces))
-
-	for (space_no in 1:length(list.of.spaces)) #calculate everything nonpermutted for each chromosomes
-	{
-		space<-list.of.spaces[space_no]
-		if (length(start(ranges(rd_query)[[space]]))==0 &&
-			length(start(ranges(rd_reference)[[space]]))==0)
-		{
-			good_space[space_no]=FALSE
-			warning("The space: ",space, " is not populated nor in query neither in reference, we omit it.")
-		}
-	}
-
-	list.of.spaces<-list.of.spaces[good_space];
-	#filtered....
-
 	#initialise it all
 	result<-list()
-
+	
+	
+	#starting to prepare result
 	for (space in list.of.spaces)
 	{
 		result[[space]]<-list()
@@ -635,12 +524,12 @@ GenometriCorrelation <- function(
 	for (space in list.of.spaces) #calculate everything nonpermutted for each chromosomes
 	{
 		qu<-sorted.representing.points(
-			ranges=rd_query[space]$ranges,
+			iranges=.space_ranges(query,space),
 			representing.point.function=query.representing.point.function,
 			chromosome.length=chromosomes.length[space],
 			space=space
 		)
-
+		#HERE
 		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 
 		if (showTkProgressBar)
@@ -651,10 +540,11 @@ GenometriCorrelation <- function(
 		}
 
 		ref<-sorted.representing.points(
-			ranges=rd_reference[space]$ranges,
+			iranges=.space_ranges(reference,space),
 			representing.point.function=reference.representing.point.function,
 			chromosome.length=chromosomes.length[space],
-			space=space		)
+			space=space
+		)
 
 		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 
@@ -669,9 +559,9 @@ GenometriCorrelation <- function(
 
 		result[[space]][['reference.population']]<-length(ref)
 
-		result[[space]][['query.coverage']]<-sum(width(reduce(rd_query[space]$ranges)))
+		result[[space]][['query.coverage']]<-sum(width(reduce(.space_ranges(query,space))))
 
-		result[[space]][['reference.coverage']]<-sum(width(reduce(rd_reference[space]$ranges)))
+		result[[space]][['reference.coverage']]<-sum(width(reduce(.space_ranges(reference,space))))
 
 		qu_or_ref_is_empty<-(length(qu)==0 || length(ref)==0)
 		
@@ -753,8 +643,8 @@ GenometriCorrelation <- function(
 		}
 
 
-		result[[space]][['query.reference.intersection']]<-sum(width(reduce(intersect(rd_query[space]$ranges,rd_reference[space]$ranges))))
-		result[[space]][['query.reference.union']]<-sum(width(reduce(union(rd_query[space]$ranges,rd_reference[space]$ranges))))
+		result[[space]][['query.reference.intersection']]<-sum(width(reduce(intersect(.space_ranges(query,space),.space_ranges(reference,space)))))
+		result[[space]][['query.reference.union']]<-sum(width(reduce(union(.space_ranges(query,space),.space_ranges(reference,space)))))
 
 		if (result[[space]][['query.reference.union']] > 0)
 			result[[space]][['jaccard.measure']]<-result[[space]][['query.reference.intersection']]/result[[space]][['query.reference.union']]	
@@ -776,7 +666,7 @@ GenometriCorrelation <- function(
 		}
 		
 		result[[space]][['projection.test']]<-
-				  query.to.ref.projection.statistics(qu,rd_reference[space]$ranges,TRUE,chromosomes.length[space])	
+				  query.to.ref.projection.statistics(qu,.space_ranges(reference,space),TRUE,chromosomes.length[space])	
 				  
 		if(!qu_or_ref_is_empty) {	
 				  proj.p.value<-
@@ -1001,7 +891,7 @@ GenometriCorrelation <- function(
 			for (space in list.of.spaces)
 			{
 				#each choromosome
-				sample_size<-length(rd_query[space]$ranges)
+				sample_size<-length(.space_ranges(query,space))
 				sample<-runif(sample_size,0,rel.dist.top) #sample
 				if (length(sample)>0) {
 				dev_area<-
@@ -1056,7 +946,7 @@ GenometriCorrelation <- function(
 			for (space in list.of.spaces)
 			{
 				#each choromosome
-				sample_size<-length(rd_query[space]$ranges)
+				sample_size<-length(.space_ranges(query,space))
 				chr_length<-chromosomes.length[[space]]
 				ref<-result[[space]][['reference.middles']]
 				sample<-((floor(runif(sample_size,0,1)*chr_length*2)+1)/2) #sample
@@ -1109,12 +999,12 @@ GenometriCorrelation <- function(
 				#each choromosome
 				chr_length<-chromosomes.length[[space]]
 				if (!jaccard.permut.is.rearrangement)
-					permuted.query<-.permuteIRanges(rd_query[space]$ranges,chr_length)
+					permuted.query<-.permuteIRanges(.space_ranges(query,space),chr_length)
 				else
-					permuted.query<-.rearrangeIRanges(rd_query[space]$ranges,chr_length)
+					permuted.query<-.rearrangeIRanges(.space_ranges(query,space),chr_length)
 
-				space.intersection<-sum(width(reduce(intersect(permuted.query,rd_reference[space]$ranges))))
-				space.union<-sum(width(reduce(union(permuted.query,rd_reference[space]$ranges))))
+				space.intersection<-sum(width(reduce(intersect(permuted.query,.space_ranges(reference,space)))))
+				space.union<-sum(width(reduce(union(permuted.query,.space_ranges(reference,space)))))
 				
 				if (space.union> 0)
 					space.jaccard.measure<-space.intersection/space.union	
@@ -1317,10 +1207,10 @@ GenometriCorrelation <- function(
 }
 
 
-sorted.representing.points<-function(ranges,representing.point.function,chromosome.length,space)
+sorted.representing.points<-function(iranges,representing.point.function,chromosome.length,space)
 {
-	#ranges is IRanges
-	mids<-representing.point.function(start(ranges),end(ranges),chromosome.length,space)
+	#iranges is IRanges
+	mids<-representing.point.function(start(iranges),end(iranges),chromosome.length,space)
 	return(mids[order(mids)])
 }
 
@@ -1328,14 +1218,14 @@ sorted.representing.points<-function(ranges,representing.point.function,chromoso
 #output: vector of represetating points
 
 
-chromosomes.length.eval<-function(rd_query_space,rd_reference_space)
+chromosomes.length.eval<-function(ir_query_space,ir_reference_space)
 {
-	#rd_query and rd_reference are IRange
-	min_coord<-max(min(start(rd_query_space),start(rd_reference_space),end(rd_query_space),end(rd_reference_space)),0)
+	#ir_query and ir_reference are IRange
+	min_coord<-max(min(start(ir_query_space),start(ir_reference_space),end(ir_query_space),end(ir_reference_space)),0)
 	#we prefer this way rather than obvious max
 	#to equal the error if everything is located in say right and left telomeres
 	#in other words, if everything starts at 10000 we will add 10000 to the max coord of any interval
-	max_coord<-max(start(rd_query_space),start(rd_reference_space),end(rd_query_space),end(rd_reference_space))
+	max_coord<-max(start(ir_query_space),start(ir_reference_space),end(ir_query_space),end(ir_reference_space))
 	return(max_coord+min_coord)
 }
 

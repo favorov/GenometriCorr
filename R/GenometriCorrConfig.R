@@ -1,7 +1,9 @@
 # GenometriCorrelation project evaluating two interval markups genomewide independence. 
-# (c) 2010-2019 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
-#               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
-#               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+# (c) 2010-2020 Alexander Favorov, Loris Mularoni, 
+#               Yulia Medvedeva, Harris A. Jaffee, 
+#               Ekaterina V. Zhuravleva, Veronica Busa,
+#               Leslie M. Cope, Andrey A. Mironov, 
+#               Vsevolod J. Makeev, Sarah J. Wheelan.
 #
 # configuration - works with ini file format  
 
@@ -150,7 +152,7 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 		#any other query.format value (including the default NA) suggests a 
 		#text file of the format to be read if query is character
 		#if query (parameter, it cannot be in config file)
-		#is a IRanges/RangedData/GRanges object, the run.config
+		#is a IRanges/GRanges object, the run.config
 		#uses the object and it does not write the
 		#result@config lines for query and query.format
 		#the name of the file is given by query variable
@@ -160,7 +162,7 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 		#object cannot be NA
 		if (is.object(query) && 
-				(inherits(query,"RangedData") || inherits(query,'IRanges') || inherits (query,'GRanges'))
+				( inherits(query,'IRanges') || inherits (query,'GRanges'))
 			) 
 		{
 			#if query is an object, we do not go on with the $data stuff
@@ -172,7 +174,7 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 		{
 			#it is not an object, we want to test whether it is a string
 			if (!is.na(query) && !is.character(query) )
-				stop("The query parameter is not character and not an IRanges or RangedData or GRanges.\n")
+				stop("The query parameter is not character and not an IRanges or GRanges.\n")
 			if (!is.na(query.format) && !is.character(query.format) )
 				stop("The query.format parameter is not character.\n")
 			conf$data$query<-query
@@ -198,8 +200,8 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 				else
 					stop(paste("The (query) variable with name:",query.name,"is not an object.\n"))
 			}		
-			else if ( !( inherits(query,"RangedData") || inherits(query,'IRanges') || inherits(query,'GRanges') ) )
-				stop(paste("The (query) variable with name:",query.name,"is not an IRanges or RangedData or GRanges.\n"))
+			else if ( !( inherits(query,'IRanges') || inherits(query,'GRanges') ) )
+				stop(paste("The (query) variable with name:",query.name,"is not an IRanges or GRanges.\n"))
 			query.as.is<-TRUE	
 		}
 
@@ -220,15 +222,13 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 			if (is.null(conf$data$query.format)) 
 				#query<-rtracklayer::import(conf$data$query)
 				query<-import(conf$data$query)
-			else if (conf$data$query.format=='bed.like.with.header')
-				query<-readTableToIRanges(conf$data$query,header=TRUE)
 			#else query<-rtracklayer::import(conf$data$query,format=conf$data$query.format)
 			else query<-import(conf$data$query,format=conf$data$query.format)
 		}
 
 		#object cannot be NA
 		if (is.object(reference) && 
-				(inherits(reference,"RangedData") || inherits(reference,'IRanges') || inherits (reference,'GRanges'))
+				(inherits(reference,'IRanges') || inherits (reference,'GRanges'))
 			) 
 		{
 			#if reference is an object, we do not go on with the $data stuff
@@ -240,7 +240,7 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 		{
 			#it is not an object, we want to test whether it is a string
 			if (!is.na(reference) && !is.character(reference) )
-				stop("The reference parameter is not character and not an IRanges or RangedData or GRanges.\n")
+				stop("The reference parameter is not character and not an IRanges or GRanges.\n")
 			if (!is.na(reference.format) && !is.character(reference.format) )
 				stop("The reference.format parameter is not character.\n")
 			conf$data$reference<-reference
@@ -266,8 +266,8 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 				else
 					stop(paste("The (reference) variable with name:",reference.name,"is not an object.\n"))
 			}		
-			else if ( !( inherits(reference,"RangedData") || inherits(reference,'IRanges') || inherits(reference,'GRanges') ) )
-				stop(paste("The (reference) variable with name:",reference.name,"is not an IRanges or RangedData or GRanges.\n"))
+			else if ( !(inherits(reference,'IRanges') || inherits(reference,'GRanges') ) )
+				stop(paste("The (reference) variable with name:",reference.name,"is not an IRanges or GRanges.\n"))
 			reference.as.is<-TRUE	
 		}
 
@@ -288,8 +288,6 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 			#if (is.null(conf$data$reference.format)) reference<-rtracklayer::import(conf$data$reference)
 			if (is.null(conf$data$reference.format)) reference<-import(conf$data$reference)
-			else if (conf$data$reference.format=='bed.like.with.header')
-				reference<-readTableToIRanges(conf$data$reference,header=TRUE)
 			#else reference<-rtracklayer::import(conf$data$reference,format=conf$data$reference.format)
 			else reference<-import(conf$data$reference,format=conf$data$reference.format)
 		}
@@ -315,7 +313,7 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 			#object cannot be NA
 			if (is.object(mapping) && 
-					(inherits(mapping,"RangedData") || inherits(mapping,'IRanges') || inherits (mapping,'GRanges'))
+					(inherits(mapping,'IRanges') || inherits (mapping,'GRanges'))
 				) 
 			{
 				#if mapping is an object, we do not go on with the $data stuff
@@ -327,7 +325,7 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 			{
 				#it is not an object, we want to test whether it is a string
 				if (!is.na(mapping) && !is.character(mapping) )
-					stop("The mapping parameter is not character and not an IRanges or RangedData or GRanges.\n")
+					stop("The mapping parameter is not character and not an IRanges or GRanges.\n")
 				if (!is.na(mapping.format) && !is.character(mapping.format) )
 					stop("The mapping.format parameter is not character.\n")
 				conf$data$mapping<-mapping
@@ -353,8 +351,8 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 					else
 						stop(paste("The (mapping) variable with name:",mapping.name,"is not an object.\n"))
 				}		
-				else if ( !( inherits(mapping,"RangedData") || inherits(mapping,'IRanges') || inherits(mapping,'GRanges') ) )
-					stop(paste("The (mapping) variable with name:",mapping.name,"is not an IRanges or RangedData or GRanges.\n"))
+				else if ( !( inherits(mapping,'IRanges') || inherits(mapping,'GRanges') ) )
+					stop(paste("The (mapping) variable with name:",mapping.name,"is not an IRanges or GRanges.\n"))
 				mapping.as.is<-TRUE	
 			}
 
@@ -375,8 +373,6 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 
 				#if (is.null(conf$data$mapping.format)) mapping<-rtracklayer::import(conf$data$mapping)
 				if (is.null(conf$data$mapping.format)) mapping<-import(conf$data$mapping)
-				else if (conf$data$mapping.format=='bed.like.with.header')
-					mapping<-readTableToIRanges(conf$data$mapping,header=TRUE)
 				#else mapping<-rtracklayer::import(conf$data$mapping,format=conf$data$mapping.format)
 				else mapping<-import(conf$data$mapping,format=conf$data$mapping.format)
 			}
@@ -437,9 +433,6 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 			#the typo was in old versions
 		}
 
-		if (!is.null(conf$options$cut.all.over.length))
-			todo<-paste(todo,',cut.all.over.length=',conf$options$cut.all.over.length,sep='')
-		
 		if (!is.null(conf$tests$permut.number))
 			todo<-paste(todo,',permut.number=',conf$tests$permut.number,sep='')
 	

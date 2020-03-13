@@ -4,8 +4,15 @@
 \alias{VisualiseTwoGRanges}
 \title{VisualiseTwoGRanges}
 \usage{
-VisualiseTwoGRanges(grA, grB, nameA = "RangesA", nameB = "RangesB",
-  title = NA, pdf = NULL, close.device = NULL)
+VisualiseTwoGRanges(
+  grA,
+  grB,
+  nameA = "RangesA",
+  nameB = "RangesB",
+  title = NA,
+  pdf = NULL,
+  close.device = NULL
+)
 }
 \arguments{
 \item{grA}{First \code{GRanges} object to be vsualised.}

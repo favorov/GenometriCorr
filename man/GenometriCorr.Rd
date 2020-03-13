@@ -1,8 +1,9 @@
 % GenometriCorrelation project evaluating two interval markups genomewide independence. 
-% (c) 2010-2019 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
-%               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
-%               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
-%
+% (c) 2010-2020 Alexander Favorov, Loris Mularoni, 
+%               Yulia Medvedeva, Harris A. Jaffee, 
+%               Ekaterina V. Zhuravleva, Veronica Busa,
+%               Leslie M. Cope, Andrey A. Mironov, 
+%               Vsevolod J. Makeev, Sarah J. Wheelan.
 \name{GenometriCorr}
 \alias{GenometriCorr}
 \alias{GenometriCorr-package}
@@ -13,7 +14,7 @@ GenometriCorr (Genometric Correlation) package
 \description{
 \code{GenometriCorr} evaluates the spatial correlation between two types of features (experimental or annotated) in genomic coordinates. Several different approaches are implemented, each intended to evaluate a different biologically relevant spatial relationship. The genomic features are split into intervals and correlations are evaluated as described in the package vignette. 
 
-Most standard genomic feature annotation file formats are accepted as input. Each feature type is given in a separate file, one used as a query and the other used as a reference. The statistical comparisons that are made are not symmetric; that is, they are sensitive to which file is the query and which is the reference, so we recommend running the comparisons twice, switching the status of the input files for the second run. This is intentional, as biological relationships can be asymmetric. Once the files are read, the annotations are stored as \code{\link{GRanges}}, \code{\link{RangedData}} or \code{\link{IRanges-class}} objects (\code{IRanges}, \code{GenomicRanges} packages).
+Most standard genomic feature annotation file formats are accepted as input. Each feature type is given in a separate file, one used as a query and the other used as a reference. The statistical comparisons that are made are not symmetric; that is, they are sensitive to which file is the query and which is the reference, so we recommend running the comparisons twice, switching the status of the input files for the second run. This is intentional, as biological relationships can be asymmetric. Once the files are read, the annotations are stored as \code{\link{GRanges}} objects from \code{\link{GenomicRanges}} package).
 
 There are two classes that are provided by the package. One of them, \code{\link{GenometriCorrConfig-class}} provide serialization into configuration file that describe a full run of the package that is intended to explore spatial correlations between two markups. The class also provide run.config method that open the input data files, read them, make all the calculations by applying the central \code{\link{GenometriCorrelation}} function to mapped or unmapped data (see below). The \code{\link{GenometriCorrelation}} function returns an instance of \code{\link{GenometriCorrResult-class}} that is based on a list with the results of the run and also contains the \code{\link{GenometriCorrConfig-class}} instance that describes the run as a slot. The \code{\link{GenometriCorrResult-class}} provides \code{\link{show}} method and two graphical representations: \code{\link{graphical.report}} and \code{\link{visualize}}. 
 
@@ -44,7 +45,8 @@ The Jaccard test compares the length of the union of all query and reference fea
 This is the permutation-based evaluation of the \emph{p-value} for the Jaccard measure; the \code{jaccard.measure.lower.tail} is \code{TRUE} if there are fewer overlaps than expected (less overlap) ond \code{FALSE} otherwise.
 }
 
-When both query and reference features are restricted to genomic subsets, or when we want to compare their relationship only within smaller genomic intervals (e.g. genes), we can remap the intervals of interest onto pseudochromosomes and use the \code{\link{MapRangesToGenomicIntervals}} provided by the package. Each mapping result is a \code{\link{RangedData}} object. The pseudochromosomes can now be treated as usual by \code{\link{GenometriCorrelation}} to test the correlations of interest.
+When both query and reference features are restricted to genomic subsets, or when we want to compare their relationship only within smaller genomic intervals (e.g. genes), we can remap the intervals of interest onto pseudochromosomes and use the \code{\link{MapRangesToGenomicIntervals}} provided by the package. Each mapping result is a \code{\link{GRanges}} object. The pseudochromosomes can now be treated as usual by \code{\link{GenometriCorrelation}} to test the correlations of interest.
+
 
 The package also provides the \code{\link{VisualiseTwoIRanges}} function that creates a very high-level graphic overview of a pair of annotations on a chromosome (space).
 
@@ -54,23 +56,22 @@ The package also provides the \code{\link{VisualiseTwoIRanges}} function that cr
 Package: \tab GenometriCorr\cr
 Type: \tab Package\cr
 Title: \tab Genometric Correlation package \cr
-Version: \tab 1.1.21\cr
-Date: \tab 2019-08-28\cr
+Version: \tab 1.1.23\cr
+Date: \tab 2020-02-20\cr
 License: \tab Artistic-2.0\cr
 LazyLoad: \tab yes\cr
 biocViews: \tab Annotation, Genetics, Infrastructure, DataRepresentation, Bioinformatics, StatisticalMethod\cr
 URL: \tab http://genometricorr.sourceforge.net/ \cr
 }}
 
-\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Veronica Busa, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 \references{
 \url{http://genometricorr.sourceforge.net/}
 }
 \keyword{ package }
-\seealso{
-	The {../doc/GenometriCorr.pdf}{GenometriCorr package vignette}.
-}
+\seealso{ See the GenometriCorr package vignette.}
+
 \examples{
 library('rtracklayer')
 library('GenometriCorr')
@@ -108,9 +109,9 @@ chromo.length<-c(3000000)
 
 names(chromo.length)<-c('the_chromosome')
 
-rquery<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width=c(10)),space='the_chromosome')
+rquery<-GRanges(ranges=IRanges(start=runif(population,1000001,2000000-9),width=c(10)),seqnames='the_chromosome')
 
-rref<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width=c(10)),space='the_chromosome')
+rref<-GRanges(ranges=IRanges(start=runif(population,1000001,2000000-9),width=c(10)),seqnames='the_chromosome')
 
 #create two features, they are randomly scattered in 1 000 000...2 000 000
 
@@ -121,13 +122,13 @@ unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.leng
 cat('Unmapped result:\n')
 print(unmapped_result)
 
-map_space<-RangedData(ranges=IRanges(start=c(1000000),end=c(2000000)),space='the_chromosome')
+map_space<-GRanges(ranges=IRanges(start=c(1000001),end=c(2000000)),seqname='the_chromosome')
 
 mapped_rquery<-MapRangesToGenomicIntervals(what.to.map=rquery,where.to.map=map_space)
 
 mapped_rref<-MapRangesToGenomicIntervals(what.to.map=rref,where.to.map=map_space)
 
-#map them into 1 000 000...2 000 000
+#map them into 1 000 001...2 000 000
 
 mapped_result<-GenometriCorrelation(mapped_rquery,mapped_rref,permut.number=permut.number,keep.distributions=FALSE,showProgressBar=FALSE)
 

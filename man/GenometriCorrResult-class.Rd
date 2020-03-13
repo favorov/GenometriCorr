@@ -1,7 +1,9 @@
 % GenometriCorrelation project evaluating two interval markups genomewide independence. 
-% (c) 2010-2019 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
-%               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
-%               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+% (c) 2010-2020 Alexander Favorov, Loris Mularoni, 
+%               Yulia Medvedeva, Harris A. Jaffee, 
+%               Ekaterina V. Zhuravleva, Veronica Busa,
+%               Leslie M. Cope, Andrey A. Mironov, 
+%               Vsevolod J. Makeev, Sarah J. Wheelan.
 %
 \name{GenometriCorrResult-class}
 \Rdversion{1.1}
@@ -59,11 +61,10 @@ Class \code{"\linkS4class{vector}"}, by class "namedList", distance 3.
 \url{http://genometricorr.sourceforge.net/}
 }
 
-\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Veronica Busa, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 \seealso{
-	The \code{\link{GenometriCorrResult-class}} class; the \code{\link{GenometriCorr}} documentation and the \href{../doc/GenometriCorr.pdf}{GenometriCorr package vignette}.
-}
+	The \code{\link{GenometriCorrResult-class}} class; the \code{\link{GenometriCorr}} documentation and the GenometriCorr package vignette.}
 
 \examples{
 

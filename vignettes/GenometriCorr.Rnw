@@ -25,11 +25,12 @@
 %\usepackage{graphicx}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \title{GenometriCorr (Genometric Correlation): an R package for spatial correlation of genome-wide interval datasets}
 
 
-\author{Alexander Favorov\footnote{favorov@sensi.org}\ , Loris Mularoni, Yulia Medvedeva,\\Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope,\\Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
+\author{Alexander Favorov\footnote{favorov@sensi.org}\ , Loris Mularoni, Yulia Medvedeva,\\Harris A. Jaffee, Ekaterina V. Zhuravleva, Veronica Busa, Leslie M. Cope,\\Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 \maketitle
 
@@ -166,7 +167,7 @@ The package {\tt GenometriCorr} provides functions to load interval data from a 
 
 \subsection{R objects that {\tt GenometriCorr} understands}
 
-The interval sets are represented by the {\tt IRanges} or {\tt RangedData} or {\tt GRanges} objects, which are interval data representation classes defined by {\tt IRanges } package.  {\tt IRanges} is a set of intervals in one space (chromosome). {\tt RangedData} is a set of intervals defined over different spaces (here, chromosomes), so it is suitable for encoding a full-genome annotation.  {\tt GRanges} is very simlar to {\tt RangedData} but it contains the chromosome length information and ensures that operations do not return intervals beyond the length of the chromosomes.
+The interval sets are represented by the {\tt GRanges} objects, which are interval data representation classes defined by {\tt GenomicRanges } package. {\tt GRanges} is a set of intervals defined over different chromosomes (AKA spaces), so it is suitable for encoding a full-genome annotation. It also contains the chromosome length information and ensures that operations do not return intervals beyond the length of the chromosomes.
 
 \subsection{Code loading}
 Load the package:
@@ -188,8 +189,6 @@ We will use the {\tt import} function from {\tt rtracklayer} package to read dat
 <<read_files>>=
 library('rtracklayer')
 library('TxDb.Hsapiens.UCSC.hg19.knownGene')
-#cpgis<-import("../extdata/UCSCcpgis_hg19.bed")
-#refseq<-as(import(system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "GenometriCorr")),'RangedData');
 refseq<-transcripts(TxDb.Hsapiens.UCSC.hg19.knownGene)
 cpgis<-import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr"))
 seqinfo(cpgis)<-seqinfo(TxDb.Hsapiens.UCSC.hg19.knownGene)[seqnames(seqinfo(cpgis))]
@@ -343,7 +342,7 @@ And, finally, let's start the {\tt GenometriCorrelation} with this parameters:
 conf_res<-run.config(config,query=histones,reference=expr_genes)
 @
 
-Here, we passed {\tt query} and {\tt reference} to the {\tt run.config} call as {\tt RangedData} R objects, wo they will be pased to the {\tt GenometriCorrelation} as is. {\tt run.config} also accepts filenames, file formats or the names or R variables to be used as query, reference and mapping. To show that a variable name is passed, the corresponding format identifier is 'R.variable.name'. All the methods of passing data to {\tt run.config} except the direct pass of R object (as in the example) can be described in the configuration file.
+Here, we passed {\tt query} and {\tt reference} to the {\tt run.config} call as {\tt GRanges} R objects, wo they will be pased to the {\tt GenometriCorrelation} as is. {\tt run.config} also accepts filenames, file formats or the names or R variables to be used as query, reference and mapping. To show that a variable name is passed, the corresponding format identifier is 'R.variable.name'. All the methods of passing data to {\tt run.config} except the direct pass of R object (as in the example) can be described in the configuration file.
 
 The {\tt run.config} returns a {\tt GenometriCorrResult} object that was obtained from {\tt GenometriCorrResult}. The {\tt @config} slot of the returned object is a {\tt GenometriCorrConfig} describing the run. 
 
@@ -357,7 +356,7 @@ print(quickconfig)
 \subsection{Mapping}
 If we test the correlation of a reference and query that are consistently found in the same chromosomal regions (e.g. in genes), we will always achieve what looks like extremely high correlation on a genomic scale and we are unable to ask questions about finer-scale associations. To use the Genometric Correlation statistical tests on data such as these, we can convert the regions (that the query and reference occupy) to pseudochromosomes, and then run the {\tt GenometriCorrelation} test. The mapping is available in the package as {\tt MapRangesToGenomicIntervals.}
 
-The MapRangesToGenomicIntervals accepts two RangedData or GRanges, and maps the intervals from the second interval set that are contained in the first interval set, recalculating the coordinates so that within each new interval the coordinates range from 1 to the length of the interval. 
+The MapRangesToGenomicIntervals accepts two {\tt GRanges}, and maps the intervals from the second interval set that are contained in the first interval set, recalculating the coordinates so that within each new interval the coordinates range from 1 to the length of the interval. 
 
 Let's see how it works. In this artificial example, we create two random feature sets that reside only in bases $\left[1000000, 2000000\right]$ in a chromosome of length 3000000. First, we correlate these two features as is, not accounting for their restricted range. Next we will run the correlation again, this time using the mapping functions to test their relationship only within the $\left[1000000, 2000000\right]$ chromosomal range.
 
@@ -366,13 +365,13 @@ In the first test, the query and reference appear to be correlated, and all of t
 <<mapping_example_random,cache=TRUE>>=
 population<-1000
 
-chromo.length<-c(3000000)
+chromo.length<-c('the_chromosome'=3000000)
 
 names(chromo.length)<-c('the_chromosome')
 
-rquery<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width=c(10)),space='the_chromosome')
+rquery<-GRanges(ranges=IRanges(start=runif(population,1000000,2000000-10),width=c(10)),seqnames='the_chromosome',seqlengths=chromo.length)
 
-rref<-RangedData(ranges=IRanges(start=runif(population,1000000,2000000-10),width=c(10)), space='the_chromosome')
+rref<-GRanges(ranges=IRanges(start=runif(population,1000000,2000000-10),width=c(10)),seqnames='the_chromosome',seqlengths=chromo.length)
 
 #create two features, they are randomly scattered in 1 000 000...2 000 000
 
@@ -380,7 +379,7 @@ unmapped_result<-GenometriCorrelation(rquery,rref,chromosomes.length=chromo.leng
 
 #correlate them on the whole chromosome: 1...3 000 000
 
-map_space<-RangedData(ranges=IRanges(start=c(1000000),end=c(2000000)),space='the_chromosome')
+map_space<-GRanges(ranges=IRanges(start=c(1000000),end=c(2000000)),seqnames='the_chromosome',seqlengths=chromo.length)
 
 mapped_rquery<-MapRangesToGenomicIntervals(what.to.map=rquery,where.to.map=map_space)
 

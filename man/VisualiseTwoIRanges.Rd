@@ -4,9 +4,18 @@
 \alias{VisualiseTwoIRanges}
 \title{VisualiseTwoIRanges}
 \usage{
-VisualiseTwoIRanges(irA, irB, start = 1, end = NA, nameA = "RangesA",
-  nameB = "RangesB", chrom_length = NA, title = NA, pdf = NULL,
-  close.device = NULL)
+VisualiseTwoIRanges(
+  irA,
+  irB,
+  start = 1,
+  end = NA,
+  nameA = "RangesA",
+  nameB = "RangesB",
+  chrom_length = NA,
+  title = NA,
+  pdf = NULL,
+  close.device = NULL
+)
 }
 \arguments{
 \item{irA}{First \code{IRanges} object to be vsualised.}
@@ -35,11 +44,12 @@ VisualiseTwoIRanges is a function that displays the intervals of two IRanges, on
 \examples{
 
 library('rtracklayer')
+library('plyranges')
 library('GenometriCorr')
 
-cpgis<-as(import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr")),'RangedData');
+cpgis<-import(system.file("extdata", "UCSCcpgis_hg19.bed", package = "GenometriCorr"));
 
-refseq<-as(import(system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "GenometriCorr")),'RangedData');
+refseq<-import(system.file("extdata", "UCSCrefseqgenes_hg19.bed", package = "GenometriCorr"));
 
 
 human.chrom.length<-c(249250621,243199373,198022430,191154276,180915260,171115067,159138663,146364022,141213431,135534747,135006516,133851895,115169878,107349540,102531392,90354753,81195210,78077248,59128983,63025520,48129895,51304566,59373566,155270560)
@@ -47,7 +57,9 @@ human.chrom.length<-c(249250621,243199373,198022430,191154276,180915260,17111506
 
 names(human.chrom.length)<-c('chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrY','chrX')
 
-VisualiseTwoIRanges(cpgis['chr1']$ranges, refseq['chr1']$ranges,
+VisualiseTwoIRanges(
+ (cpgis \%>\% filter(seqnqmes=='chr1')@ranges, 
+ (refseq \%>\% filter(seqnqmes=='chr1')@ranges, 
 	nameA='CpG Islands', nameB='RefSeq Genes',
 	chrom_length=human.chrom.length[['chr1']],
 	title="CpGIslands and RefGenes on chr1, hg19",
@@ -61,7 +73,7 @@ VisualiseTwoIRanges(cpgis['chr1']$ranges, refseq['chr1']$ranges,
 The \code{\link{GenometriCorr}} documentation and vignette.
 }
 \author{
-Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Veronica Busa, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
 }
 \concept{GenometriCorr 2-range visualisation}
 \keyword{hplot}

@@ -1,7 +1,9 @@
 % GenometriCorrelation project evaluating two interval markups genomewide independence. 
-% (c) 2010-2019 Alexander Favorov, Loris Mularoni, Yulia Medvedeva, 
-%               Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, 
-%               Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan.
+% (c) 2010-2020 Alexander Favorov, Loris Mularoni, 
+%               Yulia Medvedeva, Harris A. Jaffee, 
+%               Ekaterina V. Zhuravleva, Veronica Busa,
+%               Leslie M. Cope, Andrey A. Mironov, 
+%               Vsevolod J. Makeev, Sarah J. Wheelan.
 %
 \name{run.config-methods}
 \docType{methods}
@@ -25,7 +27,6 @@ The \code{run.config} function runs on a \code{"\linkS4class{GenometriCorrConfig
 		\code{[options]} \tab \code{add.chr.as.prefix} \tab \code{add.chr.as.prefix}\cr
 		\code{[options]} \tab \code{awhole.only} \tab \code{awhole.only}\cr
 		\code{[options]} \tab \code{suppress.evaluated.length.warning} \tab \code{suppress.evaluated.length.warning}\cr
-		\code{[options]} \tab \code{cut.all.over.length} \tab \code{cut.all.over.length}\cr
 		\code{[options]} \tab \code{keep.distributions} \tab \code{keep.distributions}\cr
 		\code{[options]} \tab \code{showTkProgressBar} \tab \code{showTkProgressBar}\cr
 		\code{[options]} \tab \code{showProgressBar} \tab \code{showProgressBar}\cr
@@ -46,12 +47,12 @@ The \code{run.config} function runs on a \code{"\linkS4class{GenometriCorrConfig
 		\code{[data]} \tab \code{mapping.format} \tab format of the mapping file or \code{'R.variable.name'} \cr
 		\code{[data]} \tab \code{do.mapping} \tab logical; whether to do mapping
 		}
-		Each of the data (\code{query}, \code{reference}, \code{mapping}) parameters may instead be data of one of the accepted formats ( \code{\link{GRanges}} or \code{\link{RangedData}} or \code{\link{IRanges-class}}). In this case, the corresponding format value is omitted and nothing is written to the \code{config} slot of the result, and the data are used for the function calls. If the format parameter is \code{'R.variable.name'}, the input is taken from that variable. The calculation is the same as for \code{\link{GRanges}} or \code{\link{RangedData}} or \code{\link{IRanges-class}} parameter, but the name of the variable and the \code{'R.variable.name'} are saved in \code{config} slot of the result.
+		Each of the data (\code{query}, \code{reference}, \code{mapping}) parameters may instead be data of one of the accepted formats (\code{\link{GRanges}}). In this case, the corresponding format value is omitted and nothing is written to the \code{config} slot of the result, and the data are used for the function calls. If the format parameter is \code{'R.variable.name'}, the input is taken from that variable. The calculation is the same as for \code{\link{GRanges}} parameter, but the name of the variable and the \code{'R.variable.name'} are saved in \code{config} slot of the result.
 
-		Other formats are interpreted as \code{format} parameters for the {\code{\link[rtracklayer:export]{import}}} function from \code{rtracklayer} package. A useful option is \code{bed.like.with.header} that calls \code{\link{readTableToIRanges}} with \code{header=TRUE} parameter to read the file rather than the standard {\code{\link[rtracklayer:export]{import}}}.
+		Other formats are interpreted as \code{format} parameters for the {\code{\link[rtracklayer:export]{import}}} function from \code{rtracklayer} package. 
 }}
 
-\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
+\author{Alexander Favorov \email{favorov@sensi.org}, Loris Mularoni, Yulia Medvedeva, Harris A. Jaffee, Ekaterina V. Zhuravleva, Veronica Busa,Leslie M. Cope, Andrey A. Mironov, Vsevolod J. Makeev, Sarah J. Wheelan}
 
 \note{See an example at \code{\linkS4class{GenometriCorrResult}} help.}
 
