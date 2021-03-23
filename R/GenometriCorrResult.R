@@ -35,6 +35,7 @@ setMethod('show','GenometriCorrResult',function(object)
 				'scaled.absolute.min.distance.sum.null.list',
 				'jaccard.measure.null.list',
 				'jaccard.intersection.null.list',
+				'reference.middles',
 				'projection.test')
 				#scaled.absolute.min.distance.sum
 		#we remove the do_not_show list from namelist
@@ -137,15 +138,15 @@ setMethod('graphical.report',
 				mtext(paste("Relative ecdf deviation area p-value :", sprintf(formstring_s,data$relative.distances.ecdf.deviation.area.p.value), sep=" "), line=-9, cex=0.7)
 			if('scaled.absolute.min.distance.sum.p.value' %in% names(data))
 				mtext(paste("Scaled Absolute min. distance p-value :", sprintf(formstring_s,data$scaled.absolute.min.distance.sum.p.value), sep=" "), line=-10, cex=0.7)
-				mtext(paste("Scaled Absolute min. lower tail :", data$scaled.absolute.min.distance.sum.lower.tail, sep=" "), line=-11, cex=0.7)
+				mtext(paste("Scaled Absolute min. direction :", data$scaled.absolute.min.distance.sum.direction, sep=" "), line=-11, cex=0.7)
 			if('jaccard.measure.p.value'%in% names(data))
 				mtext(paste("Jaccard Measure p-value :", sprintf(formstring_s,data$jaccard.measure.p.value), sep=" "), line=-12, cex=0.7)
-			if('jaccard.measure.lower.tail'%in% names(data))
-				mtext(paste("Jaccard Measure lower tail :", data$jaccard.measure.lower.tail, sep=" "), line=-13, cex=0.7)
+			if('jaccard.measure.test.direction'%in% names(data))
+				mtext(paste("Jaccard Measure test direction :", data$jaccard.measure.test.direction, sep=" "), line=-13, cex=0.7)
 			if('projection.test.p.value'%in% names(data))
 				mtext(paste("Projection test p-value :", sprintf(formstring_g,data$projection.test.p.value), sep=" "), line=-14, cex=0.7)
-			if('projection.test.lower.tail'%in% names(data))
-				mtext(paste("Projection test lower tail :", data$projection.test.lower.tail, sep=" "), line=-15, cex=0.7)
+			if('projection.test.direction'%in% names(data))
+				mtext(paste("Projection test direction :", data$projection.test.direction, sep=" "), line=-15, cex=0.7)
 			if('projection.test.obs.to.exp'%in% names(data))
 				mtext(paste("Projection test observed to expected ratio :", sprintf(formstring_g,data$projection.test.obs.to.exp), sep=" "), line=-16, cex=0.7)
 
@@ -295,7 +296,7 @@ setMethod('visualize',
 			mtext(paste("Jaccard p-value: ", data$jaccard.measure.p.value, sep=""), line=-6, cex=0.8, side=3)
 			if (!is.integer(data$jaccard.measure.p.value))
 			{
-				if (data$jaccard.measure.lower.tail == FALSE)
+				if (data$jaccard.measure.test.direction == 'attraction')
 				{
 					mtext(paste("Query and reference intervals overlap significantly more than expected by chance, by Jaccard"), line=-8, cex=0.8, side=3)
 				}
@@ -306,7 +307,7 @@ setMethod('visualize',
 			}
 			if (!is.integer(data$projection.test.p.value))
 			{
-				if (data$projection.test.lower.tail == FALSE)
+				if (data$projection.test.direction == 'attraction')
 				{
 					mtext(paste("Query midpoints and reference intervals overlap significantly more than expected by chance, by projection"), line=-10, cex=0.8, side=3)
 				}

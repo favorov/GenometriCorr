@@ -8,6 +8,7 @@
 # GenomertiCorrelation is the main function of the package
 
 #' @importFrom gtools mixedsort
+#' @importFrom stringr str_detect str_c
 #' @importFrom tcltk tkProgressBar setTkProgressBar getTkProgressBar
 #' @importFrom GenomeInfoDb seqlevels seqlevels<- seqlengths
 #' @importFrom stats ecdf integrate ks.test pbinom punif runif 
@@ -100,6 +101,7 @@ add.chr.prefix.to.names<-function(namelist)
 #' @param mean.distance.permut.number The number of permutations to ascribe \emph{p-value} to minimal query-reference distance averaged over all query points.
 #' @param jaccard.measure.permut.number The number of permutations for Jaccard measure \emph{p-value} estimation. 
 #' @param jaccard.permut.is.rearrangement If \code{TRUE}, the permutations of the reference for the Jaccard test retain the lengths of all intervals and gaps in the query. All the permuted queries will mirror the original, so the \emph{p-value} is overestimated. If \code{FALSE} (the default), the permutation is a random resampling of starts of the query intervals.
+#' @param alternative a character string specifying the alternative hypothesis, must be one of \code{"two.sided"} (default), \code{"attraction"} or \code{"repulsion"}. You can specify just the initial letter.
 #' @param awhole.space.name The name of the pseudo-space that describes the overall genome statistics. Default is 'awhole'.
 #' @param keep.distributions It this is true, the procedure returns all points in th distributions calculated for comparison. This is useful for making figures. Default is \code{FALSE}.
 #' @param representing.point.function By default, the midpoint of each interval is used as the surrogate for the position of the interval. To force the program to use something other than the midpoint, define the function to use to return comparison points. The function must take the same parameters as the default \code{mitl} that returns the middle points. The function is to be passed as the \code{representing.point.function} parameter. The default for the parameter is: \code{mitl<-function(start,end,chromosome.length,space){return ((as.integer(start)+as.integer(end))/2)}} 
@@ -111,19 +113,21 @@ add.chr.prefix.to.names<-function(namelist)
 #' Below is the description of the values of the list returned for each chromosome. 
 #' \item{query.population}{Query points used in the comparisons.}
 #' \item{reference.population}{Reference points used in the comparisons.}
+#' \item{alternative}{Shows the value of the \code{alternative} parameter passed.} 
 #' \item{relative.distances.ks.p.value}{\emph{p-value} for local independence obtained by the Kolmogorov-Smirnov test for relative distances. }
 #' \item{relative.distances.ecdf.deviation.area.p.value}{\emph{p-value} for local independence obtained by the permutation test for relative distances. }
+#' \item{relative.distances.ecdf.deviation.area.test.direction}{"attraction" or "repulsion". If the \code{alternative} parameter is "two.sided" (default), if shows the direction of the effect; if the parameter is {"attraction" or "repulsion"} it is not shown}
 #' \item{relative.distances.ecdf.area.correlation}{Has the same sign with the relative distance-based local correlation. }
 #' \item{projection.test.p.value}{\emph{p-value} for chromosome-scale independence obtained by the projection test. }
-#' \item{projection.test.lower.tail}{If TRUE, projection test shows negative correlation, real overlap is lessthan the expectation.}
+#' \item{projection.test.direction}{"attraction" or "repulsion". If the \code{alternative} parameter is "two.sided" (default), if shows the direction of the effect; if the parameter is {"attraction" or "repulsion"} it is not shown}
 #' \item{projection.test.obs.to.exp}{To measure the effect size, the observed to expected ratio for the projection test statistics that is the number of query characteristic points (by default, midpoints) that fell into a reference features.}
 #' \item{scaled.absolute.min.distance.sum.p.value}{\emph{p-value} for chromosome-scale null hypothesis as obtained by the permutations of the query points and the mean of the distances to the two closest reference points.}
-#' \item{scaled.absolute.min.distance.sum.lower.tail}{If TRUE, the query points are closer to the reference points than expected (the absolute distance is lower than the expectation). }
+#' \item{scaled.absolute.min.distance.sum.test.direction}{"attraction" or "repulsion". If the \code{alternative} parameter is "two.sided" (default), if shows the direction of the effect; if the parameter is {"attraction" or "repulsion"} it is not shown}
 #' \item{query.reference.intersection}{Intersection of reference and query, in bases.}
 #' \item{query.reference.union}{Union of reference and query, in bases.}
 #' \item{jaccard.measure}{Jaccard measure of query and reference overlap.}
 #' \item{jaccard.measure.p.value}{The permutation-based evaluation of the \emph{p-value} for the obtained Jaccard measure, given the null hypothesis of independence.}
-#' \item{jaccard.measure.lower.tail}{If \code{TRUE}, then Jaccard measure is lower that the expectation (overlap less than expected)}
+#' \item{jaccard.measure.test.direction}{"attraction" or "repulsion". If the \code{alternative} parameter is "two.sided" (default), if shows the direction of the effect; if the parameter is {"attraction" or "repulsion"} it is not shown}
 #'
 #' The additional values that are returned if \code{keep.distributions=TRUE}
 #' \item{relative.distances.data}{The original relative distances}
@@ -174,6 +178,7 @@ GenometriCorrelation <- function(
 	mean.distance.permut.number=permut.number,
 	jaccard.measure.permut.number=permut.number,
 	jaccard.permut.is.rearrangement=FALSE,
+	alternative='two.sided',
 	awhole.space.name="awhole",
 	keep.distributions=FALSE,
 	representing.point.function=mitl,
@@ -266,6 +271,14 @@ GenometriCorrelation <- function(
 	wrong_diff<-setdiff(chromosomes.to.exclude.from.awhole,chromosomes.to.include.in.awhole)
 	if (length(wrong_diff)>0)
 		stop("Some spaces are in chromosomes.to.exclude.from.awhole but they are not in the awhole inclusion list.\n  It's all lost!:\n",paste(wrong_diff,collapse="\n"), "\n")
+	
+	#alternative is to be initial substring of 'attraction', 'repulsion' or 'two.sided'
+	alt<-NA
+	for (test in c("attraction","repulsion","two.sided")) {
+		if (str_detect(test,str_c("^",alternative))) {alt<-test}
+	}
+
+	if(is.na(alt)) {stop("Alternative is not 'attraction' or 'repulsion' or 'two.sided'. \n  It's all lost!" )}
 
 	#now, everyting is cheched
 	awhole.chromosomes<-setdiff(chromosomes.to.include.in.awhole,chromosomes.to.exclude.from.awhole)
@@ -297,6 +310,7 @@ GenometriCorrelation <- function(
 			mean.distance.permut.number=mean.distance.permut.number,
 			jaccard.measure.permut.number=jaccard.measure.permut.number,
 			jaccard.permut.is.rearrangement=jaccard.permut.is.rearrangement,
+			alternative=alt, #alt is the result of the check of alternative
 			awhole.chromosomes=awhole.chromosomes,
 			awhole.space.name=awhole.space.name,
 			awhole.only=awhole.only,
@@ -322,6 +336,7 @@ GenometriCorrelation <- function(
 	if (awhole.space.name!="awhole") result@config$options$awhole.space.name=awhole.space.name
 	result@config$tests=list()
 	result@config$tests$permut.number=permut.number
+	result@config$tests$alternative=alt #alt is the result of the check of alternative
 	if (ecdf.area.permut.number!=permut.number) result@config$tests$ecdf.area.permut.number=ecdf.area.permut.number
 	if (mean.distance.permut.number!=permut.number) result@config$tests$mean.distance.permut.number=mean.distance.permut.number
 	if (jaccard.measure.permut.number!=permut.number) result@config$tests$jaccard.measure.permut.number=jaccard.measure.permut.number
@@ -345,6 +360,7 @@ GenometriCorrelation <- function(
 	mean.distance.permut.number=100,
 	jaccard.measure.permut.number=100,
 	jaccard.permut.is.rearrangement=FALSE,
+	alternative="two.sided",
 	awhole.chromosomes=c(),
 	awhole.space.name="awhole",
 	awhole.only=FALSE,
@@ -458,6 +474,7 @@ GenometriCorrelation <- function(
 
 		result[[awhole.space.name]][['query.population']]<-0
 		result[[awhole.space.name]][['reference.population']]<-0
+		result[[awhole.space.name]][['alternative']]<-alternative
 		result[[awhole.space.name]][['query.coverage']]<-0
 		result[[awhole.space.name]][['reference.coverage']]<-0
 		result[[awhole.space.name]][['projection.test']]<-c()
@@ -529,7 +546,6 @@ GenometriCorrelation <- function(
 			chromosome.length=chromosomes.length[space],
 			space=space
 		)
-		#HERE
 		if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
 
 		if (showTkProgressBar)
@@ -558,6 +574,8 @@ GenometriCorrelation <- function(
 		result[[space]][['query.population']]<-length(qu)
 
 		result[[space]][['reference.population']]<-length(ref)
+
+		result[[space]][['alternative']]<-alternative
 
 		result[[space]][['query.coverage']]<-sum(width(reduce(.space_ranges(query,space))))
 
@@ -668,40 +686,44 @@ GenometriCorrelation <- function(
 		result[[space]][['projection.test']]<-
 				  query.to.ref.projection.statistics(qu,.space_ranges(reference,space),TRUE,chromosomes.length[space])	
 				  
-		if(!qu_or_ref_is_empty) {	
-				  proj.p.value<-
-					  pbinom(
-						  result[[space]][['projection.test']][['query.hits']],
-						  result[[space]][['query.population']],
-						  result[[space]][['projection.test']][['reference.coverage']]/
-									 	result[[space]][['projection.test']][['space.length']]
-					  )
+		if(!qu_or_ref_is_empty) {
+			result[[space]][['projection.test.obs.to.exp']]<- 
+				(	
+					result[[space]][['projection.test']][['query.hits']]
+					/
+					result[[space]][['query.population']]
+				)*
+				(
+					result[[space]][['projection.test']][['space.length']] 
+					/ 
+					result[[space]][['projection.test']][['reference.coverage']]
+				)
+			
+			if(alternative == "two.sided") {
+				if (result[[space]][['projection.test.obs.to.exp']] < 1.) {#repulsion
+						direction<-"repulsion"
+				} else {
+						direction<-"attraction"
+				}
+			}	
+			else {direction<-alternative}
 
-				  if (proj.p.value<.5) # one-sided test
-				  {
-					  result[[space]][['projection.test.p.value']]<-proj.p.value
-					  result[[space]][['projection.test.lower.tail']] <- TRUE
-				  }
-				  else
-				  {
-					  result[[space]][['projection.test.p.value']]<- 1.-proj.p.value
-					  result[[space]][['projection.test.lower.tail']] <- FALSE
-				  }
-
-				  result[[space]][['projection.test.obs.to.exp']]<- 
-					  (	
-						  result[[space]][['projection.test']][['query.hits']]
-						  /
-						  result[[space]][['query.population']]
-					  )*
-					  (
-						  result[[space]][['projection.test']][['space.length']] 
-						  / 
-						  result[[space]][['projection.test']][['reference.coverage']]
-					  )
+			proj.p.value<-
+				pbinom(
+					result[[space]][['projection.test']][['query.hits']],
+					result[[space]][['query.population']],
+					result[[space]][['projection.test']][['reference.coverage']]/
+								result[[space]][['projection.test']][['space.length']],
+					lower.tail = direction == "repulsion")
+			
+			if(alternative == "two.sided") {
+				 proj.p.value<- min(proj.p.value*2,1.)
+				 result[[space]][['projection.test.direction']]<-direction
+			}
+			result[[space]][['projection.test.p.value']]<-proj.p.value
 		} else {
 			result[[space]][['projection.test.p.value']] <- 1.
-			result[[space]][['projection.test.lower.tail']] <- FALSE
+			result[[space]][['projection.test.direction']] <- "undefined"
 			result[[space]][['projection.test.obs.to.exp']] <- 1.
 		}
 		
@@ -790,10 +812,13 @@ GenometriCorrelation <- function(
 	#relative distances data for whole genome
 	if (do.awhole)
 	{
-		the.names<- names(result[[awhole.space.name]])
+		space<-awhole.space.name	
+		the.names<- names(result[[space]])
+
+		#qu_or_ref_is_empty<-(result[[space]][['query.population']]==0 ||result[[space]][['reference.population']]==0 )
+
 		if ('relative.distances.data' %in% the.names)
 		{
-			space<-awhole.space.name	
 			result[[space]][['relative.distances.ks.p.value']]<-
 				ks.test(untie(result[[space]]$relative.distances.data),punif,min=0,max=rel.dist.top)$p.value
 
@@ -827,37 +852,48 @@ GenometriCorrelation <- function(
 		
 		if ('projection.test' %in% the.names) #projection test for awhole genome
 		{
-			space<-awhole.space.name	
-			proj.p.value<-
-				pbinom(
-					result[[space]][['projection.test']][['query.hits']],
-					result[[space]][['query.population']],
-					result[[space]][['projection.test']][['reference.coverage']]/result[[space]][['projection.test']][['space.length']]
-				)
-			if (proj.p.value<.5) # one-sided test
-			{
+			if(!qu_or_ref_is_empty) {
+				result[[space]][['projection.test.obs.to.exp']]<- 
+					(	
+						result[[space]][['projection.test']][['query.hits']]
+						/
+						result[[space]][['query.population']]
+					)*
+					(
+						result[[space]][['projection.test']][['space.length']] 
+						/ 
+						result[[space]][['projection.test']][['reference.coverage']]
+					)
+				
+				if(alternative == "two.sided") {
+					if (result[[space]][['projection.test.obs.to.exp']] < 1.) {#repulsion
+							direction<-"repulsion"
+					} else {
+							direction<-"attraction"
+					}
+				}	
+				else {direction<-alternative}
+
+				proj.p.value<-
+					pbinom(
+						result[[space]][['projection.test']][['query.hits']],
+						result[[space]][['query.population']],
+						result[[space]][['projection.test']][['reference.coverage']]/
+									result[[space]][['projection.test']][['space.length']],
+						lower.tail = direction == "repulsion")
+				
+				if(alternative == "two.sided") {
+					 proj.p.value<- min(proj.p.value*2,1.)
+					 result[[space]][['projection.test.direction']]<-direction
+				}
 				result[[space]][['projection.test.p.value']]<-proj.p.value
-				result[[space]][['projection.test.lower.tail']] <- TRUE
-			}
-			else
-			{
-				result[[space]][['projection.test.p.value']]<- 1.-proj.p.value
-				result[[space]][['projection.test.lower.tail']] <- FALSE
+			} else {
+				result[[space]][['projection.test.p.value']] <- 1.
+				result[[space]][['projection.test.direction']] <- "undefined"
+				result[[space]][['projection.test.obs.to.exp']] <- 1.
 			}
 		}
 
-		result[[space]][['projection.test.obs.to.exp']]<- 
-			(	
-				result[[space]][['projection.test']][['query.hits']]
-				/
-				result[[space]][['query.population']]
-			)*
-			(
-				result[[space]][['projection.test']][['space.length']] 
-				/ 
-				result[[space]][['projection.test']][['reference.coverage']]
-			)
-	
 		if ('query.reference.union' %in% the.names && 'query.reference.intersection' %in% the.names)
 		{
 			if (result[[space]][['query.reference.union']] > 0)
@@ -1064,17 +1100,53 @@ GenometriCorrelation <- function(
 	{
 		for (space in c(list.of.spaces,awhole.space.name))
 		{
+			#if ( result[[space]][['query.population']]==0 || result[[space]][['reference.population']]==0) {
+			#	p.value<-1.
+			#} else {
+			#	p.value<-
+			#		1-(ecdf(result[[space]][['relative.distances.ecdf.deviation.area.null.list']]))(
+			#			result[[space]][['relative.distances.ecdf.deviation.area']]
+			#		) #we treat only right side
+			#	if (p.value==0) 
+			#		p.value = paste("<",toString(1/ecdf.area.permut.number),sep='')
+			#}
+			#result[[space]][['relative.distances.ecdf.deviation.area.p.value']]<-p.value
+			# old end	-- er are wrong with right side???? ecdf. think 
+			#we will remove it if the following works
+
+
 			if ( result[[space]][['query.population']]==0 || result[[space]][['reference.population']]==0) {
 				p.value<-1.
+				direction<-"undefined"	
 			} else {
 				p.value<-
-					1-(ecdf(result[[space]][['relative.distances.ecdf.deviation.area.null.list']]))(
-						result[[space]][['relative.distances.ecdf.deviation.area']]
-					) #we treat only right side
-				if (p.value==0) 
-					p.value = paste("<",toString(1/ecdf.area.permut.number),sep='')
+					1 - (ecdf(result[[space]][['relative.distances.ecdf.deviation.area.null.list']]))(
+						result[[space]][['relative.distances.ecdf.deviation.area']]) #we treat only right side
+					
+				if('attraction'==alternative) { #it is for lower tail of distance 
+					direction<-'attraction'
+				} else if ('repulsion'==alternative) { #upper tail
+					direction <- 'repulsion'
+					p.value <- 1-p.value
+				} else { #two.sided
+				if (p.value<0.5) {
+						p.value <- p.value*2
+						direction <- 'attraction'
+					} else {
+						p.value <- (1-p.value)*2
+						direction <- 'repulsion'
+					}
+				}
+				if (p.value==0) {
+					if (alternative=='two.sided') {
+						p.value = paste("<",toString(2/mean.distance.permut.number),sep='')
+					} else {
+						p.value = paste("<",toString(1/mean.distance.permut.number),sep='')
+					}
+				}
 			}
 			result[[space]][['relative.distances.ecdf.deviation.area.p.value']]<-p.value
+			if('two.sided'==alternative) {result[[space]][['relative.distances.ecdf.deviation.area.test.direction']] <- direction}
 		}
 	}
 	if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)
@@ -1093,24 +1165,35 @@ GenometriCorrelation <- function(
 		{
 			if ( result[[space]][['query.population']]==0 || result[[space]][['reference.population']]==0) {
 				p.value<-1.
-				lower.tail<-FALSE
+				direction<-"undefined"	
 			} else {
 				p.value<-
 					(ecdf(result[[space]][['scaled.absolute.min.distance.sum.null.list']]))(result[[space]][['scaled.absolute.min.distance.sum']]) #we treat only right side
-				
-				if(p.value<=0.5)
-					lower.tail<-TRUE
-				else
-				{
-					lower.tail <- FALSE
-					p.value<-1-p.value
+					
+				if('attraction'==alternative) { #it is for lower tail of distance 
+					direction<-'attraction'
+				} else if ('repulsion'==alternative) { #upper tail
+					direction <- 'repulsion'
+					p.value <- 1-p.value
+				} else { #two.sided
+					if (p.value<0.5) {
+						p.value <- p.value*2
+						direction <- 'attraction'
+					} else {
+						p.value <- (1-p.value)*2
+						direction <- 'repulsion'
+					}
 				}
-
-				if (p.value==0) 
-					p.value = paste("<",toString(1/mean.distance.permut.number),sep='')
+				if (p.value==0) {
+					if (alternative=='two.sided') {
+						p.value = paste("<",toString(2/mean.distance.permut.number),sep='')
+					} else {
+						p.value = paste("<",toString(1/mean.distance.permut.number),sep='')
+					}
+				}
 			}
 			result[[space]][['scaled.absolute.min.distance.sum.p.value']]<-p.value
-			result[[space]][['scaled.absolute.min.distance.sum.lower.tail']] <- lower.tail 
+			if('two.sided'==alternative) {result[[space]][['scaled.absolute.min.distance.sum.test.direction']] <- direction} 
 		}
 	}
 	
@@ -1121,26 +1204,35 @@ GenometriCorrelation <- function(
 		{
 			if ( result[[space]][['query.population']]==0 || result[[space]][['reference.population']]==0) {
 				p.value<-1.
-				lower.tail<-FALSE
+				direction<-"undefined"	
 			} else {
 				p.value<-
-				(ecdf(result[[space]][['jaccard.measure.null.list']]))(
-						result[[space]][['jaccard.measure']]
-				) #we treat only right side
-			
-				if(p.value<=0.5)
-					lower.tail<-TRUE
-				else
-				{
-					lower.tail <- FALSE
-					p.value<-1-p.value
+					(ecdf(result[[space]][['jaccard.measure.null.list']]))(result[[space]][['jaccard.measure']]) #we treat only right side
+				
+				if('attraction'==alternative) { #it is for upper tail of distance 
+					direction<-'attraction'
+					p.value <- 1-p.value
+				} else if ('repulsion'==alternative) { #lower tail
+					direction <- 'repulsion'
+				} else { #two.sided
+					if (p.value<0.5) {
+						p.value <- p.value*2
+						direction <- 'repulsion'
+					} else {
+						p.value <- (1-p.value)*2
+						direction <- 'attraction'
+					}
 				}
-
-				if (p.value==0) 
-					p.value = paste("<",toString(1/jaccard.measure.permut.number),sep='')
+				if (p.value==0) {
+					if (alternative=='two.sided') {
+						p.value = paste("<",toString(2/mean.distance.permut.number),sep='')
+					} else {
+						p.value = paste("<",toString(1/mean.distance.permut.number),sep='')
+					}
+				}
 			}
 			result[[space]][['jaccard.measure.p.value']]<-p.value
-			result[[space]][['jaccard.measure.lower.tail']] <- lower.tail 
+			if('two.sided'==alternative) {result[[space]][['jaccard.measure.test.direction']] <- direction }
 		}
 	}
 	if (showProgressBar) setTxtProgressBar(txt_pb, getTxtProgressBar(txt_pb)[1]+1)

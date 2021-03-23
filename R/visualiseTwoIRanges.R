@@ -8,7 +8,6 @@
 
 # HJ -- pdf and close.device arguments
 
-
 #'VisualiseTwoIRanges
 #'
 #'VisualiseTwoIRanges is a function that displays the intervals of two IRanges, one above the other, in different colors, along a chromosome or subset of a chromosome. The intent is to show large-scale relationships between the two IRanges.

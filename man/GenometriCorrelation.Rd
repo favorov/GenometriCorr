@@ -23,6 +23,7 @@ GenometriCorrelation(
   mean.distance.permut.number = permut.number,
   jaccard.measure.permut.number = permut.number,
   jaccard.permut.is.rearrangement = FALSE,
+  alternative = "two.sided",
   awhole.space.name = "awhole",
   keep.distributions = FALSE,
   representing.point.function = mitl,
@@ -66,6 +67,8 @@ GenometriCorrelation(
 
 \item{jaccard.permut.is.rearrangement}{If \code{TRUE}, the permutations of the reference for the Jaccard test retain the lengths of all intervals and gaps in the query. All the permuted queries will mirror the original, so the \emph{p-value} is overestimated. If \code{FALSE} (the default), the permutation is a random resampling of starts of the query intervals.}
 
+\item{alternative}{a character string specifying the alternative hypothesis, must be one of \code{"two.sided"} (default), \code{"attraction"} or \code{"repulsion"}. You can specify just the initial letter.}
+
 \item{awhole.space.name}{The name of the pseudo-space that describes the overall genome statistics. Default is 'awhole'.}
 
 \item{keep.distributions}{It this is true, the procedure returns all points in th distributions calculated for comparison. This is useful for making figures. Default is \code{FALSE}.}
@@ -84,19 +87,21 @@ The result is an instance of the \code{\link{GenometriCorrResult-class}} that de
 Below is the description of the values of the list returned for each chromosome. 
 \item{query.population}{Query points used in the comparisons.}
 \item{reference.population}{Reference points used in the comparisons.}
+\item{alternative}{Shows the value of the \code{alternative} parameter passed.} 
 \item{relative.distances.ks.p.value}{\emph{p-value} for local independence obtained by the Kolmogorov-Smirnov test for relative distances. }
 \item{relative.distances.ecdf.deviation.area.p.value}{\emph{p-value} for local independence obtained by the permutation test for relative distances. }
+\item{relative.distances.ecdf.deviation.area.test.direction}{"attraction" or "repulsion". If the \code{alternative} parameter is "two.sided" (default), if shows the direction of the effect; if the parameter is {"attraction" or "repulsion"} it is not shown}
 \item{relative.distances.ecdf.area.correlation}{Has the same sign with the relative distance-based local correlation. }
 \item{projection.test.p.value}{\emph{p-value} for chromosome-scale independence obtained by the projection test. }
-\item{projection.test.lower.tail}{If TRUE, projection test shows negative correlation, real overlap is lessthan the expectation.}
+\item{projection.test.direction}{"attraction" or "repulsion". If the \code{alternative} parameter is "two.sided" (default), if shows the direction of the effect; if the parameter is {"attraction" or "repulsion"} it is not shown}
 \item{projection.test.obs.to.exp}{To measure the effect size, the observed to expected ratio for the projection test statistics that is the number of query characteristic points (by default, midpoints) that fell into a reference features.}
 \item{scaled.absolute.min.distance.sum.p.value}{\emph{p-value} for chromosome-scale null hypothesis as obtained by the permutations of the query points and the mean of the distances to the two closest reference points.}
-\item{scaled.absolute.min.distance.sum.lower.tail}{If TRUE, the query points are closer to the reference points than expected (the absolute distance is lower than the expectation). }
+\item{scaled.absolute.min.distance.sum.test.direction}{"attraction" or "repulsion". If the \code{alternative} parameter is "two.sided" (default), if shows the direction of the effect; if the parameter is {"attraction" or "repulsion"} it is not shown}
 \item{query.reference.intersection}{Intersection of reference and query, in bases.}
 \item{query.reference.union}{Union of reference and query, in bases.}
 \item{jaccard.measure}{Jaccard measure of query and reference overlap.}
 \item{jaccard.measure.p.value}{The permutation-based evaluation of the \emph{p-value} for the obtained Jaccard measure, given the null hypothesis of independence.}
-\item{jaccard.measure.lower.tail}{If \code{TRUE}, then Jaccard measure is lower that the expectation (overlap less than expected)}
+\item{jaccard.measure.test.direction}{"attraction" or "repulsion". If the \code{alternative} parameter is "two.sided" (default), if shows the direction of the effect; if the parameter is {"attraction" or "repulsion"} it is not shown}
 
 The additional values that are returned if \code{keep.distributions=TRUE}
 \item{relative.distances.data}{The original relative distances}

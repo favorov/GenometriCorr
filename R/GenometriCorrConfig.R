@@ -445,6 +445,9 @@ setMethod('run.config', signature(conf='GenometriCorrConfig'),
 		if (!is.null(conf$tests$ecdf.area.permut.number))
 			todo<-paste(todo,',ecdf.area.permut.number=',conf$tests$ecdf.area.permut.number,sep='')
 
+		if (!is.null(conf$tests$alternative))
+			todo<-paste(todo,',alternative=',conf$tests$alternative,sep='')
+
 		if (!is.null(conf$options$keep.distributions))
 			todo<-paste(todo,',keep.distributions=',conf$options$keep.distributions,sep='')
 

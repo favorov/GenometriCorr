@@ -148,3 +148,6 @@ readTableToIRanges removed from the package
 the main function works only with GRanges, 
 the wacky IRanges backdoor is removed
 We have working mapping, thanks to Veronica Busa
+1.1.24
+the alternatives (attration, repulsion, two.tails) are rewritten
+Thanks to Vera Mukhina
